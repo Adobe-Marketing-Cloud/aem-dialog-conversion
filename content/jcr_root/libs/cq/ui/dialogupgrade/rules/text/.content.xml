@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+    jcr:primaryType="nt:unstructured">
+    <patterns jcr:primaryType="nt:unstructured">
+        <text/>
+    </patterns>
+    <replacement jcr:primaryType="nt:unstructured">
+        <text
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="granite/ui/components/foundation/form/textfield"
+            disabled="${./disabled}"
+            emptyText="${./emptyText}"
+            fieldDescription="${./fieldDescription}"
+            fieldLabel="${./fieldLabel}"
+            maxlength="${./maxLength}"
+            name="${./name}"
+            renderReadOnly="${./readOnly}"
+            required="${./allowBlank}"
+            value="${./value}"/>
+    </replacement>
+</jcr:root>
