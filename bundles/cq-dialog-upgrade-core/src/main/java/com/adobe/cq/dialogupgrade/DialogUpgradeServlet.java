@@ -20,10 +20,9 @@ package com.adobe.cq.dialogupgrade;
 
 import com.adobe.cq.dialogupgrade.api.DialogRewriteRule;
 import com.adobe.cq.dialogupgrade.treerewriter.RewriteException;
+import com.adobe.cq.dialogupgrade.treerewriter.TreeRewriter;
 import com.adobe.cq.dialogupgrade.treerewriter.rules.RewriteRule;
 import com.adobe.cq.dialogupgrade.treerewriter.rules.RewriteRulesFactory;
-import com.adobe.cq.dialogupgrade.treerewriter.TreeRewriter;
-import com.day.cq.commons.jcr.JcrUtil;
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.ReferenceCardinality;
@@ -35,6 +34,7 @@ import org.apache.sling.api.request.RequestParameter;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.servlets.SlingAllMethodsServlet;
+import org.apache.sling.commons.json.JSONObject;
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -51,6 +51,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @SlingServlet(
+        // todo: remove GET
         methods = {"GET","POST"},
         paths = "/libs/cq/ui/dialogupgrade/content/upgrade",
         extensions = "json"
@@ -88,6 +89,8 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
         this.context = context;
     }
 
+    // todo: synchronization?
+
     @SuppressWarnings("unused")
     protected void bindRule(ServiceReference reference) {
         rulesReferences.add(reference);
@@ -100,6 +103,7 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
         referencesSorted = false;
     }
 
+    // todo: remove doGet
     @Override
     protected void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response)
             throws ServletException, IOException {
@@ -109,7 +113,6 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
     @Override
     protected void doPost(SlingHttpServletRequest request, SlingHttpServletResponse response)
             throws ServletException, IOException {
-        logger.info("get");
         // if the references were updated
         if (!referencesSorted) {
             // sort them, in order to respect the service ranking
@@ -127,28 +130,61 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
 
         try {
             RequestParameter[] paths = request.getRequestParameters("paths");
+
+            // validate 'paths' parameter
             if (paths == null) {
                 response.setContentType("text/html");
+                response.getWriter().println("Missing parameter 'paths'");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
 
-            TreeRewriter rewriter = new TreeRewriter(rules);
             Session session = request.getResourceResolver().adaptTo(Session.class);
+            TreeRewriter rewriter = new TreeRewriter(rules);
             String path = "";
+            JSONObject results = new JSONObject();
+            // iterate over all paths
             for (RequestParameter parameter : paths) {
                 path = parameter.getString();
-                // todo: validate path
+                JSONObject result = new JSONObject();
+                results.put(path, result);
+
+                // path doesn't exist
+                if (!session.nodeExists(path)) {
+                    // todo: use constants
+                    result.put("RESULT", "PATH_NOT_FOUND");
+                    continue;
+                }
+
                 Node dialog = session.getNode(path);
-                Node parent = dialog.getParent();
+                // path does not point to a dialog
+                if (!"cq:Dialog".equals(dialog.getPrimaryNodeType().getName())) {
+                    result.put("RESULT", "NOT_A_DIALOG");
+                    continue;
+                }
+
+                // Touch UI dialog already exists
+                if (dialog.getParent().hasNode("cq:dialog")) {
+                    result.put("RESULT", "TOUCH_DIALOG_ALREADY_EXISTS");
+                    continue;
+                }
+
+                // do the upgrade
                 try {
-                    rewriter.rewrite(dialog);
+                    Node upgradedDialog = rewriter.rewrite(dialog);
+                    result.put("RESULT", "SUCCESS");
+                    result.put("path", upgradedDialog.getPath());
+                    logger.debug("Upgraded dialog to {}", upgradedDialog.getPath());
                 } catch (RewriteException e) {
+                    result.put("RESULT", "ERROR");
+                    result.put("message", e.getMessage());
                     logger.warn("Upgrading dialog {} failed", path, e);
                 }
             }
+            response.setContentType("application/json");
+            response.getWriter().write(results.toString());
         } catch (Exception e) {
-            throw new ServletException("Caught exception while rewriting dialog", e);
+            throw new ServletException("Caught exception while rewriting dialogs", e);
         }
     }
 

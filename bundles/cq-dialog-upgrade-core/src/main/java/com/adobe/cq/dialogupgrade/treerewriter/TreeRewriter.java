@@ -45,10 +45,11 @@ public class TreeRewriter {
      * Rewrites the specified tree according to the set of rules passed to the constructor.
      *
      * @param root The root of the tree to be rewritten
+     * @return the root node of the rewritten tree, or null if it was removed
      * @throws RewriteException If the rewrite operation fails
      * @throws RepositoryException If there is a problem with the repository
      */
-    public void rewrite(Node root)
+    public Node rewrite(Node root)
             throws RewriteException, RepositoryException {
         logger.info("Rewriting tree rooted at {}", root.getPath());
         long tick = System.currentTimeMillis();
@@ -127,6 +128,8 @@ public class TreeRewriter {
 
         long tack = System.currentTimeMillis();
         logger.info("Tree rooted at {} rewritten in {} ms", root.getPath(), tack - tick);
+
+        return startNode;
     }
 
 }
