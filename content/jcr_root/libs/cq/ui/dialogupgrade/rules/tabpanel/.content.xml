@@ -4,7 +4,11 @@
     <patterns jcr:primaryType="nt:unstructured">
         <panel/>
         <panel1/>
-        <panel2/>
+        <panel2
+            jcr:primaryType="nt:unstructured"
+            xtype="panel">
+            <items jcr:primaryType="cq:WidgetCollection"/>
+        </panel2>
     </patterns>
     <replacement jcr:primaryType="nt:unstructured">
         <tab
