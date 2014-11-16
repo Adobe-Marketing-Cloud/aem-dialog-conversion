@@ -1,0 +1,16 @@
+#content {
+    padding: 30px;
+}
+
+#path {
+    width: 400px;
+}
+
+.left {
+    float: left;
+    margin-right: 20px;
+}
+
+.centered {
+    text-align: center;
+}
