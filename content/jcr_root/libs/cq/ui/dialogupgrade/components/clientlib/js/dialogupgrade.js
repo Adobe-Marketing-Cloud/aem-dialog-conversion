@@ -6,20 +6,31 @@ $(document).ready(function () {
     });
 
 
-    $("#upgrade").click(function () {
+    $("#upgrade-dialogs").click(function () {
         // get paths from table
         var paths = $(".path").map(function () {
             return $(this).text();
         }).get();
 
-        var url = "/libs/cq/ui/dialogupgrade/content/upgrade";
+        var url = "/libs/cq/ui/dialogupgrade/content/upgrade.json";
         var data = {
             paths : paths
         };
-        $.post(url, data, function () {
-            alert('success');
+        // todo: wait popup
+        $.post(url, data, function (data) {
+            $("#dialogs").remove();
+            $("#upgrade-dialogs").remove();
+            $("#upgrade-results").show();
+
+            var $tbody = $("#upgrade-results tbody");
+            for (var path in data) {
+                var $tr = $('<tr class="coral-Table-row"></tr>').appendTo($tbody);
+                $tr.append('<td class="coral-Table-cell">' + path + '</td>');
+                var result = data[path].result;
+                $tr.append('<td class="coral-Table-cell centered">' + result + '</td>');
+            }
         }).fail(function () {
-            alert('fail');
+            alert('Error');
         });
     });
 

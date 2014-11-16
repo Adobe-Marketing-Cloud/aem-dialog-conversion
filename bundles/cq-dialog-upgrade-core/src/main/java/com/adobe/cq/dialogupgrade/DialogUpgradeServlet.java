@@ -152,31 +152,31 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
                 // path doesn't exist
                 if (!session.nodeExists(path)) {
                     // todo: use constants
-                    result.put("RESULT", "PATH_NOT_FOUND");
+                    result.put("result", "PATH_NOT_FOUND");
                     continue;
                 }
 
                 Node dialog = session.getNode(path);
                 // path does not point to a dialog
                 if (!"cq:Dialog".equals(dialog.getPrimaryNodeType().getName())) {
-                    result.put("RESULT", "NOT_A_DIALOG");
+                    result.put("result", "NOT_A_DIALOG");
                     continue;
                 }
 
                 // Touch UI dialog already exists
                 if (dialog.getParent().hasNode("cq:dialog")) {
-                    result.put("RESULT", "TOUCH_DIALOG_ALREADY_EXISTS");
+                    result.put("result", "TOUCH_DIALOG_ALREADY_EXISTS");
                     continue;
                 }
 
                 // do the upgrade
                 try {
                     Node upgradedDialog = rewriter.rewrite(dialog);
-                    result.put("RESULT", "SUCCESS");
+                    result.put("result", "SUCCESS");
                     result.put("path", upgradedDialog.getPath());
                     logger.debug("Upgraded dialog to {}", upgradedDialog.getPath());
                 } catch (RewriteException e) {
-                    result.put("RESULT", "ERROR");
+                    result.put("result", "ERROR");
                     result.put("message", e.getMessage());
                     logger.warn("Upgrading dialog {} failed", path, e);
                 }

@@ -14,3 +14,7 @@
 .centered {
     text-align: center;
 }
+
+#upgrade-results {
+    display: none;
+}
