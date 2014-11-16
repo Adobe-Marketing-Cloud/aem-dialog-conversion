@@ -2,13 +2,9 @@
 <jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
     jcr:primaryType="cq:Page">
     <jcr:content
-        jcr:mixinTypes="[sling:VanityPath]"
         jcr:primaryType="nt:unstructured"
-        jcr:title="Dialog Upgrade"
-        sling:redirect="{Boolean}false"
-        sling:resourceType="granite/ui/components/foundation/page"
-        sling:vanityOrder="{Long}301"
-        sling:vanityPath="/aem/workflow">
+        jcr:title="AEM Dialog Upgrade"
+        sling:resourceType="granite/ui/components/foundation/page">
         <head jcr:primaryType="nt:unstructured">
             <viewport
                 jcr:primaryType="nt:unstructured"
@@ -39,7 +35,7 @@
             <rail
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="granite/ui/components/endor/navcolumns"
-                currentId="dialog-upgrade"
+                currentId="cq-tools-dialogupgrade"
                 srcPath="cq/core/content/nav"/>
             <breadcrumbs
                 jcr:primaryType="nt:unstructured"

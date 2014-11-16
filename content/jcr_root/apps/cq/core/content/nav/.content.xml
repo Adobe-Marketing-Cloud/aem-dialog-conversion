@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0" xmlns:rep="internal"
+    jcr:primaryType="nt:unstructured">
+    <tools jcr:primaryType="nt:unstructured">
+        <operations
+            jcr:mixinTypes="[rep:AccessControllable]"
+            jcr:primaryType="nt:unstructured">
+            <dialogupgrade
+                jcr:mixinTypes="[rep:AccessControllable]"
+                jcr:primaryType="nt:unstructured"
+                jcr:title="Dialog Upgrade"
+                sling:orderBefore="configuration"
+                href="/libs/cq/ui/dialogupgrade/content/console.html"
+                id="cq-tools-dialogupgrade">
+                <rep:policy/>
+            </dialogupgrade>
+        </operations>
+    </tools>
+</jcr:root>
