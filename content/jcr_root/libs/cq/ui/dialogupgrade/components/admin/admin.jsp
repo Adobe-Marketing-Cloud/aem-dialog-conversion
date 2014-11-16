@@ -76,7 +76,7 @@
                     <% if (parent.hasNode("cq:dialog")) {
                         Node touchDialog = parent.getNode("cq:dialog");
                     %>
-                        <td class="coral-Table-cell centered"><i class="coral-Icon coral-Icon--check"></i> &nbsp;&nbsp; <a href="<%= externalizer.authorLink(resourceResolver, touchDialog.getPath()) %>.html" target="_blank" class="coral-Link">show</a> / <a href="<%= externalizer.authorLink(resourceResolver, "/") %>crx/de/index.jsp#<%= touchDialog.getPath() %>" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a></td>
+                        <td class="coral-Table-cell centered"><i class="coral-Icon coral-Icon--check"></i> &nbsp;&nbsp; <a href="<%= externalizer.authorLink(resourceResolver, "/") %>crx/de/index.jsp#<%= touchDialog.getPath() %>" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a></td>
                     <% } else { %>
                         <td class="coral-Table-cell centered">-</td>
                     <% } %>
