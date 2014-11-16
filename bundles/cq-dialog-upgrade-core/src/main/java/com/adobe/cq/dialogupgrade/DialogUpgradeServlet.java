@@ -23,6 +23,7 @@ import com.adobe.cq.dialogupgrade.treerewriter.RewriteException;
 import com.adobe.cq.dialogupgrade.treerewriter.TreeRewriter;
 import com.adobe.cq.dialogupgrade.treerewriter.rules.RewriteRule;
 import com.adobe.cq.dialogupgrade.treerewriter.rules.RewriteRulesFactory;
+
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.ReferenceCardinality;
@@ -35,6 +36,7 @@ import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.servlets.SlingAllMethodsServlet;
 import org.apache.sling.commons.json.JSONObject;
+
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -51,8 +53,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 @SlingServlet(
-        // todo: remove GET
-        methods = {"GET","POST"},
+        methods = "POST",
         paths = "/libs/cq/ui/dialogupgrade/content/upgrade",
         extensions = "json"
 )
@@ -101,13 +102,6 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
     protected void unbindRule(ServiceReference reference) {
         rulesReferences.remove(reference);
         referencesSorted = false;
-    }
-
-    // todo: remove doGet
-    @Override
-    protected void doGet(SlingHttpServletRequest request, SlingHttpServletResponse response)
-            throws ServletException, IOException {
-        doPost(request, response);
     }
 
     @Override
