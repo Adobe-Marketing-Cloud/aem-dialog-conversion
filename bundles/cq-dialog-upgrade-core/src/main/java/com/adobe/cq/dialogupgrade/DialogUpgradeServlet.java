@@ -59,6 +59,22 @@ import java.util.List;
 )
 public class DialogUpgradeServlet extends SlingAllMethodsServlet {
 
+    public static final String PARAM_PATHS = "paths";
+    private static final String KEY_RESULT = "result";
+    private static final String KEY_PATH = "path";
+    private static final String KEY_MESSAGE = "message";
+
+    private static enum UpgradeResult {
+        PATH_NOT_FOUND,
+        NOT_A_DIALOG,
+        ALREADY_UPGRADED,
+        SUCCESS,
+        ERROR
+    }
+
+    /**
+     * Path to the upgrade rules container
+     */
     private static final String RULES_PATH = "cq/ui/dialogupgrade/rules";
 
     private Logger logger = LoggerFactory.getLogger(DialogUpgradeServlet.class);
@@ -123,12 +139,12 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
         }
 
         try {
-            RequestParameter[] paths = request.getRequestParameters("paths");
+            RequestParameter[] paths = request.getRequestParameters(PARAM_PATHS);
 
             // validate 'paths' parameter
             if (paths == null) {
                 response.setContentType("text/html");
-                response.getWriter().println("Missing parameter 'paths'");
+                response.getWriter().println("Missing parameter '" + PARAM_PATHS + "'");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
@@ -146,32 +162,32 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
                 // path doesn't exist
                 if (!session.nodeExists(path)) {
                     // todo: use constants
-                    result.put("result", "PATH_NOT_FOUND");
+                    result.put(KEY_RESULT, UpgradeResult.PATH_NOT_FOUND);
                     continue;
                 }
 
                 Node dialog = session.getNode(path);
                 // path does not point to a dialog
                 if (!"cq:Dialog".equals(dialog.getPrimaryNodeType().getName())) {
-                    result.put("result", "NOT_A_DIALOG");
+                    result.put(KEY_RESULT, UpgradeResult.NOT_A_DIALOG);
                     continue;
                 }
 
                 // Touch UI dialog already exists
                 if (dialog.getParent().hasNode("cq:dialog")) {
-                    result.put("result", "TOUCH_DIALOG_ALREADY_EXISTS");
+                    result.put(KEY_RESULT, UpgradeResult.ALREADY_UPGRADED);
                     continue;
                 }
 
                 // do the upgrade
                 try {
                     Node upgradedDialog = rewriter.rewrite(dialog);
-                    result.put("result", "SUCCESS");
-                    result.put("path", upgradedDialog.getPath());
+                    result.put(KEY_RESULT, UpgradeResult.SUCCESS);
+                    result.put(KEY_PATH, upgradedDialog.getPath());
                     logger.debug("Upgraded dialog to {}", upgradedDialog.getPath());
                 } catch (RewriteException e) {
-                    result.put("result", "ERROR");
-                    result.put("message", e.getMessage());
+                    result.put(KEY_RESULT, UpgradeResult.ERROR);
+                    result.put(KEY_MESSAGE, e.getMessage());
                     logger.warn("Upgrading dialog {} failed", path, e);
                 }
             }
