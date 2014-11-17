@@ -50,6 +50,7 @@ public class CqIncludeRewriteRule implements DialogRewriteRule {
 
         String path = root.getProperty("path").getString();
         // todo: improve
+        path = path.replace(".overlay.infinity.json", "");
         path = path.replace(".infinity.json", "");
 
         Session session = root.getSession();
