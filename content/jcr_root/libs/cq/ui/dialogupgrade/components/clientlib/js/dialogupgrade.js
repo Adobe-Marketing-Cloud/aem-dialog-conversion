@@ -35,8 +35,10 @@ $(document).ready(function () {
             $("#upgrade-results").show();
 
             // build result table
+            var count = 0;
             var $tbody = $("#upgrade-results tbody");
             for (var path in data) {
+                count++;
                 var $tr = $('<tr class="coral-Table-row"></tr>').appendTo($tbody);
                 $tr.append('<td class="coral-Table-cell">' + path + '</td>');
                 var result = data[path].result;
@@ -54,6 +56,10 @@ $(document).ready(function () {
                 $tr.append('<td class="coral-Table-cell centered"><i class="coral-Icon ' + iconClass + '" /></td>');
                 $tr.append('<td class="coral-Table-cell">' + message + '</td>');
             }
+
+            // change info text
+            $("#info-text").empty();
+            $("#info-text").append("Ran upgrade procedure on <b>" + count + "</b> dialogs. See details below:");
         }).fail(function () {
             var title = "Error";
             var message = "Call to dialog upgrade servlet failed. Please review the logs.";

@@ -15,10 +15,6 @@
                 sling:resourceType="granite/ui/components/foundation/meta"
                 content="chrome=1"
                 name="X-UA-Compatible"/>
-            <title
-                jcr:primaryType="nt:unstructured"
-                jcr:title="Dialog Upgrade"
-                sling:resourceType="cq/workflow/admin/console/components/page/title"/>
             <favicon
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="granite/ui/components/foundation/page/favicon"/>
@@ -41,10 +37,6 @@
             <breadcrumbs
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="dam/gui/components/admin/commons/endor/breadcrumbs"/>
-            <title
-                jcr:primaryType="nt:unstructured"
-                jcr:title="Dialog Upgrade"
-                sling:resourceType="cq/workflow/admin/console/components/endor/title"/>
             <helpactivator
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="granite/ui/components/foundation/hyperlink"
@@ -59,10 +51,7 @@
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="granite/ui/components/endor/user"
                 href="#granite-user-properties"/>
-            <help
-                jcr:primaryType="nt:unstructured"
-                sling:resourceType="granite/ui/components/foundation/include"
-                path="cq/workflow/admin/console/content/common/help"/>
+            <help jcr:primaryType="nt:unstructured"/>
             <notifications
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="cq/gui/components/endor/notifications"

@@ -44,53 +44,56 @@
     <%
 
         if (request.getParameter("path") != null && !request.getParameter("path").isEmpty()) {
-    %>
-            <table class="coral-Table coral-Table--hover" id="dialogs">
-                <thead>
-                    <tr class="coral-Table-row">
-                        <th class="coral-Table-headerCell">Dialog (Classic UI)</th>
-                        <th class="coral-Table-headerCell centered">Links</th>
-                        <th class="coral-Table-headerCell centered">Dialog (Touch UI)</th>
-                    </tr>
-                </thead>
-                <tbody>
-        <%
             Externalizer externalizer = resourceResolver.adaptTo(Externalizer.class);
             Session session = slingRequest.getResourceResolver().adaptTo(Session.class);
             QueryManager queryManager = session.getWorkspace().getQueryManager();
 
-            // build query
+            // build and execute query
             String path = request.getParameter("path");
             // todo: sql injection
             String sql = "SELECT * FROM [cq:Dialog] AS d WHERE isdescendantnode('"+path+"') AND NAME(d) = 'dialog'";
             final Query query = queryManager.createQuery(sql, Query.JCR_SQL2);
-
             final NodeIterator results = query.execute().getNodes();
+    %>
+            <div id="info-text">
+                Found <b><%= results.getSize() %></b> dialogs below <b><%= path %></b>
+            </div>
+            <br />
+            <div id="dialogs">
+                <table class="coral-Table coral-Table--hover">
+                    <thead>
+                        <tr class="coral-Table-row">
+                            <th class="coral-Table-headerCell">Dialog (Classic UI)</th>
+                            <th class="coral-Table-headerCell centered">Links</th>
+                            <th class="coral-Table-headerCell centered">Dialog (Touch UI)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+        <%
             while(results.hasNext()) {
                 Node dialog = results.nextNode();
                 Node parent = dialog.getParent();
                 String href = externalizer.authorLink(resourceResolver, dialog.getPath()) + ".html";
                 String crxHref = externalizer.authorLink(resourceResolver, "/") + "crx/de/index.jsp#" + dialog.getPath();
                 %>
-                <tr class="coral-Table-row">
-                    <td class="coral-Table-cell path"><%= dialog.getPath()%></td>
-                    <td class="coral-Table-cell centered"><a href="<%= xssAPI.getValidHref(href) %>" target="_blank" class="coral-Link">show</a> / <a href="<%= xssAPI.getValidHref(crxHref) %>" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a></td>
-                    <% if (parent.hasNode("cq:dialog")) {
-                        Node touchDialog = parent.getNode("cq:dialog");
-                        crxHref = externalizer.authorLink(resourceResolver, "/") + "crx/de/index.jsp#" + touchDialog.getPath().replaceAll(":", "%3A");
-                    %>
-                        <td class="coral-Table-cell centered"><i class="coral-Icon coral-Icon--check"></i> &nbsp;&nbsp; <a href="<%= xssAPI.getValidHref(crxHref) %>" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a></td>
-                    <% } else { %>
-                        <td class="coral-Table-cell centered">-</td>
-                    <% } %>
-                </tr>
+                        <tr class="coral-Table-row">
+                            <td class="coral-Table-cell path"><%= dialog.getPath()%></td>
+                            <td class="coral-Table-cell centered"><a href="<%= xssAPI.getValidHref(href) %>" target="_blank" class="coral-Link">show</a> / <a href="<%= xssAPI.getValidHref(crxHref) %>" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a></td>
+                <% if (parent.hasNode("cq:dialog")) {
+                    Node touchDialog = parent.getNode("cq:dialog");
+                    crxHref = externalizer.authorLink(resourceResolver, "/") + "crx/de/index.jsp#" + touchDialog.getPath().replaceAll(":", "%3A");
+                %>
+                            <td class="coral-Table-cell centered"><i class="coral-Icon coral-Icon--check"></i> &nbsp;&nbsp; <a href="<%= xssAPI.getValidHref(crxHref) %>" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a></td>
+                <% } else { %>
+                            <td class="coral-Table-cell centered">-</td>
+                <% } %>
+                        </tr>
             <% } %>
-                </tbody>
-            </table>
-
-            <br />
-
-            <cq:include path="/libs/cq/ui/dialogupgrade/content/console/components/upgradeButton" resourceType="granite/ui/components/foundation/button"/>
+                    </tbody>
+                </table>
+                <br />
+                <cq:include path="/libs/cq/ui/dialogupgrade/content/console/components/upgradeButton" resourceType="granite/ui/components/foundation/button"/>
+            </div>
 
             <table class="coral-Table coral-Table--hover" id="upgrade-results">
                 <thead>
