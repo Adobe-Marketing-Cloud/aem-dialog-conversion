@@ -51,7 +51,6 @@
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="granite/ui/components/endor/user"
                 href="#granite-user-properties"/>
-            <help jcr:primaryType="nt:unstructured"/>
             <notifications
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="cq/gui/components/endor/notifications"
