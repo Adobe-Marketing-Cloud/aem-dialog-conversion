@@ -9,4 +9,5 @@
     <checkbox/>
     <selection/>
     <autocomplete/>
+    <sizefield/>
 </jcr:root>
