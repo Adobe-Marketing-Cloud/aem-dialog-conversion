@@ -11,4 +11,5 @@
     <autocomplete/>
     <sizefield/>
     <password/>
+    <hidden/>
 </jcr:root>
