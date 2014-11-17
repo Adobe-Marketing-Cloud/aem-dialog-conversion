@@ -5,7 +5,9 @@
         <selection/>
         <selection1/>
     </patterns>
-    <replacement jcr:primaryType="nt:unstructured">
+    <replacement
+        jcr:primaryType="nt:unstructured"
+        cq:rewriteIsFinal="{Boolean}true">
         <selection
             jcr:primaryType="nt:unstructured"
             sling:resourceType="granite/ui/components/foundation/form/select"

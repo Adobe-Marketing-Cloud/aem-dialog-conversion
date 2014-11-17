@@ -14,18 +14,24 @@
         <tab
             jcr:primaryType="nt:unstructured"
             jcr:title="${./title}"
-            sling:resourceType="granite/ui/components/foundation/section">
+            sling:resourceType="granite/ui/components/foundation/section"
+            cq:rewriteIsFinal="{Boolean}true">
             <layout
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="granite/ui/components/foundation/layouts/fixedcolumns"
-                margin="{Boolean}false"/>
-            <items jcr:primaryType="nt:unstructured">
+                margin="{Boolean}false"
+                cq:rewriteIsFinal="{Boolean}true"/>
+            <items
+                jcr:primaryType="nt:unstructured"
+                cq:rewriteIsFinal="{Boolean}true">
                 <columns
                     jcr:primaryType="nt:unstructured"
-                    sling:resourceType="granite/ui/components/foundation/container">
+                    sling:resourceType="granite/ui/components/foundation/container"
+                    cq:rewriteIsFinal="{Boolean}true">
                     <items
                         cq:mapsTo="./items"
-                        jcr:primaryType="nt:unstructured"/>
+                        jcr:primaryType="nt:unstructured"
+                        cq:rewriteIsFinal="{Boolean}true"/>
                 </columns>
             </items>
         </tab>

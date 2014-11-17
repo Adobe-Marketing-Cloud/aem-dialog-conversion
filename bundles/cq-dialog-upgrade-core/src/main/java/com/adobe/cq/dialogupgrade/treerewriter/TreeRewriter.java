@@ -26,8 +26,8 @@ import org.slf4j.LoggerFactory;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -71,6 +71,8 @@ public class TreeRewriter {
         boolean foundMatch;
         // keeps track of whether or not the rewrite operation succeeded
         boolean success = false;
+        // collect paths of nodes that are final and can be skipped by the algorithm
+        Set<String> finalPaths = new LinkedHashSet<String>();
 
         try {
             // do a pre-order tree traversal until we found no match
@@ -81,6 +83,11 @@ public class TreeRewriter {
                 // traverse the tree in pre-order
                 while (iterator.hasNext()) {
                     Node node = iterator.next();
+
+                    // check if we should skip this node
+                    if (finalPaths.contains(node.getPath())) {
+                        continue;
+                    }
 
                     // if this node and its siblings are ordered..
                     if (node.getParent().getPrimaryNodeType().hasOrderableChildNodes()) {
@@ -100,11 +107,13 @@ public class TreeRewriter {
                         // check for a match
                         if (rule.matches(node)) {
                             // the rule matched, rewrite the tree
-                            Node result = rule.applyTo(node);
+                            Set<Node> finalNodes = new LinkedHashSet<Node>();
+                            Node result = rule.applyTo(node, finalNodes);
                             // set the start node in case it was rewritten
                             if (node.equals(startNode)) {
                                 startNode = result;
                             }
+                            addPaths(finalPaths, finalNodes);
                             foundMatch = true;
                             break;
                         }
@@ -130,6 +139,13 @@ public class TreeRewriter {
         logger.info("Tree rooted at {} rewritten in {} ms", root.getPath(), tack - tick);
 
         return startNode;
+    }
+
+    private void addPaths(Set<String> paths, Set<Node> nodes)
+            throws RepositoryException {
+        for (Node node : nodes) {
+            paths.add(node.getPath());
+        }
     }
 
 }

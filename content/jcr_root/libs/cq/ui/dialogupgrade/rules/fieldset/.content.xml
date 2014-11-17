@@ -10,10 +10,12 @@
             jcr:primaryType="nt:unstructured"
             jcr:title="${./title}"
             sling:resourceType="granite/ui/components/foundation/form/fieldset"
-            title="${./title}">
+            title="${./title}"
+            cq:rewriteIsFinal="{Boolean}true">
             <items
                 cq:mapsTo="./items"
-                jcr:primaryType="nt:unstructured"/>
+                jcr:primaryType="nt:unstructured"
+                cq:rewriteIsFinal="{Boolean}true"/>
         </fieldset>
     </replacement>
 </jcr:root>

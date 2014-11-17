@@ -23,7 +23,6 @@ import com.adobe.cq.dialogupgrade.treerewriter.RewriteException;
 import com.adobe.cq.dialogupgrade.treerewriter.TreeRewriter;
 import com.adobe.cq.dialogupgrade.treerewriter.rules.RewriteRule;
 import com.adobe.cq.dialogupgrade.treerewriter.rules.RewriteRulesFactory;
-
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.ReferenceCardinality;
@@ -36,7 +35,6 @@ import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.servlets.SlingAllMethodsServlet;
 import org.apache.sling.commons.json.JSONObject;
-
 import org.osgi.framework.ServiceReference;
 import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
@@ -139,9 +137,8 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
         }
 
         try {
-            RequestParameter[] paths = request.getRequestParameters(PARAM_PATHS);
-
             // validate 'paths' parameter
+            RequestParameter[] paths = request.getRequestParameters(PARAM_PATHS);
             if (paths == null) {
                 response.setContentType("text/html");
                 response.getWriter().println("Missing parameter '" + PARAM_PATHS + "'");
@@ -149,6 +146,7 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
                 return;
             }
 
+            long tick = System.currentTimeMillis();
             Session session = request.getResourceResolver().adaptTo(Session.class);
             TreeRewriter rewriter = new TreeRewriter(rules);
             String path = "";
@@ -161,7 +159,6 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
 
                 // path doesn't exist
                 if (!session.nodeExists(path)) {
-                    // todo: use constants
                     result.put(KEY_RESULT, UpgradeResult.PATH_NOT_FOUND);
                     continue;
                 }
@@ -193,6 +190,9 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
             }
             response.setContentType("application/json");
             response.getWriter().write(results.toString());
+
+            long tack = System.currentTimeMillis();
+            logger.info("Rewrote {} dialogs in {} ms", paths.length, tack - tick);
         } catch (Exception e) {
             throw new ServletException("Caught exception while rewriting dialogs", e);
         }

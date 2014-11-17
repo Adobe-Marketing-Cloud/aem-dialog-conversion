@@ -22,6 +22,7 @@ import com.adobe.cq.dialogupgrade.treerewriter.RewriteException;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
+import java.util.Set;
 
 /**
  * A rewrite rule rewrites a tree by replacing specific subtrees that it matches.
@@ -41,15 +42,20 @@ public interface RewriteRule {
      * Applies this rule to the specified subtree. This rewrites the subtree according
      * to the definition of this rule.
      *
-     * Care has to be taken about the rewrite operation. If it leaves the original tree unchanged,
-     * the rewrite algorithm will get stuck in an infinite loop.
+     * After the application of the rule, the rewrite algorithm will recursively proceed on all nodes of
+     * the rewritten subtree (including the root). Therefore, care has to be taken during the rewrite
+     * operation: if it leaves the original tree unchanged, the algorithm will get stuck in an infinite loop.
+     *
+     * Optionally, the <code>finalNodes</code> parameter can be used to control and optimize the rewrite algorithm.
+     * The implementation can add to this set all nodes of the rewritten subtree which are final and therefore
+     * safe for the algorithm to subsequently ignore.
      *
      * todo: describe rename
      *
      * @param root The root of the subtree to be rewritten
      * @return the root node of the rewritten tree, or null if it was removed
      */
-    Node applyTo(Node root)
+    Node applyTo(Node root, Set<Node> finalNodes)
             throws RewriteException, RepositoryException;
 
 }

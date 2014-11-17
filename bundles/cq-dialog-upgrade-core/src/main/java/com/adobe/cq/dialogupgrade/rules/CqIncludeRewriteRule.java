@@ -29,6 +29,7 @@ import org.apache.felix.scr.annotations.Service;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+import java.util.Set;
 
 @Component
 @Service
@@ -41,7 +42,7 @@ public class CqIncludeRewriteRule implements DialogRewriteRule {
         return root.hasProperty("xtype") && "cqinclude".equals(root.getProperty("xtype").getString());
     }
 
-    public Node applyTo(Node root)
+    public Node applyTo(Node root, Set<Node> finalNodes)
             throws RewriteException, RepositoryException {
         if (!root.hasProperty("path")) {
             throw new RewriteException("Missing include path");

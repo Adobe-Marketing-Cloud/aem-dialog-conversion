@@ -35,6 +35,7 @@ import javax.jcr.Value;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -160,7 +161,7 @@ public class NodeBasedRewriteRule implements RewriteRule {
         return true;
     }
 
-    public Node applyTo(Node root)
+    public Node applyTo(Node root, Set<Node> finalNodes)
             throws RewriteException, RepositoryException {
         // check if the 'replacement' node exists
         if (!ruleNode.hasNode("replacement")) {
@@ -175,20 +176,32 @@ public class NodeBasedRewriteRule implements RewriteRule {
             return null;
         }
 
+        // true if the replacement tree is final and all its nodes are excluded from
+        // further processing by the algorithm
+        boolean treeIsFinal = false;
+        if (replacement.hasProperty("cq:rewriteIsFinal")) {
+            treeIsFinal = replacement.getProperty("cq:rewriteIsFinal").getBoolean();
+        }
+
         /**
          * Approach:
+         * - we move (rename) the tree to be rewritten to a temporary name
          * - we copy the replacement tree to be a new child of the original tree's parent
-         * - this new child has a temporary and unique name
          * - we process the copied replacement tree (mapped properties, children etc)
-         * - at the end, we remove the original tree and move (rename) the copied replacement
+         * - at the end, we remove the original tree
          */
 
-        // copy replacement to original tree under temporary name
-        replacement = replacement.getNodes().nextNode();
+        // move (rename) original tree
+        Session session = root.getSession();
         Node parent = root.getParent();
+        String rootName = root.getName();
         String tmpName = JcrUtil.createValidChildName(parent, "tree-rewriter-tmp-" + System.currentTimeMillis());
         String tmpPath = parent.getPath() + "/" + tmpName;
-        Node copy = JcrUtil.copy(replacement, parent, tmpName);
+        session.move(root.getPath(), tmpPath);
+
+        // copy replacement to original tree under original name
+        replacement = replacement.getNodes().nextNode();
+        Node copy = JcrUtil.copy(replacement, parent, rootName);
 
         // collect mappings: (node in original tree) -> (node in replacement tree)
         Map<String, String> mappings = new HashMap<String, String>();
@@ -212,13 +225,20 @@ public class NodeBasedRewriteRule implements RewriteRule {
                     property.remove();
                     continue;
                 }
+                // add single node to final nodes
+                if ("cq:rewriteIsFinal".equals(property.getName())) {
+                    if (!treeIsFinal) {
+                        finalNodes.add(node);
+                    }
+                    property.remove();
+                    continue;
+                }
                 // set value from original tree in case this is a mapped property
                 mapProperty(root, property);
             }
         }
 
         // copy children from original tree to replacement tree according to the mappings found
-        Session session = root.getSession();
         for (Map.Entry<String, String> mapping : mappings.entrySet()) {
             if (!root.hasNode(mapping.getKey())) {
                 // the node specified in the mapping does not exist in the original tree
@@ -234,10 +254,17 @@ public class NodeBasedRewriteRule implements RewriteRule {
             }
         }
 
-        // remove original tree and rename the replacement copy
-        String name = root.getName();
+        // we add the complete subtree to the final nodes
+        if (treeIsFinal) {
+            traverser = new TreeTraverser(copy);
+            nodeIterator = traverser.iterator();
+            while (nodeIterator.hasNext()) {
+                finalNodes.add(nodeIterator.next());
+            }
+        }
+
+        // remove original tree and return rewritten tree
         root.remove();
-        session.move(tmpPath, parent.getPath() + "/" + name);
         return copy;
     }
 

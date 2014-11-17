@@ -25,12 +25,11 @@ import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
+import java.util.Set;
 
 @Component
 @Service
@@ -47,7 +46,7 @@ public class CqDialogRewriteRule implements DialogRewriteRule {
         return false;
     }
 
-    public Node applyTo(Node root)
+    public Node applyTo(Node root, Set<Node> finalNodes)
             throws RewriteException, RepositoryException {
         // Granite UI dialog already exists at this location
         Node parent = root.getParent();
@@ -64,6 +63,7 @@ public class CqDialogRewriteRule implements DialogRewriteRule {
 
         // add cq:content and cq:content/content nodes
         Node cqDialog = parent.addNode("cq:dialog", "nt:unstructured");
+        finalNodes.add(cqDialog);
         // todo: remove
         cqDialog.setProperty("dialog-upgrade-tool", true);
         if (root.hasProperty("helpPath")) {
@@ -74,9 +74,12 @@ public class CqDialogRewriteRule implements DialogRewriteRule {
         }
         cqDialog.setProperty("sling:resourceType", "cq/gui/components/authoring/dialog");
         Node content = cqDialog.addNode("content", "nt:unstructured");
+        finalNodes.add(content);
         content.setProperty("sling:resourceType", "granite/ui/components/foundation/container");
         Node layout = content.addNode("layout", "nt:unstructured");
+        finalNodes.add(layout);
         Node items = content.addNode("items", "nt:unstructured");
+        finalNodes.add(items);
 
         if (isTabbed) {
             layout.setProperty("sling:resourceType", "granite/ui/components/foundation/layouts/tabs");
@@ -84,8 +87,10 @@ public class CqDialogRewriteRule implements DialogRewriteRule {
         } else {
             layout.setProperty("sling:resourceType", "granite/ui/components/foundation/layouts/fixedcolumns");
             Node column = items.addNode("column", "nt:unstructured");
+            finalNodes.add(column);
             column.setProperty("sling:resourceType", "granite/ui/components/foundation/container");
             items = column.addNode("items", "nt:unstructured");
+            finalNodes.add(items);
         }
         NodeIterator iterator = dialogItems.getNodes();
         while (iterator.hasNext()) {
