@@ -84,11 +84,6 @@ public class TreeRewriter {
                 while (iterator.hasNext()) {
                     Node node = iterator.next();
 
-                    // check if we should skip this node
-                    if (finalPaths.contains(node.getPath())) {
-                        continue;
-                    }
-
                     // if this node and its siblings are ordered..
                     if (node.getParent().getPrimaryNodeType().hasOrderableChildNodes()) {
                         // ..then we move it to the end of its parent's list of children. This is necessary because
@@ -96,18 +91,24 @@ public class TreeRewriter {
                         // we do this for all siblings in order to keep the order.
                         node.getParent().orderBefore(node.getName(), null);
                     }
+
+                    // we have previously found a match (and will start a new traversal from the start node)
+                    // but we still need to finish this traversal in order not to change the order of nodes
                     if (foundMatch) {
-                        // we have previously found a match (and will start a new traversal from the start node)
-                        // but we still need to finish this traversal in order not to change the order of nodes
+                        continue;
+                    }
+
+                    // check if we should skip this node
+                    if (finalPaths.contains(node.getPath())) {
                         continue;
                     }
 
                     // traverse all available rules
+                    Set<Node> finalNodes = new LinkedHashSet<Node>();
                     for (RewriteRule rule : rules) {
                         // check for a match
                         if (rule.matches(node)) {
                             // the rule matched, rewrite the tree
-                            Set<Node> finalNodes = new LinkedHashSet<Node>();
                             Node result = rule.applyTo(node, finalNodes);
                             // set the start node in case it was rewritten
                             if (node.equals(startNode)) {
@@ -117,6 +118,13 @@ public class TreeRewriter {
                             foundMatch = true;
                             break;
                         }
+                    }
+
+                    // if we have found no match for this node, we can ignore it
+                    // in subsequent traversals
+                    if (!foundMatch) {
+                        finalNodes.add(node);
+                        addPaths(finalPaths, finalNodes);
                     }
                 }
             } while (foundMatch && startNode != null);
