@@ -49,7 +49,7 @@ public class CheckboxRewriteRule implements DialogRewriteRule {
 
     public boolean matches(Node root)
             throws RepositoryException {
-        return hasXtype(root, XTYPE) && hasType(root, TYPE);
+        return (hasXtype(root, XTYPE) && hasType(root, TYPE)) || hasXtype(root, TYPE);
     }
 
     public Node applyTo(Node root, Set<Node> finalNodes)
