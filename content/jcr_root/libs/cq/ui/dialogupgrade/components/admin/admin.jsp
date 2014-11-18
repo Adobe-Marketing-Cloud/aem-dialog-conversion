@@ -51,7 +51,7 @@
             // build and execute query
             String path = request.getParameter("path");
             // todo: sql injection
-            String sql = "SELECT * FROM [cq:Dialog] AS d WHERE isdescendantnode('"+path+"') AND NAME(d) = 'dialog'";
+            String sql = "SELECT * FROM [cq:Dialog] AS d WHERE (ISDESCENDANTNODE('"+path+"') OR [jcr:path] = '"+path+"') AND NAME(d) = 'dialog'";
             final Query query = queryManager.createQuery(sql, Query.JCR_SQL2);
             final NodeIterator results = query.execute().getNodes();
     %>
