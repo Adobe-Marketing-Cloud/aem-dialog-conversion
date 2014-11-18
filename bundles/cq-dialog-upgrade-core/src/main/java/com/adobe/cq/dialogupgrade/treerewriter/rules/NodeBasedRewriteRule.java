@@ -39,6 +39,9 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.hasPrimaryType;
+import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.renameToTemp;
+
 /**
  * A rule that rewrites a tree based on a given node structure. The node structure
  * has the following form:
@@ -118,7 +121,7 @@ public class NodeBasedRewriteRule implements RewriteRule {
     private boolean matches(Node root, Node pattern)
             throws RepositoryException {
         // check if the primary types match
-        if (!root.getPrimaryNodeType().getName().equals(pattern.getPrimaryNodeType().getName())) {
+        if (!hasPrimaryType(root, pattern.getPrimaryNodeType().getName())) {
             return false;
         }
 
@@ -192,12 +195,9 @@ public class NodeBasedRewriteRule implements RewriteRule {
          */
 
         // move (rename) original tree
-        Session session = root.getSession();
         Node parent = root.getParent();
         String rootName = root.getName();
-        String tmpName = JcrUtil.createValidChildName(parent, "tree-rewriter-tmp-" + System.currentTimeMillis());
-        String tmpPath = parent.getPath() + "/" + tmpName;
-        session.move(root.getPath(), tmpPath);
+        renameToTemp(root);
 
         // copy replacement to original tree under original name
         replacement = replacement.getNodes().nextNode();
@@ -239,6 +239,7 @@ public class NodeBasedRewriteRule implements RewriteRule {
         }
 
         // copy children from original tree to replacement tree according to the mappings found
+        Session session = root.getSession();
         for (Map.Entry<String, String> mapping : mappings.entrySet()) {
             if (!root.hasNode(mapping.getKey())) {
                 // the node specified in the mapping does not exist in the original tree

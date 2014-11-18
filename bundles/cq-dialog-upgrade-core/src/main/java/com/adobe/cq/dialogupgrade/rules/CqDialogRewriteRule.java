@@ -31,19 +31,21 @@ import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import java.util.Set;
 
+import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.hasXtype;
+import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.hasPrimaryType;
+
 @Component
 @Service
 @Properties({
-    @Property(name="service.ranking", intValue = 5000)
+    @Property(name="service.ranking", intValue = 1)
 })
 public class CqDialogRewriteRule implements DialogRewriteRule {
 
+    private static final String PRIMARY_TYPE = "cq:Dialog";
+
     public boolean matches(Node root)
             throws RepositoryException {
-        if ("cq:Dialog".equals(root.getPrimaryNodeType().getName())) {
-            return true;
-        }
-        return false;
+        return hasPrimaryType(root, PRIMARY_TYPE);
     }
 
     public Node applyTo(Node root, Set<Node> finalNodes)
@@ -64,8 +66,6 @@ public class CqDialogRewriteRule implements DialogRewriteRule {
         // add cq:content and cq:content/content nodes
         Node cqDialog = parent.addNode("cq:dialog", "nt:unstructured");
         finalNodes.add(cqDialog);
-        // todo: remove
-        cqDialog.setProperty("dialog-upgrade-tool", true);
         if (root.hasProperty("helpPath")) {
             cqDialog.setProperty("helpPath", root.getProperty("helpPath").getValue());
         }
@@ -154,15 +154,10 @@ public class CqDialogRewriteRule implements DialogRewriteRule {
         if ("cq:TabPanel".equals(node.getPrimaryNodeType().getName())) {
             return true;
         }
-        if (isXtype(node, "tabpanel")) {
+        if (hasXtype(node, "tabpanel")) {
             return true;
         }
         return false;
-    }
-
-    private boolean isXtype(Node node, String xtype)
-            throws RepositoryException {
-        return node.hasProperty("xtype") && xtype != null && xtype.equals(node.getProperty("xtype").getString());
     }
 
 }
