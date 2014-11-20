@@ -20,11 +20,13 @@ package com.adobe.cq.dialogupgrade.rules;
 
 import com.adobe.cq.dialogupgrade.api.DialogRewriteRule;
 import com.adobe.cq.dialogupgrade.treerewriter.RewriteException;
+import com.day.cq.commons.PathInfo;
 import com.day.cq.commons.jcr.JcrUtil;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
 import org.apache.felix.scr.annotations.Service;
+import org.apache.sling.api.request.RequestPathInfo;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
@@ -54,10 +56,8 @@ public class IncludeRewriteRule implements DialogRewriteRule {
         }
 
         // get path to included node
-        String path = root.getProperty("path").getString();
-        // todo: improve
-        path = path.replace(".overlay.infinity.json", "");
-        path = path.replace(".infinity.json", "");
+        RequestPathInfo info = new PathInfo(root.getProperty("path").getString());
+        String path = info.getResourcePath();
 
         // check if the path is valid
         Session session = root.getSession();
