@@ -14,6 +14,11 @@ $(document).ready(function () {
         }
     });
 
+    // hide upgrade button if there are no results
+    if ($("#dialogs table tbody tr").length > 0) {
+        $("#upgrade-dialogs").show();
+    }
+
     $("#upgrade-dialogs").click(function () {
         // get paths from table
         var paths = $(".path").map(function () {

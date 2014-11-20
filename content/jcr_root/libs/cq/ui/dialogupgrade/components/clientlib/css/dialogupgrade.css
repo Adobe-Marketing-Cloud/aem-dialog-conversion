@@ -15,6 +15,10 @@
     text-align: center;
 }
 
+#upgrade-dialogs {
+    display: none;
+}
+
 #upgrade-results {
     display: none;
 }
