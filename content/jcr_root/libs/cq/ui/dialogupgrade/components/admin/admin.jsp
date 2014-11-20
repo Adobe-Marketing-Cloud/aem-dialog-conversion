@@ -52,11 +52,23 @@
             String path = request.getParameter("path");
             // todo: sql injection
             String sql = "SELECT * FROM [cq:Dialog] AS d WHERE (ISDESCENDANTNODE('"+path+"') OR [jcr:path] = '"+path+"') AND NAME(d) = 'dialog'";
-            final Query query = queryManager.createQuery(sql, Query.JCR_SQL2);
-            final NodeIterator results = query.execute().getNodes();
+            Query query = queryManager.createQuery(sql, Query.JCR_SQL2);
+            QueryResult result = query.execute();
+            NodeIterator iterator = result.getNodes();
+
+            // count number of results
+            long nbResults = iterator.getSize();
+            if (nbResults < 0) {
+                nbResults = 0;
+                while (iterator.hasNext()) {
+                    iterator.nextNode();
+                    nbResults++;
+                }
+                iterator = result.getNodes();
+            }
     %>
             <div id="info-text">
-                Found <b><%= results.getSize() %></b> dialogs below <b><%= path %></b>
+                Found <b><%= nbResults %></b> dialogs below <b><%= path %></b>
             </div>
             <br />
             <div id="dialogs">
@@ -70,8 +82,8 @@
                     </thead>
                     <tbody>
         <%
-            while(results.hasNext()) {
-                Node dialog = results.nextNode();
+            while(iterator.hasNext()) {
+                Node dialog = iterator.nextNode();
                 Node parent = dialog.getParent();
                 String href = externalizer.authorLink(resourceResolver, dialog.getPath()) + ".html";
                 String crxHref = externalizer.authorLink(resourceResolver, "/") + "crx/de/index.jsp#" + dialog.getPath();
