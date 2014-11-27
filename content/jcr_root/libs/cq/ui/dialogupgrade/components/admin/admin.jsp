@@ -75,7 +75,7 @@
                 <table class="coral-Table coral-Table--hover">
                     <thead>
                         <tr class="coral-Table-row">
-                            <th class="coral-Table-headerCell">Dialog (Classic UI)</th>
+                            <th class="coral-Table-headerCell dialog-cell">Dialog (Classic UI)</th>
                             <th class="coral-Table-headerCell centered">Links</th>
                             <th class="coral-Table-headerCell centered">Dialog (Touch UI)</th>
                         </tr>
@@ -89,7 +89,13 @@
                 String crxHref = externalizer.authorLink(resourceResolver, "/") + "crx/de/index.jsp#" + dialog.getPath();
                 %>
                         <tr class="coral-Table-row">
-                            <td class="coral-Table-cell path"><%= dialog.getPath()%></td>
+                            <td class="coral-Table-cell dialog-cell">
+                                <label class="coral-Checkbox">
+                                    <input class="coral-Checkbox-input path" type="checkbox" value="<%= dialog.getPath()%>">
+                                    <span class="coral-Checkbox-checkmark"></span>
+                                    <span class="coral-Checkbox-description"><%= dialog.getPath()%></span>
+                                </label>
+                            </td>
                             <td class="coral-Table-cell centered"><a href="<%= xssAPI.getValidHref(href) %>" target="_blank" class="coral-Link">show</a> / <a href="<%= xssAPI.getValidHref(crxHref) %>" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a></td>
                 <% if (parent.hasNode("cq:dialog")) {
                     Node touchDialog = parent.getNode("cq:dialog");

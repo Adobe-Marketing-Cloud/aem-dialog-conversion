@@ -2,27 +2,52 @@ $(document).ready(function () {
 
     $pathTextfield = $(".js-coral-pathbrowser-input", $("#path").closest(".coral-Form-fieldwrapper"));
 
+    /**
+     * Click handler for the "show dialogs" button
+     */
     $("#show-dialogs").click(function () {
         var path = $pathTextfield.val();
         window.location = window.location.pathname + "?path=" + path;
     });
 
-    // enable enter key for the path field
+    /**
+     * Enable enter key for the path field
+     */
     $($pathTextfield).keyup(function(event){
         if(event.keyCode == 13){
             $("#show-dialogs").click();
         }
     });
 
-    // hide upgrade button if there are no results
-    if ($("#dialogs table tbody tr").length > 0) {
-        $("#upgrade-dialogs").show();
-    }
+    /**
+     * Delegate clicks on table rows to checkbox.
+     */
+    $("td.dialog-cell").parent().click(function (e) {
+        // handles clicks on table rows
+        $(".coral-Checkbox", this).click();
+    });
+
+    /**
+     * Prevent events from bubbling down to the table row when clicking
+     * on the checkboxes or links in the table.
+     */
+    $("#dialogs td a, .coral-Checkbox").click(function (e) {
+        e.stopPropagation();
+    });
+
+    $(".path").change(function () {
+        var count = $(".path:checked").length;
+        // hide "upgrade dialogs" button if no dialogs are selected
+        $("#upgrade-dialogs").toggle(count > 0);
+        // adjust button text
+        $("#upgrade-dialogs span").text("upgrade " + count + " dialogs");
+    });
+
 
     $("#upgrade-dialogs").click(function () {
         // get paths from table
-        var paths = $(".path").map(function () {
-            return $(this).text();
+        var paths = $(".path:checked").map(function () {
+            return $(this).val();
         }).get();
 
         var url = "/libs/cq/ui/dialogupgrade/content/upgrade.json";

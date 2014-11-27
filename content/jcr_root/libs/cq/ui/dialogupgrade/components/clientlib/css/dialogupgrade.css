@@ -22,3 +22,15 @@
 #upgrade-results {
     display: none;
 }
+
+th.dialog-cell {
+    padding-left: 47px;
+}
+
+td.dialog-cell {
+    padding-left: 15px;
+}
+
+.dialog-cell .coral-Checkbox-description {
+    margin-left: 15px;
+}
