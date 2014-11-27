@@ -29,11 +29,13 @@ import org.apache.felix.scr.annotations.Service;
 import org.apache.sling.api.request.RequestPathInfo;
 
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import java.util.Set;
 
 import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.hasXtype;
+import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.hasPrimaryType;
 
 @Component
 @Service
@@ -44,7 +46,8 @@ public class IncludeRewriteRule implements DialogRewriteRule {
 
     private static final String XTYPE = "cqinclude";
 
-    public boolean matches(Node root) throws RepositoryException {
+    public boolean matches(Node root)
+            throws RepositoryException {
         return hasXtype(root, XTYPE);
     }
 
@@ -65,11 +68,29 @@ public class IncludeRewriteRule implements DialogRewriteRule {
             throw new RewriteException("Include path does not exist");
         }
 
-        // remove original and copy referenced node
+        // remove original
         Node parent = root.getParent();
         String name = root.getName();
         root.remove();
-        return JcrUtil.copy(session.getNode(path), parent, name);
+
+        Node node = session.getNode(path);
+        // check if referenced node is a widget collection
+        if (hasPrimaryType(node, "cq:WidgetCollection")) {
+            NodeIterator iterator = node.getNodes();
+            Node newRoot = null;
+            // copy all items of the widget collection
+            while (iterator.hasNext()) {
+                Node item = iterator.nextNode();
+                Node copy = JcrUtil.copy(item, parent, JcrUtil.createValidChildName(parent, item.getName()));
+                if (newRoot == null) {
+                    newRoot = copy;
+                }
+            }
+            // we return the first item as the new root
+            return newRoot;
+        } else {
+            return JcrUtil.copy(session.getNode(path), parent, name);
+        }
     }
 
 }
