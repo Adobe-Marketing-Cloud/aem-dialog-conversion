@@ -29,7 +29,7 @@
                     sling:resourceType="granite/ui/components/foundation/container"
                     cq:rewriteIsFinal="{Boolean}true">
                     <items
-                        cq:mapsTo="./items"
+                        cq:rewriteMapChildren="./items"
                         jcr:primaryType="nt:unstructured"
                         cq:rewriteIsFinal="{Boolean}true"/>
                 </columns>

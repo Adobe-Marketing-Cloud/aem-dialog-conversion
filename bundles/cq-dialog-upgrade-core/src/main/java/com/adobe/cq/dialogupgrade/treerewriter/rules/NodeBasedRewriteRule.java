@@ -82,10 +82,10 @@ import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.renameTo
  *       - multi = [${./prop1}, ${./prop2}]
  * </pre>
  *
- * The replacement tree supports following special properties:
+ * The replacement tree supports following special properties (named <code>cq:rewrite...</code>):
  *
  * <ul>
- *     <li><code>cq:mapsTo</code>: The node containing this property will receive a copy of the children of the
+ *     <li><code>cq:rewriteMapChildren</code>: The node containing this property will receive a copy of the children of the
  *     node in the original tree referenced by the propery value</li>
  *     <li><code>cq:rewriteIsFinal</code>: Optimization measure, telling the algorithm that the node containing this
  *     property is final and doesn't have to be rechecked for matching rewrite rules. When placed on the
@@ -96,6 +96,10 @@ public class NodeBasedRewriteRule implements RewriteRule {
 
     // pattern that matches the regex for mapped properties: ${<path>}
     private static final Pattern MAPPED_PATTERN = Pattern.compile("^\\$\\{(.*)\\}$");
+
+    // special properties
+    private static final String PROPERTY_MAP_CHILDREN = "cq:rewriteMapChildren";
+    private static final String PROPERTY_IS_FINAL = "cq:rewriteIsFinal";
 
     private Logger logger = LoggerFactory.getLogger(NodeBasedRewriteRule.class);
 
@@ -192,8 +196,8 @@ public class NodeBasedRewriteRule implements RewriteRule {
         // true if the replacement tree is final and all its nodes are excluded from
         // further processing by the algorithm
         boolean treeIsFinal = false;
-        if (replacement.hasProperty("cq:rewriteIsFinal")) {
-            treeIsFinal = replacement.getProperty("cq:rewriteIsFinal").getBoolean();
+        if (replacement.hasProperty(PROPERTY_IS_FINAL)) {
+            treeIsFinal = replacement.getProperty(PROPERTY_IS_FINAL).getBoolean();
         }
 
         /**
@@ -229,14 +233,14 @@ public class NodeBasedRewriteRule implements RewriteRule {
                     continue;
                 }
                 // add mapping to collection
-                if ("cq:mapsTo".equals(property.getName())) {
+                if (PROPERTY_MAP_CHILDREN.equals(property.getName())) {
                     mappings.put(property.getString(), node.getPath());
                     // remove property, as we don't want it to be part of the result
                     property.remove();
                     continue;
                 }
                 // add single node to final nodes
-                if ("cq:rewriteIsFinal".equals(property.getName())) {
+                if (PROPERTY_IS_FINAL.equals(property.getName())) {
                     if (!treeIsFinal) {
                         finalNodes.add(node);
                     }

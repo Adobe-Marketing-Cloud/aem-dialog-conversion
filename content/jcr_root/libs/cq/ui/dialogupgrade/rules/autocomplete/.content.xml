@@ -18,7 +18,7 @@
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="granite/ui/components/foundation/form/autocomplete/list"/>
             <items
-                cq:mapsTo="./options"
+                cq:rewriteMapChildren="./options"
                 jcr:primaryType="nt:unstructured"/>
         </autocomplete>
     </replacement>

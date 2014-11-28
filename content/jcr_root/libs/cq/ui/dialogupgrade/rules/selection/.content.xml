@@ -19,7 +19,7 @@
             title="${./title}"
             value="[${./value},${./defaultValue}]">
             <items
-                cq:mapsTo="./options"
+                cq:rewriteMapChildren="./options"
                 jcr:primaryType="nt:unstructured"/>
         </selection>
     </replacement>
