@@ -87,11 +87,11 @@
             jcr:primaryType="nt:unstructured"
             sling:resourceType="granite/ui/components/foundation/button"
             id="show-dialogs"
-            text="show dialogs"/>
+            text="Show dialogs"/>
         <upgradeButton
             jcr:primaryType="nt:unstructured"
             sling:resourceType="granite/ui/components/foundation/button"
             id="upgrade-dialogs"
-            text="upgrade dialogs"/>
+            text="Upgrade dialogs"/>
     </components>
 </jcr:root>

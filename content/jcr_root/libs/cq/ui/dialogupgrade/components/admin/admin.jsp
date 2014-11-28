@@ -51,7 +51,7 @@
             // build and execute query
             String path = request.getParameter("path");
             // todo: not possible to bind variable inside constraint function -> sql injection
-            String sql = "SELECT * FROM [cq:Dialog] AS d WHERE (ISDESCENDANTNODE('"+path+"') OR [jcr:path] = '"+path+"') AND NAME(d) = 'dialog'";
+            String sql = "SELECT * FROM [cq:Dialog] AS d WHERE (ISDESCENDANTNODE('"+path+"') OR [jcr:path] = '"+path+"') AND NAME(d) = 'dialog' ORDER BY [jcr:path]";
             Query query = queryManager.createQuery(sql, Query.JCR_SQL2);
             QueryResult result = query.execute();
             NodeIterator iterator = result.getNodes();
@@ -87,11 +87,12 @@
                 Node parent = dialog.getParent();
                 String href = externalizer.authorLink(resourceResolver, dialog.getPath()) + ".html";
                 String crxHref = externalizer.authorLink(resourceResolver, "/") + "crx/de/index.jsp#" + dialog.getPath();
+                String disabled = parent.hasNode("cq:dialog") ? "disabled=\"disabled\"" : "";
                 %>
                         <tr class="coral-Table-row">
                             <td class="coral-Table-cell dialog-cell">
                                 <label class="coral-Checkbox">
-                                    <input class="coral-Checkbox-input path" type="checkbox" value="<%= dialog.getPath()%>">
+                                    <input class="coral-Checkbox-input path" type="checkbox" value="<%= dialog.getPath()%>" <%= disabled %>>
                                     <span class="coral-Checkbox-checkmark"></span>
                                     <span class="coral-Checkbox-description"><%= dialog.getPath()%></span>
                                 </label>
@@ -102,7 +103,7 @@
                     href = externalizer.authorLink(resourceResolver, "/libs/cq/ui/dialogupgrade/content/render") + ".html" + touchDialog.getPath();
                     crxHref = externalizer.authorLink(resourceResolver, "/") + "crx/de/index.jsp#" + touchDialog.getPath().replaceAll(":", "%3A");
                 %>
-                            <td class="coral-Table-cell centered"><i class="coral-Icon coral-Icon--check"></i> &nbsp;&nbsp; <a href="<%= xssAPI.getValidHref(href) %>" target="_blank" class="coral-Link">show</a> / <a href="<%= xssAPI.getValidHref(crxHref) %>" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a></td>
+                            <td class="coral-Table-cell centered"><i class="coral-Icon coral-Icon--check"></i><a href="<%= xssAPI.getValidHref(href) %>" target="_blank" class="coral-Link">show</a> / <a href="<%= xssAPI.getValidHref(crxHref) %>" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a></td>
                 <% } else { %>
                             <td class="coral-Table-cell centered">-</td>
                 <% } %>

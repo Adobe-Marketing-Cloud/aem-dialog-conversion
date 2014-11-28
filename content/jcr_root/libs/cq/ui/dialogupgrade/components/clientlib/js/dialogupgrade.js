@@ -40,7 +40,7 @@ $(document).ready(function () {
         // hide "upgrade dialogs" button if no dialogs are selected
         $("#upgrade-dialogs").toggle(count > 0);
         // adjust button text
-        $("#upgrade-dialogs span").text("upgrade " + count + " dialogs");
+        $("#upgrade-dialogs span").text("Upgrade " + count + " dialogs");
     });
 
 
@@ -83,13 +83,19 @@ $(document).ready(function () {
                     iconClass = "coral-Icon--exclude";
                     message = Granite.I18n.get("Skipped (Touch UI dialog already exists)");
                 }
-                $tr.append('<td class="coral-Table-cell centered"><i class="coral-Icon ' + iconClass + '" /></td>');
+                var links = "";
+                if (data[path].path) {
+                    var href = Granite.HTTP.externalize("/libs/cq/ui/dialogupgrade/content/render.html" + data[path].path);
+                    var crxHref = Granite.HTTP.externalize("/crx/de/index.jsp#" + data[path].path.replace(":", "%3A"));
+                    links += '<a href="' + href + '" target="_blank" class="coral-Link">show</a> / <a href="' + crxHref + '" target="_blank" class="coral-Link">crxde</a>';
+                }
+                $tr.append('<td class="coral-Table-cell centered"><i class="coral-Icon ' + iconClass + '" />' + links + '</td>');
                 $tr.append('<td class="coral-Table-cell">' + message + '</td>');
             }
 
             // change info text
             $("#info-text").empty();
-            $("#info-text").append("Ran upgrade procedure on <b>" + count + "</b> dialogs. See details below:");
+            $("#info-text").append("Ran upgrade procedure on <b>" + count + "</b> dialogs:");
         }).fail(function () {
             var title = "Error";
             var message = "Call to dialog upgrade servlet failed. Please review the logs.";

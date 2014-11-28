@@ -34,3 +34,7 @@ td.dialog-cell {
 .dialog-cell .coral-Checkbox-description {
     margin-left: 15px;
 }
+
+.coral-Icon--check {
+    margin-right: 10px;
+}
