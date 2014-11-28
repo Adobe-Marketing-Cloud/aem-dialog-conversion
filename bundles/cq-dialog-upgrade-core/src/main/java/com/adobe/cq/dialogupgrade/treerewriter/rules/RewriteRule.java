@@ -42,15 +42,17 @@ public interface RewriteRule {
      * Applies this rule to the specified subtree. This rewrites the subtree according
      * to the definition of this rule.
      *
-     * After the application of the rule, the rewrite algorithm will recursively proceed on all nodes of
-     * the rewritten subtree (including the root). Therefore, care has to be taken during the rewrite
-     * operation: if it leaves the original tree unchanged, the algorithm will get stuck in an infinite loop.
+     * The rewrite algorithm does not detect rewrite loops, therefore rewrite rules must not rewrite trees in a
+     * circular fashion. Also, a rewrite rule must not leave the original tree unchanged, as the algorithm will
+     * get stuck in an infinite loop (unless <code>finalNodes</code> is used appropriately, see below).
      *
      * Optionally, the <code>finalNodes</code> parameter can be used to control and optimize the rewrite algorithm.
      * The implementation can add to this set all nodes of the rewritten subtree which are final and therefore
-     * safe for the algorithm to subsequently ignore.
+     * safe for the algorithm to ignore in subsequent traversals of the tree.
      *
-     * todo: describe rename
+     * {@link com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils} provides utility methods that can
+     * be used to temporarily rename (move) the original subtree, so that the resulting subtree can be built
+     * while still having the original around.
      *
      * @param root The root of the subtree to be rewritten
      * @return the root node of the rewritten tree, or null if it was removed

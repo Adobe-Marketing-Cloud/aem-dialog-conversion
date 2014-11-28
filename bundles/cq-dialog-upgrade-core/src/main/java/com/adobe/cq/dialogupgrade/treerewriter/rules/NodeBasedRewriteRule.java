@@ -63,24 +63,34 @@ import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.renameTo
  *       + ...
  * </pre>
  *
- * If a tree matches any of the defined patterns (i.e. child nodes of the pattern nodes), then it will
- * be replaced by the tree specified below the replacement node. A pattern is an arbitrary tree containing
- * nodes and properties. It matches a tree, if the tree contains the the same nodes as the pattern, and all
- * properties defined in the pattern match the properties on the tree.
+ * If a tree matches any of the defined patterns - defined as children of the <code>pattern</code> nodes - then
+ * it will be replaced by the tree specified below the <code>replacement</code> node. A pattern is an arbitrary
+ * tree containing nodes and properties. It matches a tree, if the tree contains the same nodes as the pattern,
+ * and all properties defined in the pattern match the properties on the tree.
  *
  * The replacement tree can define mapped properties of type <code>string</code> that will inherit the value of a
- * property in the original tree. For instance, the following property <code>one</code> will receive the value
- * of the property <code>three</code> of the subnode <code>two</code> of the matched tree.
+ * property in the original tree. They need to be of type <code>string</code> and have the following format:
+ * <code>${&lt;path&gt;}</code>. For instance, the following property <code>one</code> will receive the value
+ * of the property <code>./two/three</code> of the matched tree. Mapped properties can be multivalue, in which case
+ * the it will inherit the first existing original property.
  *
  * <pre>
  * ...
  *   + replacement
  *     + bar
  *       - one = ${./two/three}
+ *       - multi = [${./prop1}, ${./prop2}]
  * </pre>
  *
- * todo: multivalue, special properties
+ * The replacement tree supports following special properties:
  *
+ * <ul>
+ *     <li><code>cq:mapsTo</code>: The node containing this property will receive a copy of the children of the
+ *     node in the original tree referenced by the propery value</li>
+ *     <li><code>cq:rewriteIsFinal</code>: Optimization measure, telling the algorithm that the node containing this
+ *     property is final and doesn't have to be rechecked for matching rewrite rules. When placed on the
+ *     <code>replacement</code> node itself, the whole replacement tree is considered final.</li>
+ * </ul>
  */
 public class NodeBasedRewriteRule implements RewriteRule {
 
