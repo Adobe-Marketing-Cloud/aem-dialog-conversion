@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
+    jcr:primaryType="nt:unstructured">
+    <patterns jcr:primaryType="nt:unstructured">
+        <tags/>
+    </patterns>
+    <replacement
+        jcr:primaryType="nt:unstructured"
+        cq:rewriteIsFinal="{Boolean}true">
+        <autocomplete
+            jcr:primaryType="nt:unstructured"
+            sling:resourceType="granite/ui/components/foundation/form/autocomplete"
+            fieldLabel="${./fieldLabel}"
+            fieldDescription="${./fieldDescription}"
+            name="${./name}"
+            disabled="${./disabled}"
+            renderReadOnly="${./readOnly}"
+            emptyText="${./emptyText}"
+            multiple="{Boolean}true">
+            <datasource
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="cq/gui/components/common/datasources/tags"/>
+            <values
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="granite/ui/components/foundation/form/autocomplete/tags"/>
+            <options
+                jcr:primaryType="nt:unstructured"
+                sling:resourceType="granite/ui/components/foundation/form/autocomplete/list"/>
+        </autocomplete>
+    </replacement>
+</jcr:root>
