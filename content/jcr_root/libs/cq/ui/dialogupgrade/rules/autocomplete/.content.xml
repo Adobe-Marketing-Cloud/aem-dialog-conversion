@@ -3,6 +3,7 @@
     jcr:primaryType="nt:unstructured">
     <patterns jcr:primaryType="nt:unstructured">
         <combobox/>
+        <combobox1/>
     </patterns>
     <replacement
         jcr:primaryType="nt:unstructured"
