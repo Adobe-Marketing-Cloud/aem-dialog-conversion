@@ -14,22 +14,16 @@
   is strictly forbidden unless prior written permission is obtained
   from Adobe Systems Incorporated.
 --%><%
-%><%@page session="false" import="javax.jcr.*,
+%><%@page session="false" import="com.day.cq.commons.Externalizer,
+                                  javax.jcr.Node,
+                                  javax.jcr.NodeIterator,
+                                  javax.jcr.Session,
+                                  javax.jcr.ValueFactory,
                                   javax.jcr.query.*,
-                                  java.util.*,
-                                  com.day.cq.commons.Externalizer" %>
+                                  javax.jcr.query.qom.*,
+                                  javax.jcr.query.qom.Literal,
+                                  static javax.jcr.query.qom.QueryObjectModelConstants.*" %>
 <%@include file="/libs/foundation/global.jsp"%>
-
-<% if (request.getParameter("path") != null) { %>
-<script>
-
-    $(document).ready(function () {
-        // prefill pathbrowser with value from the url
-        $(".js-coral-pathbrowser-input", $("#path").closest(".coral-Form-fieldwrapper")).val("<%= xssAPI.encodeForJSString(request.getParameter("path")) %>");
-    });
-
-</script>
-<% } %>
 
 <div id="content">
 
@@ -43,16 +37,42 @@
 
     <%
 
-        if (request.getParameter("path") != null && !request.getParameter("path").isEmpty()) {
+        String path = request.getParameter("path");
+        if (path != null && !path.isEmpty()) {
             Externalizer externalizer = resourceResolver.adaptTo(Externalizer.class);
             Session session = slingRequest.getResourceResolver().adaptTo(Session.class);
             QueryManager queryManager = session.getWorkspace().getQueryManager();
+            QueryObjectModelFactory qf = queryManager.getQOMFactory();
+            ValueFactory vf = session.getValueFactory();
 
-            // build and execute query
-            String path = request.getParameter("path");
-            // todo: not possible to bind variable inside constraint function -> sql injection
-            String sql = "SELECT * FROM [cq:Dialog] AS d WHERE (ISDESCENDANTNODE('"+path+"') OR [jcr:path] = '"+path+"') AND NAME(d) = 'dialog' ORDER BY [jcr:path]";
-            Query query = queryManager.createQuery(sql, Query.JCR_SQL2);
+            /**
+             * Using the query object model in order to prevent SQL injection in the ISDESCENDANTNODE constraint. The
+             * query is equivalent to following JCR SQL:
+             *
+             * SELECT * FROM [cq:Dialog] AS d WHERE (ISDESCENDANTNODE('"+path+"') OR [jcr:path] = '"+path+"') AND NAME(d) = 'dialog' ORDER BY [jcr:path]
+             */
+
+            // node type selector
+            Selector selector = qf.selector("cq:Dialog", "d");
+
+            // ISDESCENDANTNODE constraint
+            Constraint c1 = qf.descendantNode("d", path);
+
+            // path equality constraint
+            PropertyValue jcrPath = qf.propertyValue("d", "jcr:path");
+            Literal pathLiteral = qf.literal(vf.createValue(path));
+            Constraint c2 = qf.comparison(jcrPath, JCR_OPERATOR_EQUAL_TO, pathLiteral);
+
+            // NAME constraint
+            Literal dialogLiteral = qf.literal(vf.createValue("dialog"));
+            Constraint c3 = qf.comparison(qf.nodeName("d"), JCR_OPERATOR_EQUAL_TO, dialogLiteral);
+
+            // orderings
+            Ordering[] orderings = new Ordering[]{ qf.ascending(jcrPath) };
+
+            // execute query
+            Constraint constraints = qf.and(qf.or(c1, c2), c3);
+            Query query = qf.createQuery(selector, constraints, orderings, null);
             QueryResult result = query.execute();
             NodeIterator iterator = result.getNodes();
 
@@ -67,10 +87,21 @@
                 iterator = result.getNodes();
             }
     %>
+            <script>
+
+                $(document).ready(function () {
+                    // prefill pathbrowser with value from the url
+                    $(".js-coral-pathbrowser-input", $("#path").closest(".coral-Form-fieldwrapper")).val("<%= xssAPI.encodeForJSString(path) %>");
+                });
+
+            </script>
+
             <div id="info-text">
                 Found <b><%= nbResults %></b> dialogs below <b><%= path %></b>
             </div>
+
             <br />
+
             <div id="dialogs">
                 <table class="coral-Table coral-Table--hover">
                     <thead>
