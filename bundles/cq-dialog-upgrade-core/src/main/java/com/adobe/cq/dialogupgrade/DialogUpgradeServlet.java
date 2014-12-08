@@ -87,7 +87,7 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
             bind = "bindRule",
             unbind = "unbindRule"
     )
-    private List<ServiceReference> rulesReferences = new LinkedList<ServiceReference>();
+    private List<ServiceReference> rulesReferences = Collections.synchronizedList(new LinkedList<ServiceReference>());
 
     /**
      * Keeps track whether or not the references are currently in sorted order
@@ -104,8 +104,6 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
         this.context = context;
     }
 
-    // todo: synchronization?
-
     @SuppressWarnings("unused")
     protected void bindRule(ServiceReference reference) {
         rulesReferences.add(reference);
@@ -115,7 +113,6 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
     @SuppressWarnings("unused")
     protected void unbindRule(ServiceReference reference) {
         rulesReferences.remove(reference);
-        referencesSorted = false;
     }
 
     @Override
@@ -124,7 +121,9 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
         // if the references were updated
         if (!referencesSorted) {
             // sort them, in order to respect the service ranking
-            Collections.sort(rulesReferences);
+            synchronized (rulesReferences) {
+                Collections.sort(rulesReferences);
+            }
             referencesSorted = true;
         }
 
@@ -204,8 +203,10 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
 
         // rules provided as OSGi services
         if (context != null) {
-            for (ServiceReference reference : rulesReferences) {
-                rules.add((DialogRewriteRule) context.getBundleContext().getService(reference));
+            synchronized (rulesReferences) {
+                for (ServiceReference reference : rulesReferences) {
+                    rules.add((DialogRewriteRule) context.getBundleContext().getService(reference));
+                }
             }
         }
 
