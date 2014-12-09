@@ -34,6 +34,9 @@ import java.util.Set;
 import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.hasXtype;
 import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.hasPrimaryType;
 
+/**
+ * Rule that rewrites dialogs.
+ */
 @Component
 @Service
 @Properties({
@@ -63,7 +66,7 @@ public class CqDialogRewriteRule implements DialogRewriteRule {
             throw new RewriteException("Unable to find the dialog items");
         }
 
-        // add cq:content and cq:content/content nodes
+        // cq:dialog
         Node cqDialog = parent.addNode("cq:dialog", "nt:unstructured");
         finalNodes.add(cqDialog);
         if (root.hasProperty("helpPath")) {
@@ -73,38 +76,49 @@ public class CqDialogRewriteRule implements DialogRewriteRule {
             cqDialog.setProperty("jcr:title", root.getProperty("title").getValue());
         }
         cqDialog.setProperty("sling:resourceType", "cq/gui/components/authoring/dialog");
+        // cq:dialog/content
         Node content = cqDialog.addNode("content", "nt:unstructured");
         finalNodes.add(content);
         content.setProperty("sling:resourceType", "granite/ui/components/foundation/container");
+        // cq:dialog/content/layout
         Node layout = content.addNode("layout", "nt:unstructured");
         finalNodes.add(layout);
+        // cq:dialog/content/items
         Node items = content.addNode("items", "nt:unstructured");
         finalNodes.add(items);
 
         if (isTabbed) {
+            // tab layout
             layout.setProperty("sling:resourceType", "granite/ui/components/foundation/layouts/tabs");
             layout.setProperty("type", "nav");
         } else {
+            // fixedcolumn layout
             layout.setProperty("sling:resourceType", "granite/ui/components/foundation/layouts/fixedcolumns");
+            // cq:dialog/content/items/column
             Node column = items.addNode("column", "nt:unstructured");
             finalNodes.add(column);
             column.setProperty("sling:resourceType", "granite/ui/components/foundation/container");
+            // cq:dialog/content/items/column/items
             items = column.addNode("items", "nt:unstructured");
             finalNodes.add(items);
         }
+        // copy items
         NodeIterator iterator = dialogItems.getNodes();
         while (iterator.hasNext()) {
             Node item = iterator.nextNode();
             JcrUtil.copy(item, items, item.getName());
         }
 
+        // we do not remove the original tree (as we want to keep the old dialog), so
+        // we simply return the new root
         return cqDialog;
     }
 
+    /**
+     * Returns true if this dialog contains tabs, false otherwise.
+     */
     private boolean isTabbed(Node dialog)
             throws RepositoryException {
-        String xtype = dialog.hasProperty("xtype") ? dialog.getProperty("xtype").getString() : null;
-
         if (isTabPanel(dialog)) {
             return true;
         }
@@ -118,6 +132,10 @@ public class CqDialogRewriteRule implements DialogRewriteRule {
         return false;
     }
 
+    /**
+     * Returns the items that this dialog consists of. These might be components, or - in case of a tabbed
+     * dialog - tabs.
+     */
     private Node getDialogItems(Node dialog)
             throws RepositoryException {
         // find first sub node called "items" of type "cq:WidgetCollection"
@@ -138,6 +156,9 @@ public class CqDialogRewriteRule implements DialogRewriteRule {
         return items;
     }
 
+    /**
+     * Returns the child with the given name or null if it doesn't exist.
+     */
     private Node getChild(Node node, String name)
             throws RepositoryException {
         if (node.hasNode(name)) {
@@ -146,6 +167,9 @@ public class CqDialogRewriteRule implements DialogRewriteRule {
         return null;
     }
 
+    /**
+     * Returns true if the specified node is a tab panel, false otherwise.
+     */
     private boolean isTabPanel(Node node)
             throws RepositoryException {
         if (node == null) {

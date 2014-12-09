@@ -63,16 +63,18 @@ import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.renameTo
  *       + ...
  * </pre>
  *
- * If a tree matches any of the defined patterns - defined as children of the <code>pattern</code> nodes - then
- * it will be replaced by the tree specified below the <code>replacement</code> node. A pattern is an arbitrary
- * tree containing nodes and properties. It matches a tree, if the tree contains the same nodes as the pattern,
- * and all properties defined in the pattern match the properties on the tree.
+ * This example defines a rule containing two patterns (the trees rooted at <code>foo</code> and <code>foo1</code>)
+ * and a replacement (the tree rooted at <code>bar</code>). The pattern and replacement trees are arbitrary trees
+ * containing nodes and properties. The rule matches a subtree if any of the defined patterns matches. In order for
+ * a pattern to match, the subject tree must contain the same nodes as the pattern (matching names), and all properties
+ * defined in the pattern must match the properties on the tree.
  *
- * The replacement tree can define mapped properties of type <code>string</code> that will inherit the value of a
- * property in the original tree. They need to be of type <code>string</code> and have the following format:
- * <code>${&lt;path&gt;}</code>. For instance, the following property <code>one</code> will receive the value
- * of the property <code>./two/three</code> of the matched tree. Mapped properties can be multivalue, in which case
- * the it will inherit the first existing original property.
+ * In the case of a match, the matched subtree (called original tree) will be substituted by the replacement. The
+ * replacement tree can define mapped properties that will inherit the value of a property in the original tree. They
+ * need to be of type <code>string</code> and have the following format: <code>${&lt;path&gt;}. For instance, the
+ * following property <code>one</code> will be assigned the value of the property <code>./two/three</code> of the
+ * original tree. Mapped properties can be multivalue, in which case they will be assigned the value of the first
+ * property that exists in the matched tree.
  *
  * <pre>
  * ...
@@ -85,11 +87,11 @@ import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.renameTo
  * The replacement tree supports following special properties (named <code>cq:rewrite...</code>):
  *
  * <ul>
- *     <li><code>cq:rewriteMapChildren</code>: The node containing this property will receive a copy of the children of the
- *     node in the original tree referenced by the propery value</li>
- *     <li><code>cq:rewriteIsFinal</code>: Optimization measure, telling the algorithm that the node containing this
- *     property is final and doesn't have to be rechecked for matching rewrite rules. When placed on the
- *     <code>replacement</code> node itself, the whole replacement tree is considered final.</li>
+ *     <li><code>cq:rewriteMapChildren</code>: the node containing this property will receive a copy of the children of
+ *     the node in the original tree referenced by the property value</li>
+ *     <li><code>cq:rewriteIsFinal</code>: optimization measure, telling the algorithm that the node containing this
+ *     property is final and doesn't have to be rechecked for matching rewrite rules. When placed on the replacement
+ *     node itself, the whole replacement tree is considered final.</li>
  * </ul>
  */
 public class NodeBasedRewriteRule implements RewriteRule {
