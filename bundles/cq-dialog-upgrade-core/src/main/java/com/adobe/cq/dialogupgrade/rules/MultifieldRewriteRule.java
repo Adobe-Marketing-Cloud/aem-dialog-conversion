@@ -16,6 +16,10 @@ import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.hasXtype;
 import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.copyProperty;
 import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.renameToTemp;
 
+/**
+ * Rewrites widgets of xtype "multifield". The "fieldConfig" subnode (if existing) is renamed to "field" and
+ * will be handled by subsequent passes of the algorithm.
+ */
 @Component
 @Service
 @Properties({

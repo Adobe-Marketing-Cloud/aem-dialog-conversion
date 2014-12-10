@@ -73,8 +73,8 @@ import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.renameTo
  * replacement tree can define mapped properties that will inherit the value of a property in the original tree. They
  * need to be of type <code>string</code> and have the following format: <code>${&lt;path&gt;}. For instance, the
  * following property <code>one</code> will be assigned the value of the property <code>./two/three</code> of the
- * original tree. Mapped properties can be multivalue, in which case they will be assigned the value of the first
- * property that exists in the matched tree.
+ * matched original tree. Mapped properties can be multivalued, in which case they will be assigned the value of the
+ * first property that exists in the matched tree.
  *
  * <pre>
  * ...
@@ -87,9 +87,11 @@ import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.renameTo
  * The replacement tree supports following special properties (named <code>cq:rewrite...</code>):
  *
  * <ul>
- *     <li><code>cq:rewriteMapChildren</code>: the node containing this property will receive a copy of the children of
- *     the node in the original tree referenced by the property value</li>
- *     <li><code>cq:rewriteIsFinal</code>: optimization measure, telling the algorithm that the node containing this
+ *     <li><code>cq:rewriteMapChildren</code> (string)<br />
+ *     The node containing this property will receive a copy of the children of the node in the original tree
+ *     referenced by the property value (e.g. <code>cq:rewriteMapChildren=./items</code>).</li>
+ *     <li><code>cq:rewriteIsFinal</code> (boolean)<br />
+ *     Optimization measure, telling the algorithm that the node containing this
  *     property is final and doesn't have to be rechecked for matching rewrite rules. When placed on the replacement
  *     node itself, the whole replacement tree is considered final.</li>
  * </ul>

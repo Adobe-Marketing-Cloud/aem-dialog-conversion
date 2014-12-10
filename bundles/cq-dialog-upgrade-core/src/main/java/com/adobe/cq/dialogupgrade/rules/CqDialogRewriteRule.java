@@ -35,7 +35,9 @@ import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.hasXtype;
 import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.hasPrimaryType;
 
 /**
- * Rule that rewrites dialogs.
+ * Rule that rewrites the basic structure of dialogs. It creates a Granite UI container using either a "tabs" or
+ * "fixedcolumns" layout. The components (tabs or widgets) of the original dialog are copied over and will be handled
+ * by subsequent passes of the algorithm.
  */
 @Component
 @Service

@@ -35,6 +35,10 @@ import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.hasXtype;
 import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.copyProperty;
 import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.renameToTemp;
 
+/**
+ * Rewrites checkbox widgets to Granite UI checkboxes. Additionally, a hidden field is added as a sibling node,
+ * which is needed to make unchecking the checkbox work.
+ */
 @Component
 @Service
 @Properties({
