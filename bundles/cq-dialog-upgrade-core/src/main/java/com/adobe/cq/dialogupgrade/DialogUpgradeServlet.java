@@ -139,6 +139,7 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
             // validate 'paths' parameter
             RequestParameter[] paths = request.getRequestParameters(PARAM_PATHS);
             if (paths == null) {
+                logger.warn("Missing parameter '" + PARAM_PATHS + "'");
                 response.setContentType("text/html");
                 response.getWriter().println("Missing parameter '" + PARAM_PATHS + "'");
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
@@ -150,6 +151,7 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
             TreeRewriter rewriter = new TreeRewriter(rules);
             String path = "";
             JSONObject results = new JSONObject();
+            logger.debug("Upgrading {} dialogs", paths.length);
             // iterate over all paths
             for (RequestParameter parameter : paths) {
                 path = parameter.getString();
@@ -159,6 +161,7 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
                 // path doesn't exist
                 if (!session.nodeExists(path)) {
                     result.put(KEY_RESULT, UpgradeResult.PATH_NOT_FOUND);
+                    logger.debug("Path {} doesn't exist", path);
                     continue;
                 }
 
@@ -166,12 +169,14 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
                 // path does not point to a dialog
                 if (!"cq:Dialog".equals(dialog.getPrimaryNodeType().getName())) {
                     result.put(KEY_RESULT, UpgradeResult.NOT_A_DIALOG);
+                    logger.debug("{} is not a Classic UI dialog", path);
                     continue;
                 }
 
                 // Touch UI dialog already exists
                 if (dialog.getParent().hasNode("cq:dialog")) {
                     result.put(KEY_RESULT, UpgradeResult.ALREADY_UPGRADED);
+                    logger.debug("Dialog {} already has a Touch UI counterpart", path);
                     continue;
                 }
 
@@ -180,7 +185,7 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
                     Node upgradedDialog = rewriter.rewrite(dialog);
                     result.put(KEY_RESULT, UpgradeResult.SUCCESS);
                     result.put(KEY_PATH, upgradedDialog.getPath());
-                    logger.debug("Upgraded dialog to {}", upgradedDialog.getPath());
+                    logger.debug("Successfully upgraded dialog {} to {}", path,  upgradedDialog.getPath());
                 } catch (RewriteException e) {
                     result.put(KEY_RESULT, UpgradeResult.ERROR);
                     result.put(KEY_MESSAGE, e.getMessage());
@@ -191,7 +196,7 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
             response.getWriter().write(results.toString());
 
             long tack = System.currentTimeMillis();
-            logger.info("Rewrote {} dialogs in {} ms", paths.length, tack - tick);
+            logger.debug("Rewrote {} dialogs in {} ms", paths.length, tack - tick);
         } catch (Exception e) {
             throw new ServletException("Caught exception while rewriting dialogs", e);
         }
@@ -209,6 +214,7 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
                 }
             }
         }
+        int nb = rules.size();
 
         // node-based rules
         Resource resource = resolver.getResource(RULES_PATH);
@@ -216,6 +222,7 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
             rules.addAll(RewriteRulesFactory.createRules(resource.adaptTo(Node.class)));
         }
 
+        logger.debug("Found {} rules ({} Java-based, {} node-based)", nb, rules.size() - nb);
         return rules;
     }
 

@@ -336,4 +336,15 @@ public class NodeBasedRewriteRule implements RewriteRule {
         }
     }
 
+    @Override
+    public String toString() {
+        String path = null;
+        try {
+            path = ruleNode.getPath();
+        } catch (RepositoryException e) {
+            // ignore
+        }
+        return "NodeBasedRewriteRule" + (path == null ? "" : "[path=" +path + "]");
+    }
+
 }

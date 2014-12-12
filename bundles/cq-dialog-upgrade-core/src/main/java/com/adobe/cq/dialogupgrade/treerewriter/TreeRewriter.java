@@ -51,7 +51,7 @@ public class TreeRewriter {
      */
     public Node rewrite(Node root)
             throws RewriteException, RepositoryException {
-        logger.info("Rewriting tree rooted at {}", root.getPath());
+        logger.debug("Rewriting tree rooted at {}", root.getPath());
         long tick = System.currentTimeMillis();
 
         /**
@@ -80,6 +80,7 @@ public class TreeRewriter {
                 foundMatch = false;
                 TreeTraverser traverser = new TreeTraverser(startNode);
                 Iterator<Node> iterator = traverser.iterator();
+                logger.debug("Starting new pre-order tree traversal");
                 // traverse the tree in pre-order
                 while (iterator.hasNext()) {
                     Node node = iterator.next();
@@ -108,6 +109,7 @@ public class TreeRewriter {
                     for (RewriteRule rule : rules) {
                         // check for a match
                         if (rule.matches(node)) {
+                            logger.debug("Rule {} matched subtree rooted at {}", rule, node.getPath());
                             // the rule matched, rewrite the tree
                             Node result = rule.applyTo(node, finalNodes);
                             // set the start node in case it was rewritten
@@ -144,7 +146,7 @@ public class TreeRewriter {
         session.save();
 
         long tack = System.currentTimeMillis();
-        logger.info("Tree rooted at {} rewritten in {} ms", root.getPath(), tack - tick);
+        logger.debug("Rewrote tree rooted at {} in {} ms", root.getPath(), tack - tick);
 
         return startNode;
     }
