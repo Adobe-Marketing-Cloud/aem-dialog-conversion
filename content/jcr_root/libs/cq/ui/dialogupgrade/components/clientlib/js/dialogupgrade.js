@@ -1,6 +1,6 @@
 $(document).ready(function () {
 
-    $pathTextfield = $(".js-coral-pathbrowser-input", $("#path").closest(".coral-Form-fieldwrapper"));
+    var $pathTextfield = $(".js-coral-pathbrowser-input", $("#path").closest(".coral-Form-fieldwrapper"));
 
     /**
      * Click handler for the "show dialogs" button
@@ -11,10 +11,24 @@ $(document).ready(function () {
     });
 
     /**
+     * Keeps track of the time of the last selection of the pathbrowser select list.
+     */
+    var selectedMillis;
+    var selectList = $(".coral-SelectList", $("#path").closest(".coral-Form-fieldwrapper")).data("selectList");
+    selectList.on("selected", function (e) {
+        selectedMillis = new Date().getTime();
+    });
+
+    /**
      * Enable enter key for the path field
      */
     $($pathTextfield).keyup(function(event){
-        if(event.keyCode == 13){
+        if (event.keyCode == 13) {
+            // if the time between this event and the last selection is small, then we ignore this event
+            // (needed to ignore events coming from hitting enter when using the pathbrowser select list)
+            if (selectedMillis && (new Date().getTime()) - selectedMillis <= 150) {
+                return;
+            }
             $("#show-dialogs").click();
         }
     });
