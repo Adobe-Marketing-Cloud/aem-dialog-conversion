@@ -44,7 +44,7 @@ import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.hasPrima
 @Properties({
     @Property(name="service.ranking", intValue = 1)
 })
-public class CqDialogRewriteRule implements DialogRewriteRule {
+public class CqDialogRewriteRule extends AbstractRewriteRule {
 
     private static final String PRIMARY_TYPE = "cq:Dialog";
 

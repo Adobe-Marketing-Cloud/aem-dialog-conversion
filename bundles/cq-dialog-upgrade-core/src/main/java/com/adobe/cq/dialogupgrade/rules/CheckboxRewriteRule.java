@@ -44,7 +44,7 @@ import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.renameTo
 @Properties({
         @Property(name="service.ranking", intValue = 10)
 })
-public class CheckboxRewriteRule implements DialogRewriteRule {
+public class CheckboxRewriteRule extends AbstractRewriteRule {
 
     private static final String XTYPE = "selection";
     private static final String TYPE = "checkbox";

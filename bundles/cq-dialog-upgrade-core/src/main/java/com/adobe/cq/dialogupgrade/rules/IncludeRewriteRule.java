@@ -46,7 +46,7 @@ import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.hasPrima
 @Properties({
         @Property(name="service.ranking", intValue = 2)
 })
-public class IncludeRewriteRule implements DialogRewriteRule {
+public class IncludeRewriteRule extends AbstractRewriteRule {
 
     private static final String XTYPE = "cqinclude";
 

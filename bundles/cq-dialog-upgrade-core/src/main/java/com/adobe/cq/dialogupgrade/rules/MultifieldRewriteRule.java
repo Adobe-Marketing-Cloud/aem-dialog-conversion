@@ -25,7 +25,7 @@ import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.renameTo
 @Properties({
         @Property(name="service.ranking", intValue = 11)
 })
-public class MultifieldRewriteRule implements DialogRewriteRule {
+public class MultifieldRewriteRule extends AbstractRewriteRule {
 
     private static final String XTYPE = "multifield";
     private static final String GRANITEUI_MULTIFIELD_RT = "granite/ui/components/foundation/form/multifield";

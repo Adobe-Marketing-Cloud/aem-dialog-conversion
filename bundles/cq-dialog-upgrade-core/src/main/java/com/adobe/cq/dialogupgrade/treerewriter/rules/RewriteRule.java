@@ -60,4 +60,11 @@ public interface RewriteRule {
     Node applyTo(Node root, Set<Node> finalNodes)
             throws RewriteException, RepositoryException;
 
+    /**
+     * Determines the ranking of this rule (the lower the ranking the higher the priority).
+     *
+     * @return The ranking
+     */
+    int getRanking();
+
 }

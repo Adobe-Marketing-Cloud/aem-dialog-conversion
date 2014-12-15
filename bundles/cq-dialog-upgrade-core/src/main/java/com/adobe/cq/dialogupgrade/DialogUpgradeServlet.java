@@ -47,6 +47,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -90,11 +91,6 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
     private List<ServiceReference> rulesReferences = Collections.synchronizedList(new LinkedList<ServiceReference>());
 
     /**
-     * Keeps track whether or not the references are currently in sorted order
-     */
-    private boolean referencesSorted;
-
-    /**
      * Used to retrieve the service from the service references
      */
     private ComponentContext context;
@@ -107,7 +103,6 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
     @SuppressWarnings("unused")
     protected void bindRule(ServiceReference reference) {
         rulesReferences.add(reference);
-        referencesSorted = false;
     }
 
     @SuppressWarnings("unused")
@@ -118,15 +113,6 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
     @Override
     protected void doPost(SlingHttpServletRequest request, SlingHttpServletResponse response)
             throws ServletException, IOException {
-        // if the references were updated
-        if (!referencesSorted) {
-            // sort them, in order to respect the service ranking
-            synchronized (rulesReferences) {
-                Collections.sort(rulesReferences);
-            }
-            referencesSorted = true;
-        }
-
         // collect rules
         List<RewriteRule> rules;
         try {
@@ -204,7 +190,7 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
 
     private List<RewriteRule> collectRules(ResourceResolver resolver)
             throws RepositoryException {
-        List<RewriteRule> rules = new LinkedList<RewriteRule>();
+        final List<RewriteRule> rules = new LinkedList<RewriteRule>();
 
         // rules provided as OSGi services
         if (context != null) {
@@ -221,6 +207,15 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
         if (resource != null) {
             rules.addAll(RewriteRulesFactory.createRules(resource.adaptTo(Node.class)));
         }
+
+        // sort rules according to their ranking
+        Collections.sort(rules, new Comparator<RewriteRule>() {
+
+            public int compare(RewriteRule rule1, RewriteRule rule2) {
+                return Double.compare(rule1.getRanking(), rule2.getRanking());
+            }
+
+        });
 
         logger.debug("Found {} rules ({} Java-based, {} node-based)", nb, rules.size() - nb);
         return rules;
