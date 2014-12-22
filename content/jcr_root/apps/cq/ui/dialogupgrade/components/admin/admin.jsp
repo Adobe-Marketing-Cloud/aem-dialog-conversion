@@ -33,10 +33,10 @@
 
 <div id="content">
 
-    <cq:include path="/libs/cq/ui/dialogupgrade/content/console/components/showButton" resourceType="granite/ui/components/foundation/button"/>
+    <cq:include path="showButton" resourceType="granite/ui/components/foundation/button"/>
 
     <div class="left">
-        <cq:include path="/libs/cq/ui/dialogupgrade/content/console/components/path" resourceType="granite/ui/components/foundation/form/pathbrowser"/>
+        <cq:include path="path" resourceType="granite/ui/components/foundation/form/pathbrowser"/>
     </div>
 
     <br /><br /><br />
@@ -137,7 +137,7 @@
                             <td class="coral-Table-cell centered"><a href="<%= xssAPI.getValidHref(href) %>" target="_blank" class="coral-Link">show</a> / <a href="<%= xssAPI.getValidHref(crxHref) %>" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a></td>
                 <% if (parent.hasNode("cq:dialog")) {
                     Node touchDialog = parent.getNode("cq:dialog");
-                    href = externalizer.authorLink(resourceResolver, "/libs/cq/ui/dialogupgrade/content/render") + ".html" + touchDialog.getPath();
+                    href = externalizer.authorLink(resourceResolver, "/apps/cq/ui/dialogupgrade/content/render") + ".html" + touchDialog.getPath();
                     crxHref = externalizer.authorLink(resourceResolver, "/") + "crx/de/index.jsp#" + touchDialog.getPath().replaceAll(":", "%3A");
                 %>
                             <td class="coral-Table-cell centered"><i class="coral-Icon coral-Icon--check"></i><a href="<%= xssAPI.getValidHref(href) %>" target="_blank" class="coral-Link">show</a> / <a href="<%= xssAPI.getValidHref(crxHref) %>" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a></td>
@@ -149,7 +149,7 @@
                     </tbody>
                 </table>
                 <br />
-                <cq:include path="/libs/cq/ui/dialogupgrade/content/console/components/upgradeButton" resourceType="granite/ui/components/foundation/button"/>
+                <cq:include path="upgradeButton" resourceType="granite/ui/components/foundation/button"/>
             </div>
 
             <table class="coral-Table coral-Table--hover" id="upgrade-results">

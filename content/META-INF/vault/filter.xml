@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <workspaceFilter version="1.0">
     <filter root="/apps/cq/core/content/nav/tools/operations/dialogupgrade"/>
-    <filter root="/libs/cq/ui/dialogupgrade"/>
+    <filter root="/apps/cq/ui/dialogupgrade"/>
 </workspaceFilter>

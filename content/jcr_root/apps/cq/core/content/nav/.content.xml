@@ -10,7 +10,7 @@
                 jcr:primaryType="nt:unstructured"
                 jcr:title="Dialog Upgrade"
                 sling:orderBefore="configuration"
-                href="/libs/cq/ui/dialogupgrade/content/console.html"
+                href="/apps/cq/ui/dialogupgrade/content/console.html"
                 id="cq-tools-dialogupgrade">
                 <rep:policy/>
             </dialogupgrade>

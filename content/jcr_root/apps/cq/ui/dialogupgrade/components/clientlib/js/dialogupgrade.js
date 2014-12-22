@@ -64,7 +64,7 @@ $(document).ready(function () {
             return $(this).val();
         }).get();
 
-        var url = "/libs/cq/ui/dialogupgrade/content/upgrade.json";
+        var url = "/apps/cq/ui/dialogupgrade/content/upgrade.json";
         var data = {
             paths : paths
         };
@@ -99,7 +99,7 @@ $(document).ready(function () {
                 }
                 var links = "";
                 if (data[path].path) {
-                    var href = Granite.HTTP.externalize("/libs/cq/ui/dialogupgrade/content/render.html" + data[path].path);
+                    var href = Granite.HTTP.externalize("/apps/cq/ui/dialogupgrade/content/render.html" + data[path].path);
                     var crxHref = Granite.HTTP.externalize("/crx/de/index.jsp#" + data[path].path.replace(":", "%3A"));
                     links += '<a href="' + href + '" target="_blank" class="coral-Link">show</a> / <a href="' + crxHref + '" target="_blank" class="coral-Link">crxde</a>';
                 }

@@ -51,9 +51,12 @@ import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
+import static com.adobe.cq.dialogupgrade.DialogUpgradeConstants.BASE_PATH;
+import static com.adobe.cq.dialogupgrade.DialogUpgradeConstants.RULES_SEARCH_PATH;
+
 @SlingServlet(
         methods = "POST",
-        paths = "/libs/cq/ui/dialogupgrade/content/upgrade",
+        paths = BASE_PATH + "content/upgrade",
         extensions = "json"
 )
 public class DialogUpgradeServlet extends SlingAllMethodsServlet {
@@ -70,11 +73,6 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
         SUCCESS,
         ERROR
     }
-
-    /**
-     * Path to the upgrade rules container
-     */
-    private static final String RULES_PATH = "cq/ui/dialogupgrade/rules";
 
     private Logger logger = LoggerFactory.getLogger(DialogUpgradeServlet.class);
 
@@ -203,7 +201,7 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
         int nb = rules.size();
 
         // node-based rules
-        Resource resource = resolver.getResource(RULES_PATH);
+        Resource resource = resolver.getResource(RULES_SEARCH_PATH);
         if (resource != null) {
             rules.addAll(RewriteRulesFactory.createRules(resource.adaptTo(Node.class)));
         }
