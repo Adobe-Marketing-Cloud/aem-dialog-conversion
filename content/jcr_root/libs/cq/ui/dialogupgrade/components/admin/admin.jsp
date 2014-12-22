@@ -19,11 +19,17 @@
                                   javax.jcr.NodeIterator,
                                   javax.jcr.Session,
                                   javax.jcr.ValueFactory,
-                                  javax.jcr.query.*,
-                                  javax.jcr.query.qom.*,
+                                  javax.jcr.query.Query,
+                                  javax.jcr.query.QueryManager,
+                                  javax.jcr.query.QueryResult,
+                                  javax.jcr.query.qom.Constraint,
                                   javax.jcr.query.qom.Literal,
-                                  static javax.jcr.query.qom.QueryObjectModelConstants.*" %>
-<%@include file="/libs/foundation/global.jsp"%>
+                                  javax.jcr.query.qom.Ordering,
+                                  javax.jcr.query.qom.PropertyValue,
+                                  javax.jcr.query.qom.QueryObjectModelFactory,
+                                  javax.jcr.query.qom.Selector,
+                                  static javax.jcr.query.qom.QueryObjectModelConstants.JCR_OPERATOR_EQUAL_TO" %><%
+%><%@include file="/libs/foundation/global.jsp"%>
 
 <div id="content">
 

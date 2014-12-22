@@ -1,6 +1,5 @@
 package com.adobe.cq.dialogupgrade.rules;
 
-import com.adobe.cq.dialogupgrade.api.DialogRewriteRule;
 import com.adobe.cq.dialogupgrade.treerewriter.RewriteException;
 import com.day.cq.commons.jcr.JcrUtil;
 import org.apache.felix.scr.annotations.Component;
