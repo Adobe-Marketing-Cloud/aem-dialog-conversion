@@ -16,9 +16,9 @@
  * from Adobe Systems Incorporated.
  **************************************************************************/
 
-package com.adobe.cq.dialogupgrade;
+package com.adobe.cq.dialogupgrade.impl;
 
-import com.adobe.cq.dialogupgrade.api.DialogRewriteRule;
+import com.adobe.cq.dialogupgrade.DialogRewriteRule;
 import com.adobe.cq.dialogupgrade.treerewriter.RewriteException;
 import com.adobe.cq.dialogupgrade.treerewriter.TreeRewriter;
 import com.adobe.cq.dialogupgrade.treerewriter.rules.RewriteRule;

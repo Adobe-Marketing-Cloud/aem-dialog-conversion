@@ -1,6 +1,6 @@
-package com.adobe.cq.dialogupgrade.rules;
+package com.adobe.cq.dialogupgrade.impl.rules;
 
-import com.adobe.cq.dialogupgrade.api.DialogRewriteRule;
+import com.adobe.cq.dialogupgrade.DialogRewriteRule;
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
 import org.osgi.service.component.ComponentContext;

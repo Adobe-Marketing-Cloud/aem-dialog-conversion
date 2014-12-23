@@ -72,7 +72,7 @@
                     <instructions>
                         <Bundle-Category>cq5</Bundle-Category>
                         <Export-Package>
-                            com.adobe.cq.dialogupgrade.api
+                            com.adobe.cq.dialogupgrade
                         </Export-Package>
                     </instructions>
                 </configuration>

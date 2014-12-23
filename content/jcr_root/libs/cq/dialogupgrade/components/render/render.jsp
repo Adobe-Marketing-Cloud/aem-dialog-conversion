@@ -1,14 +1,13 @@
 <%--
 
-  render component.
-
-  
+  Renders the Touch UI dialog specified by the suffix path.
 
 --%><%
 %><%@include file="/libs/foundation/global.jsp"%><%
-%><%@page session="false" %><%
+%><%@page session="false" import="com.adobe.cq.dialogupgrade.DialogUpgradeConstants"%><%
 %><%
 
-    String suffix = slingRequest.getRequestPathInfo().getSuffix();
+    String dialogPath = slingRequest.getRequestPathInfo().getSuffix();
+    String emptyResourcePath = DialogUpgradeConstants.BASE_PATH + "/content/empty/jcr:content";
 
-%><sling:forward path="<%= suffix %>" replaceSuffix="/libs/cq/dialogupgrade/content/empty/jcr:content" resourceType="cq/gui/components/authoring/dialog" />
+%><sling:forward path="<%= dialogPath %>" replaceSuffix="<%= emptyResourcePath %>" resourceType="cq/gui/components/authoring/dialog" />

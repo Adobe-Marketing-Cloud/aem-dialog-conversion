@@ -21,6 +21,9 @@ package com.adobe.cq.dialogupgrade;
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 
+/**
+ * Provides utility methods.
+ */
 public class DialogUpgradeUtils {
 
     /**

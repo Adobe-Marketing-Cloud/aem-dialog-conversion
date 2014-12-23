@@ -1,5 +1,8 @@
 package com.adobe.cq.dialogupgrade;
 
+/**
+ * Defines constants.
+ */
 public class DialogUpgradeConstants {
 
     /**

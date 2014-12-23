@@ -56,6 +56,7 @@ public interface RewriteRule {
      *
      * @param root The root of the subtree to be rewritten
      * @return the root node of the rewritten tree, or null if it was removed
+     * @throws RewriteException if the rewrite operation failed or cannot be completed
      */
     Node applyTo(Node root, Set<Node> finalNodes)
             throws RewriteException, RepositoryException;

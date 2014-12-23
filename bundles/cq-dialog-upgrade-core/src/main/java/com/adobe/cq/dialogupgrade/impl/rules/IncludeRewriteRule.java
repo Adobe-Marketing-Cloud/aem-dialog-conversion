@@ -16,9 +16,9 @@
  * from Adobe Systems Incorporated.
  **************************************************************************/
 
-package com.adobe.cq.dialogupgrade.rules;
+package com.adobe.cq.dialogupgrade.impl.rules;
 
-import com.adobe.cq.dialogupgrade.treerewriter.RewriteException;
+import com.adobe.cq.dialogupgrade.DialogRewriteException;
 import com.day.cq.commons.PathInfo;
 import com.day.cq.commons.jcr.JcrUtil;
 import org.apache.felix.scr.annotations.Component;
@@ -55,10 +55,10 @@ public class IncludeRewriteRule extends AbstractRewriteRule {
     }
 
     public Node applyTo(Node root, Set<Node> finalNodes)
-            throws RewriteException, RepositoryException {
+            throws DialogRewriteException, RepositoryException {
         // check if the 'path property exists
         if (!root.hasProperty("path")) {
-            throw new RewriteException("Missing include path");
+            throw new DialogRewriteException("Missing include path");
         }
 
         // get path to included node
@@ -68,7 +68,7 @@ public class IncludeRewriteRule extends AbstractRewriteRule {
         // check if the path is valid
         Session session = root.getSession();
         if (!session.nodeExists(path)) {
-            throw new RewriteException("Include path does not exist");
+            throw new DialogRewriteException("Include path does not exist");
         }
 
         // remove original

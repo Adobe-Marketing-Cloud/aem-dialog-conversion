@@ -1,6 +1,6 @@
-package com.adobe.cq.dialogupgrade.rules;
+package com.adobe.cq.dialogupgrade.impl.rules;
 
-import com.adobe.cq.dialogupgrade.treerewriter.RewriteException;
+import com.adobe.cq.dialogupgrade.DialogRewriteException;
 import com.day.cq.commons.jcr.JcrUtil;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
@@ -36,7 +36,7 @@ public class MultifieldRewriteRule extends AbstractRewriteRule {
     }
 
     public Node applyTo(Node root, Set<Node> finalNodes)
-            throws RewriteException, RepositoryException {
+            throws DialogRewriteException, RepositoryException {
         Node parent = root.getParent();
         String name = root.getName();
         renameToTemp(root);

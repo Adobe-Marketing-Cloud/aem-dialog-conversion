@@ -16,9 +16,9 @@
  * from Adobe Systems Incorporated.
  **************************************************************************/
 
-package com.adobe.cq.dialogupgrade.rules;
+package com.adobe.cq.dialogupgrade.impl.rules;
 
-import com.adobe.cq.dialogupgrade.treerewriter.RewriteException;
+import com.adobe.cq.dialogupgrade.DialogRewriteException;
 import com.day.cq.commons.jcr.JcrUtil;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
@@ -53,18 +53,18 @@ public class CqDialogRewriteRule extends AbstractRewriteRule {
     }
 
     public Node applyTo(Node root, Set<Node> finalNodes)
-            throws RewriteException, RepositoryException {
+            throws DialogRewriteException, RepositoryException {
         // Granite UI dialog already exists at this location
         Node parent = root.getParent();
         if (parent.hasNode("cq:dialog")) {
-            throw new RewriteException("Could not rewrite dialog: cq:dialog node already exists");
+            throw new DialogRewriteException("Could not rewrite dialog: cq:dialog node already exists");
         }
 
         boolean isTabbed = isTabbed(root);
         // get the items: in case of a tabbed dialog, these represent tabs, otherwise widgets
         Node dialogItems = getDialogItems(root);
         if (dialogItems == null) {
-            throw new RewriteException("Unable to find the dialog items");
+            throw new DialogRewriteException("Unable to find the dialog items");
         }
 
         // cq:dialog
