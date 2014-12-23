@@ -135,8 +135,7 @@
                         <embedded>
                             <groupId>com.adobe.cq</groupId>
                             <artifactId>cq-dialog-upgrade-core</artifactId>
-                            <!-- todo: which location? -->
-                            <target>/libs/foundation/install</target>
+                            <target>/libs/cq/dialogupgrade/install</target>
                             <filter>true</filter>
                         </embedded>
                     </embeddeds>

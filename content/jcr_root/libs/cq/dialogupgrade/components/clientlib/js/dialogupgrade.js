@@ -1,5 +1,7 @@
 $(document).ready(function () {
 
+    var basePath = "/libs/cq/dialogupgrade";
+
     var $pathTextfield = $(".js-coral-pathbrowser-input", $("#path").closest(".coral-Form-fieldwrapper"));
 
     /**
@@ -64,7 +66,7 @@ $(document).ready(function () {
             return $(this).val();
         }).get();
 
-        var url = "/apps/cq/ui/dialogupgrade/content/upgrade.json";
+        var url = basePath + "/content/upgrade.json";
         var data = {
             paths : paths
         };
@@ -99,7 +101,7 @@ $(document).ready(function () {
                 }
                 var links = "";
                 if (data[path].path) {
-                    var href = Granite.HTTP.externalize("/apps/cq/ui/dialogupgrade/content/render.html" + data[path].path);
+                    var href = Granite.HTTP.externalize(basePath + "/content/render.html" + data[path].path);
                     var crxHref = Granite.HTTP.externalize("/crx/de/index.jsp#" + data[path].path.replace(":", "%3A"));
                     links += '<a href="' + href + '" target="_blank" class="coral-Link">show</a> / <a href="' + crxHref + '" target="_blank" class="coral-Link">crxde</a>';
                 }

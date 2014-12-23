@@ -137,7 +137,7 @@
                             <td class="coral-Table-cell centered"><a href="<%= xssAPI.getValidHref(href) %>" target="_blank" class="coral-Link">show</a> / <a href="<%= xssAPI.getValidHref(crxHref) %>" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a></td>
                 <% if (parent.hasNode("cq:dialog")) {
                     Node touchDialog = parent.getNode("cq:dialog");
-                    href = externalizer.authorLink(resourceResolver, "/apps/cq/ui/dialogupgrade/content/render") + ".html" + touchDialog.getPath();
+                    href = externalizer.authorLink(resourceResolver, "/libs/cq/dialogupgrade/content/render") + ".html" + touchDialog.getPath();
                     crxHref = externalizer.authorLink(resourceResolver, "/") + "crx/de/index.jsp#" + touchDialog.getPath().replaceAll(":", "%3A");
                 %>
                             <td class="coral-Table-cell centered"><i class="coral-Icon coral-Icon--check"></i><a href="<%= xssAPI.getValidHref(href) %>" target="_blank" class="coral-Link">show</a> / <a href="<%= xssAPI.getValidHref(crxHref) %>" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a></td>
