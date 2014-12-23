@@ -18,6 +18,7 @@
 
 package com.adobe.cq.dialogupgrade.impl.rules;
 
+import com.adobe.cq.dialogupgrade.AbstractDialogRewriteRule;
 import com.adobe.cq.dialogupgrade.DialogRewriteException;
 import com.day.cq.commons.jcr.JcrUtil;
 import org.apache.felix.scr.annotations.Component;
@@ -43,7 +44,7 @@ import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.renameTo
 @Properties({
         @Property(name="service.ranking", intValue = 10)
 })
-public class CheckboxRewriteRule extends AbstractRewriteRule {
+public class CheckboxRewriteRule extends AbstractDialogRewriteRule {
 
     private static final String XTYPE = "selection";
     private static final String TYPE = "checkbox";

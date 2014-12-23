@@ -49,7 +49,7 @@ import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.renameTo
  * <pre>
  * rule
  *   - jcr:primaryType = nt:unstructured
- *   - ranking = 4
+ *   - cq:rewriteRanking = 4
  *   + patterns
  *     - jcr:primaryType = nt:unstructured
  *     + foo
@@ -103,6 +103,7 @@ public class NodeBasedRewriteRule implements RewriteRule {
     private static final Pattern MAPPED_PATTERN = Pattern.compile("^\\$\\{(.*)\\}$");
 
     // special properties
+    private static final String PROPERTY_RANKING = "cq:rewriteRanking";
     private static final String PROPERTY_MAP_CHILDREN = "cq:rewriteMapChildren";
     private static final String PROPERTY_IS_FINAL = "cq:rewriteIsFinal";
 
@@ -352,15 +353,15 @@ public class NodeBasedRewriteRule implements RewriteRule {
     public int getRanking() {
         if (ranking == null) {
             try {
-                if (ruleNode.hasProperty("ranking")) {
-                    long ranking = ruleNode.getProperty("ranking").getLong();
+                if (ruleNode.hasProperty(PROPERTY_RANKING)) {
+                    long ranking = ruleNode.getProperty(PROPERTY_RANKING).getLong();
                     this.ranking = new Long(ranking).intValue();
                 } else {
                     // we assign the default value
-                    this.ranking = Integer.MAX_VALUE;
+                    this.ranking = -1;
                 }
             } catch (RepositoryException e) {
-                logger.warn("Caught exception while reading the ranking property");
+                logger.warn("Caught exception while reading the " + PROPERTY_RANKING + " property");
             }
         }
         return this.ranking;

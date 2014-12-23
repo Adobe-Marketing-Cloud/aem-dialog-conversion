@@ -1,5 +1,6 @@
 package com.adobe.cq.dialogupgrade.impl.rules;
 
+import com.adobe.cq.dialogupgrade.AbstractDialogRewriteRule;
 import com.adobe.cq.dialogupgrade.DialogRewriteException;
 import com.day.cq.commons.jcr.JcrUtil;
 import org.apache.felix.scr.annotations.Component;
@@ -24,7 +25,7 @@ import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.renameTo
 @Properties({
         @Property(name="service.ranking", intValue = 11)
 })
-public class MultifieldRewriteRule extends AbstractRewriteRule {
+public class MultifieldRewriteRule extends AbstractDialogRewriteRule {
 
     private static final String XTYPE = "multifield";
     private static final String GRANITEUI_MULTIFIELD_RT = "granite/ui/components/foundation/form/multifield";

@@ -1,6 +1,5 @@
-package com.adobe.cq.dialogupgrade.impl.rules;
+package com.adobe.cq.dialogupgrade;
 
-import com.adobe.cq.dialogupgrade.DialogRewriteRule;
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Component;
 import org.osgi.service.component.ComponentContext;
@@ -14,9 +13,9 @@ import java.util.Dictionary;
  * Abstract dialog upgrade rule implementing {@link DialogRewriteRule#getRanking}.
  */
 @Component(componentAbstract = true)
-public abstract class AbstractRewriteRule implements DialogRewriteRule {
+public abstract class AbstractDialogRewriteRule implements DialogRewriteRule {
 
-    private Logger logger = LoggerFactory.getLogger(AbstractRewriteRule.class);
+    private Logger logger = LoggerFactory.getLogger(AbstractDialogRewriteRule.class);
 
     private int ranking = Integer.MAX_VALUE;
 

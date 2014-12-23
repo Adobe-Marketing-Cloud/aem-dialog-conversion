@@ -56,7 +56,7 @@ import static com.adobe.cq.dialogupgrade.DialogUpgradeConstants.RULES_SEARCH_PAT
 
 @SlingServlet(
         methods = "POST",
-        paths = BASE_PATH + "content/upgrade",
+        paths = BASE_PATH + "/content/upgrade",
         extensions = "json"
 )
 public class DialogUpgradeServlet extends SlingAllMethodsServlet {
@@ -210,7 +210,11 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
         Collections.sort(rules, new Comparator<RewriteRule>() {
 
             public int compare(RewriteRule rule1, RewriteRule rule2) {
-                return Double.compare(rule1.getRanking(), rule2.getRanking());
+                int ranking1 = rule1.getRanking();
+                ranking1 = ranking1 < 0 ? Integer.MAX_VALUE : ranking1;
+                int ranking2 = rule2.getRanking();
+                ranking2 = ranking2 < 0 ? Integer.MAX_VALUE : ranking2;
+                return Double.compare(ranking1, ranking2);
             }
 
         });

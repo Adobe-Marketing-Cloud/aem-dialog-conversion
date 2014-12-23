@@ -62,7 +62,8 @@ public interface RewriteRule {
             throws RewriteException, RepositoryException;
 
     /**
-     * Determines the ranking of this rule (the lower the ranking the higher the priority).
+     * Determines the ranking of this rule (the lower the ranking the higher the priority). If the return value
+     * is negative, then the rule will have the lowest priority possible.
      *
      * @return The ranking
      */

@@ -18,6 +18,7 @@
 
 package com.adobe.cq.dialogupgrade.impl.rules;
 
+import com.adobe.cq.dialogupgrade.AbstractDialogRewriteRule;
 import com.adobe.cq.dialogupgrade.DialogRewriteException;
 import com.day.cq.commons.PathInfo;
 import com.day.cq.commons.jcr.JcrUtil;
@@ -45,7 +46,7 @@ import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.hasPrima
 @Properties({
         @Property(name="service.ranking", intValue = 2)
 })
-public class IncludeRewriteRule extends AbstractRewriteRule {
+public class IncludeRewriteRule extends AbstractDialogRewriteRule {
 
     private static final String XTYPE = "cqinclude";
 
