@@ -1,26 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
     jcr:primaryType="nt:unstructured"
-    cq:rewriteRanking="3">
+    cq:rewriteRanking="4">
     <patterns jcr:primaryType="nt:unstructured">
-        <tabpanel/>
-        <tabpanel1/>
-        <tabpanel2/>
+        <panel/>
+        <panel1/>
+        <panel2/>
     </patterns>
     <replacement jcr:primaryType="nt:unstructured">
-        <tabpanel
+        <panel
             jcr:primaryType="nt:unstructured"
+            jcr:title="${./title}"
             sling:resourceType="granite/ui/components/foundation/container"
             cq:rewriteIsFinal="{Boolean}true">
             <layout
                 jcr:primaryType="nt:unstructured"
-                sling:resourceType="granite/ui/components/foundation/layouts/tabs"
-                type="nav"
+                sling:resourceType="granite/ui/components/foundation/layouts/fixedcolumns"
                 cq:rewriteIsFinal="{Boolean}true"/>
             <items
                 jcr:primaryType="nt:unstructured"
-                cq:rewriteMapChildren="./items"
-                cq:rewriteIsFinal="{Boolean}true"/>
-        </tabpanel>
+                cq:rewriteIsFinal="{Boolean}true">
+                <columns
+                    jcr:primaryType="nt:unstructured"
+                    sling:resourceType="granite/ui/components/foundation/container"
+                    cq:rewriteIsFinal="{Boolean}true">
+                    <items
+                        cq:rewriteMapChildren="./items"
+                        jcr:primaryType="nt:unstructured"
+                        cq:rewriteIsFinal="{Boolean}true"/>
+                </columns>
+            </items>
+        </panel>
     </replacement>
 </jcr:root>

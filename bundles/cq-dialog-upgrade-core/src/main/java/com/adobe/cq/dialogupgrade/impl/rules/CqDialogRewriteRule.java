@@ -68,42 +68,24 @@ public class CqDialogRewriteRule extends AbstractDialogRewriteRule {
             throw new DialogRewriteException("Unable to find the dialog items");
         }
 
-        // cq:dialog
+        // add cq:dialog node
         Node cqDialog = parent.addNode("cq:dialog", "nt:unstructured");
         finalNodes.add(cqDialog);
+        cqDialog.setProperty("sling:resourceType", "cq/gui/components/authoring/dialog");
         if (root.hasProperty("helpPath")) {
             cqDialog.setProperty("helpPath", root.getProperty("helpPath").getValue());
         }
         if (root.hasProperty("title")) {
             cqDialog.setProperty("jcr:title", root.getProperty("title").getValue());
         }
-        cqDialog.setProperty("sling:resourceType", "cq/gui/components/authoring/dialog");
-        // cq:dialog/content
-        Node content = cqDialog.addNode("content", "nt:unstructured");
-        finalNodes.add(content);
-        content.setProperty("sling:resourceType", "granite/ui/components/foundation/container");
-        // cq:dialog/content/layout
-        Node layout = content.addNode("layout", "nt:unstructured");
-        finalNodes.add(layout);
-        // cq:dialog/content/items
-        Node items = content.addNode("items", "nt:unstructured");
-        finalNodes.add(items);
 
-        if (isTabbed) {
-            // tab layout
-            layout.setProperty("sling:resourceType", "granite/ui/components/foundation/layouts/tabs");
-            layout.setProperty("type", "nav");
-        } else {
-            // fixedcolumn layout
-            layout.setProperty("sling:resourceType", "granite/ui/components/foundation/layouts/fixedcolumns");
-            // cq:dialog/content/items/column
-            Node column = items.addNode("column", "nt:unstructured");
-            finalNodes.add(column);
-            column.setProperty("sling:resourceType", "granite/ui/components/foundation/container");
-            // cq:dialog/content/items/column/items
-            items = column.addNode("items", "nt:unstructured");
-            finalNodes.add(items);
-        }
+        // add content node as a panel or tabpanel widget (will be rewritten by the corresponding rule)
+        String nodeType = isTabbed ? "cq:TabPanel" : "cq:Panel";
+        Node content = cqDialog.addNode("content", nodeType);
+
+        // add items child node
+        Node items = content.addNode("items", "cq:WidgetCollection");
+
         // copy items
         NodeIterator iterator = dialogItems.getNodes();
         while (iterator.hasNext()) {
