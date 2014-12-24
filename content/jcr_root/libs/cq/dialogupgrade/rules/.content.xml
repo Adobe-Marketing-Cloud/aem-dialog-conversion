@@ -13,7 +13,7 @@
     <pathfield/>
     <radio/>
     <radiogroup/>
-    <selection/>
+    <select/>
     <sizefield/>
     <tabpanel/>
     <tags/>
