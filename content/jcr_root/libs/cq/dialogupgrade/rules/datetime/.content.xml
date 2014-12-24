@@ -12,12 +12,12 @@
             sling:resourceType="granite/ui/components/foundation/form/datepicker"
             fieldLabel="${./fieldLabel}"
             fieldDescription="${./fieldDescription}"
-            renderReadOnly="${./readOnly}"
-            disabled="${./disabled}"
-            type="datetime"
-            emptyText="${./emptyText}"
             name="${./name}"
+            value="${./value}"
             required="${./allowBlank}"
-            value="${./value}"/>
+            disabled="${./disabled}"
+            renderReadOnly="${./readOnly}"
+            emptyText="${./emptyText}"
+            type="datetime"/>
     </replacement>
 </jcr:root>

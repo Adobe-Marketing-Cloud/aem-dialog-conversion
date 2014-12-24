@@ -10,10 +10,10 @@
         <password
             jcr:primaryType="nt:unstructured"
             sling:resourceType="granite/ui/components/foundation/form/password"
-            disabled="${./disabled}"
-            fieldDescription="${./fieldDescription}"
-            fieldLabel="${./fieldLabel}"
             name="${./name}"
-            required="${./allowBlank}"/>
+            fieldLabel="${./fieldLabel}"
+            fieldDescription="${./fieldDescription}"
+            required="${./allowBlank}"
+            disabled="${./disabled}"/>
     </replacement>
 </jcr:root>

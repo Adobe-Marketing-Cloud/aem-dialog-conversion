@@ -8,13 +8,13 @@
     <replacement jcr:primaryType="nt:unstructured">
         <fieldset
             jcr:primaryType="nt:unstructured"
-            jcr:title="${./title}"
             sling:resourceType="granite/ui/components/foundation/form/fieldset"
+            jcr:title="${./title}"
             title="${./title}"
             cq:rewriteIsFinal="{Boolean}true">
             <items
-                cq:rewriteMapChildren="./items"
                 jcr:primaryType="nt:unstructured"
+                cq:rewriteMapChildren="./items"
                 cq:rewriteIsFinal="{Boolean}true"/>
         </fieldset>
     </replacement>

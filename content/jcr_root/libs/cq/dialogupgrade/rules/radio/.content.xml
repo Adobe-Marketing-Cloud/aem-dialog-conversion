@@ -8,11 +8,11 @@
         <radio
             jcr:primaryType="nt:unstructured"
             sling:resourceType="granite/ui/components/foundation/form/radio"
-            name="${./name}"
             text="${./fieldLabel}"
+            name="${./name}"
             value="${./inputValue}"
-            checked="${./checked}"
             disabled="${./disabled}"
+            checked="${./checked}"
             cq:rewriteIsFinal="{Boolean}true">
         </radio>
     </replacement>

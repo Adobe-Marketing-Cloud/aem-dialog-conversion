@@ -11,7 +11,7 @@
             jcr:primaryType="nt:unstructured"
             sling:resourceType="granite/ui/components/foundation/button"
             type="button"
-            disabled="${./disabled}"
-            text="${./text}"/>
+            text="${./text}"
+            disabled="${./disabled}"/>
     </replacement>
 </jcr:root>

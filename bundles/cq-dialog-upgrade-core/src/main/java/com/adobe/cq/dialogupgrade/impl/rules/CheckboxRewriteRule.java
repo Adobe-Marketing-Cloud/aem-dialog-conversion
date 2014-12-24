@@ -64,18 +64,17 @@ public class CheckboxRewriteRule extends AbstractDialogRewriteRule {
         finalNodes.add(newRoot);
         newRoot.setProperty("sling:resourceType", GRANITEUI_CHECKBOX_RT);
         // set properties
+        copyProperty(root, "fieldLabel", newRoot, "text");
         copyProperty(root, "fieldDescription", newRoot, "fieldDescription");
         copyProperty(root, "name", newRoot, "name");
-        copyProperty(root, "readOnly", newRoot, "renderReadOnly");
-        copyProperty(root, "fieldLabel", newRoot, "text");
-        copyProperty(root, "fieldLabel", newRoot, "title");
-        copyProperty(root, "checked", newRoot, "checked");
-        copyProperty(root, "disabled", newRoot, "disabled");
         if (copyProperty(root, "inputValue", newRoot, "value") == null) {
             if (copyProperty(root, "value", newRoot, "value") == null) {
                 copyProperty(root, "inputValue", newRoot, "value");
             }
         }
+        copyProperty(root, "disabled", newRoot, "disabled");
+        copyProperty(root, "readOnly", newRoot, "renderReadOnly");
+        copyProperty(root, "checked", newRoot, "checked");
 
         // add hidden field to enable unchecking the checkbox
         name = JcrUtil.createValidChildName(parent, name + "-delete");

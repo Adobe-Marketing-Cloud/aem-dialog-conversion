@@ -10,8 +10,8 @@
         <hidden
             jcr:primaryType="nt:unstructured"
             sling:resourceType="granite/ui/components/foundation/form/hidden"
-            disabled="${./disabled}"
             name="${./name}"
-            value="${./value}"/>
+            value="${./value}"
+            disabled="${./disabled}"/>
     </replacement>
 </jcr:root>

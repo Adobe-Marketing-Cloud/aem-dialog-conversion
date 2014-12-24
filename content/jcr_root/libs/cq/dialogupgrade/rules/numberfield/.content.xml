@@ -13,11 +13,11 @@
             fieldLabel="${./fieldLabel}"
             fieldDescription="${./fieldDescription}"
             name="${./name}"
-            disabled="${./disabled}"
-            required="${./allowBlank}"
+            value="${./value}"
             defaultValue="${./defaultValue}"
+            required="${./allowBlank}"
+            disabled="${./disabled}"
             min="${./minValue}"
-            max="${./maxValue}"
-            value="${./value}"/>
+            max="${./maxValue}"/>
     </replacement>
 </jcr:root>

@@ -10,8 +10,8 @@
         <sizefield
             jcr:primaryType="nt:unstructured"
             sling:resourceType="cq/gui/components/authoring/dialog/sizefield"
-            fieldDescription="${./fieldDescription}"
-            fieldLabel="${./fieldLabel}">
+            fieldLabel="${./fieldLabel}"
+            fieldDescription="${./fieldDescription}">
             <width
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="granite/ui/components/foundation/form/numberfield"
