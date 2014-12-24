@@ -11,15 +11,18 @@
         <autocomplete
             jcr:primaryType="nt:unstructured"
             sling:resourceType="granite/ui/components/foundation/form/autocomplete"
-            fieldDescription="Enter a property like 'jcr:created'"
-            fieldLabel="Order by"
-            name="./orderBy">
+            fieldLabel="${./fieldLabel}"
+            fieldDescription="${./fieldDescription}"
+            name="${./name}"
+            disabled="${./disabled}"
+            renderReadOnly="${./readOnly}"
+            title="${./title}">
             <options
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="granite/ui/components/foundation/form/autocomplete/list"/>
             <items
-                cq:rewriteMapChildren="./options"
-                jcr:primaryType="nt:unstructured"/>
+                jcr:primaryType="nt:unstructured"
+                cq:rewriteMapChildren="./options"/>
         </autocomplete>
     </replacement>
 </jcr:root>
