@@ -27,7 +27,7 @@ public abstract class AbstractDialogRewriteRule implements DialogRewriteRule {
         // read service ranking property
         Object ranking = props.get("service.ranking");
         if (ranking == null) {
-            return;
+            ranking = -1;
         }
         this.ranking = (Integer) ranking;
     }

@@ -22,9 +22,6 @@ import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.renameTo
  */
 @Component
 @Service
-@Properties({
-        @Property(name="service.ranking", intValue = 11)
-})
 public class MultifieldRewriteRule extends AbstractDialogRewriteRule {
 
     private static final String XTYPE = "multifield";
