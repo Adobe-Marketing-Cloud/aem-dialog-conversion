@@ -172,7 +172,6 @@
             <groupId>com.adobe.cq</groupId>
             <artifactId>cq-dialog-upgrade-core</artifactId>
             <version>0.0.1-SNAPSHOT</version>
-            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.jcr</groupId>
