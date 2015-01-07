@@ -14,22 +14,16 @@
   is strictly forbidden unless prior written permission is obtained
   from Adobe Systems Incorporated.
 --%><%
-%><%@page session="false" import="com.day.cq.commons.Externalizer,
+%><%@page session="false" import="com.adobe.cq.dialogupgrade.DialogUpgradeConstants,
+                                  com.day.cq.commons.Externalizer,
+                                  org.apache.jackrabbit.util.ISO9075,
                                   javax.jcr.Node,
                                   javax.jcr.NodeIterator,
                                   javax.jcr.Session,
-                                  javax.jcr.ValueFactory,
                                   javax.jcr.query.Query,
                                   javax.jcr.query.QueryManager,
-                                  javax.jcr.query.QueryResult,
-                                  javax.jcr.query.qom.Constraint,
-                                  javax.jcr.query.qom.Literal,
-                                  javax.jcr.query.qom.Ordering,
-                                  javax.jcr.query.qom.PropertyValue,
-                                  javax.jcr.query.qom.QueryObjectModelFactory,
-                                  javax.jcr.query.qom.Selector,
-                                  static javax.jcr.query.qom.QueryObjectModelConstants.JCR_OPERATOR_EQUAL_TO,
-                                  com.adobe.cq.dialogupgrade.DialogUpgradeConstants" %><%
+                                  java.util.LinkedList,
+                                  java.util.List" %><%
 %><%@include file="/libs/foundation/global.jsp"%>
 
 <div id="content">
@@ -48,50 +42,34 @@
         if (path != null && !path.isEmpty()) {
             Externalizer externalizer = resourceResolver.adaptTo(Externalizer.class);
             Session session = slingRequest.getResourceResolver().adaptTo(Session.class);
-            QueryManager queryManager = session.getWorkspace().getQueryManager();
-            QueryObjectModelFactory qf = queryManager.getQOMFactory();
-            ValueFactory vf = session.getValueFactory();
+            List<Node> nodes = new LinkedList<Node>();
 
-            /**
-             * Using the query object model in order to prevent SQL injection in the ISDESCENDANTNODE constraint. The
-             * query is equivalent to following JCR SQL:
-             *
-             * SELECT * FROM [cq:Dialog] AS d WHERE (ISDESCENDANTNODE('"+path+"') OR [jcr:path] = '"+path+"') AND NAME(d) = 'dialog' ORDER BY [jcr:path]
-             */
+            // sanitize path
+            path = path.trim();
+            if (!path.startsWith("/")) {
+                path = "/" + path;
+            }
 
-            // node type selector
-            Selector selector = qf.selector("cq:Dialog", "d");
-
-            // ISDESCENDANTNODE constraint
-            Constraint c1 = qf.descendantNode("d", path);
-
-            // path equality constraint
-            PropertyValue jcrPath = qf.propertyValue("d", "jcr:path");
-            Literal pathLiteral = qf.literal(vf.createValue(path));
-            Constraint c2 = qf.comparison(jcrPath, JCR_OPERATOR_EQUAL_TO, pathLiteral);
-
-            // NAME constraint
-            Literal dialogLiteral = qf.literal(vf.createValue("dialog"));
-            Constraint c3 = qf.comparison(qf.nodeName("d"), JCR_OPERATOR_EQUAL_TO, dialogLiteral);
-
-            // orderings
-            Ordering[] orderings = new Ordering[]{ qf.ascending(jcrPath) };
-
-            // execute query
-            Constraint constraints = qf.and(qf.or(c1, c2), c3);
-            Query query = qf.createQuery(selector, constraints, orderings, null);
-            QueryResult result = query.execute();
-            NodeIterator iterator = result.getNodes();
-
-            // count number of results
-            long nbResults = iterator.getSize();
-            if (nbResults < 0) {
-                nbResults = 0;
-                while (iterator.hasNext()) {
-                    iterator.nextNode();
-                    nbResults++;
+            // first check if the supplied path is a dialog node itself
+            if (session.nodeExists(path)) {
+                Node node = session.getNode(path);
+                if ("dialog".equals(node.getName()) && "cq:Dialog".equals(node.getPrimaryNodeType().getName())) {
+                    nodes.add(node);
                 }
-                iterator = result.getNodes();
+            }
+
+            // the path does not point to a dialog node: we query for dialog nodes
+            if (nodes.isEmpty()) {
+                // encode path and strip leading slash
+                String encodedPath = ISO9075.encodePath(path).substring(1);
+                String xpath = "/jcr:root/" + encodedPath + "//element(dialog, cq:Dialog) order by @jcr:path";
+                QueryManager queryManager = session.getWorkspace().getQueryManager();
+                Query query = queryManager.createQuery(xpath, Query.XPATH);
+
+                NodeIterator iterator = query.execute().getNodes();
+                while (iterator.hasNext()) {
+                    nodes.add(iterator.nextNode());
+                }
             }
     %>
             <script>
@@ -104,7 +82,7 @@
             </script>
 
             <div id="info-text">
-                Found <b><%= nbResults %></b> dialogs below <b><%= path %></b>
+                Found <b><%= nodes.size() %></b> dialogs below <b><%= path %></b>
             </div>
 
             <br />
@@ -121,8 +99,7 @@
                     <tbody>
         <%
             String renderPath = DialogUpgradeConstants.BASE_PATH + "/content/render";
-            while(iterator.hasNext()) {
-                Node dialog = iterator.nextNode();
+            for (Node dialog : nodes) {
                 Node parent = dialog.getParent();
                 String href = externalizer.authorLink(resourceResolver, dialog.getPath()) + ".html";
                 String crxHref = externalizer.authorLink(resourceResolver, "/") + "crx/de/index.jsp#" + dialog.getPath();
