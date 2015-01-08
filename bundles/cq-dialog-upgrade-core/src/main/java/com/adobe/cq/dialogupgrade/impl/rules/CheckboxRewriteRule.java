@@ -64,7 +64,9 @@ public class CheckboxRewriteRule extends AbstractDialogRewriteRule {
         finalNodes.add(newRoot);
         newRoot.setProperty("sling:resourceType", GRANITEUI_CHECKBOX_RT);
         // set properties
-        copyProperty(root, "fieldLabel", newRoot, "text");
+        if (copyProperty(root, "fieldLabel", newRoot, "text") == null) {
+            copyProperty(root, "boxLabel", newRoot, "text");
+        }
         copyProperty(root, "fieldDescription", newRoot, "fieldDescription");
         copyProperty(root, "name", newRoot, "name");
         if (copyProperty(root, "inputValue", newRoot, "value") == null) {
