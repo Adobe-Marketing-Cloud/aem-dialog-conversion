@@ -18,7 +18,6 @@
 
 package com.adobe.cq.dialogupgrade.treerewriter;
 
-import com.adobe.cq.dialogupgrade.treerewriter.rules.RewriteRule;
 import org.apache.jackrabbit.commons.flat.TreeTraverser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +45,7 @@ public class TreeRewriter {
      *
      * @param root The root of the tree to be rewritten
      * @return the root node of the rewritten tree, or null if it was removed
-     * @throws RewriteException If the rewrite operation fails
+     * @throws com.adobe.cq.dialogupgrade.treerewriter.RewriteException If the rewrite operation fails
      * @throws RepositoryException If there is a problem with the repository
      */
     public Node rewrite(Node root)

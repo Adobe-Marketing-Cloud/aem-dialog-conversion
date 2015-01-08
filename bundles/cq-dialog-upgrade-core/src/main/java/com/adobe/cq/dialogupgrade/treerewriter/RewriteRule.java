@@ -16,9 +16,7 @@
  * from Adobe Systems Incorporated.
  **************************************************************************/
 
-package com.adobe.cq.dialogupgrade.treerewriter.rules;
-
-import com.adobe.cq.dialogupgrade.treerewriter.RewriteException;
+package com.adobe.cq.dialogupgrade.treerewriter;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;

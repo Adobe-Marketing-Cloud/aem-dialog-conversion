@@ -18,7 +18,7 @@
 
 package com.adobe.cq.dialogupgrade;
 
-import com.adobe.cq.dialogupgrade.treerewriter.rules.RewriteRule;
+import com.adobe.cq.dialogupgrade.treerewriter.RewriteRule;
 
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
@@ -26,13 +26,13 @@ import java.util.Set;
 
 /**
  * Interface for classes that implement a dialog rewrite rule.
- * @see com.adobe.cq.dialogupgrade.treerewriter.rules.RewriteRule
+ * @see com.adobe.cq.dialogupgrade.treerewriter.RewriteRule
  */
 public interface DialogRewriteRule extends RewriteRule {
 
     /**
      * @throws DialogRewriteException if the dialog rewrite operation failed or cannot be completed
-     * @see com.adobe.cq.dialogupgrade.treerewriter.rules.RewriteRule#applyTo
+     * @see com.adobe.cq.dialogupgrade.treerewriter.RewriteRule#applyTo
      */
     Node applyTo(Node root, Set<Node> finalNodes)
             throws DialogRewriteException, RepositoryException;

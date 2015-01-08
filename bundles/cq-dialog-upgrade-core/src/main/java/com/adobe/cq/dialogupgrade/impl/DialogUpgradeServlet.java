@@ -20,9 +20,9 @@ package com.adobe.cq.dialogupgrade.impl;
 
 import com.adobe.cq.dialogupgrade.DialogRewriteRule;
 import com.adobe.cq.dialogupgrade.treerewriter.RewriteException;
+import com.adobe.cq.dialogupgrade.treerewriter.RewriteRule;
+import com.adobe.cq.dialogupgrade.treerewriter.RewriteRulesFactory;
 import com.adobe.cq.dialogupgrade.treerewriter.TreeRewriter;
-import com.adobe.cq.dialogupgrade.treerewriter.rules.RewriteRule;
-import com.adobe.cq.dialogupgrade.treerewriter.rules.RewriteRulesFactory;
 import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.ReferenceCardinality;

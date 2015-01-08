@@ -16,7 +16,7 @@
  * from Adobe Systems Incorporated.
  **************************************************************************/
 
-package com.adobe.cq.dialogupgrade.treerewriter.rules;
+package com.adobe.cq.dialogupgrade.treerewriter;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
