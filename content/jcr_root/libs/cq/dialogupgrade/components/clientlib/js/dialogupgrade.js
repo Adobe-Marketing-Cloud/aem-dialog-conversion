@@ -3,11 +3,13 @@ $(document).ready(function () {
     var basePath = "/libs/cq/dialogupgrade";
 
     var $pathTextfield = $(".js-coral-pathbrowser-input", $("#path").closest(".coral-Form-fieldwrapper"));
+    var $showDialogsButton = $("#show-dialogs");
+    var $upgradeDialogsButton = $("#upgrade-dialogs");
 
     /**
      * Click handler for the "show dialogs" button
      */
-    $("#show-dialogs").click(function () {
+    $showDialogsButton.click(function () {
         var path = $pathTextfield.val();
         window.location = window.location.pathname + "?path=" + path;
     });
@@ -31,7 +33,7 @@ $(document).ready(function () {
             if (selectedMillis && (new Date().getTime()) - selectedMillis <= 150) {
                 return;
             }
-            $("#show-dialogs").click();
+            $showDialogsButton.click();
         }
     });
 
@@ -51,16 +53,23 @@ $(document).ready(function () {
         e.stopPropagation();
     });
 
-    $(".path").change(function () {
+    $(".path").change(function () {debugger;
         var count = $(".path:checked").length;
         // hide "upgrade dialogs" button if no dialogs are selected
-        $("#upgrade-dialogs").toggle(count > 0);
-        // adjust button text
-        $("#upgrade-dialogs span").text("Upgrade " + count + " dialogs");
+        $upgradeDialogsButton.toggle(count > 0);
+        // adjust button label
+        var label = "Upgrade " + count + " dialogs";
+        if ($("span", $upgradeDialogsButton).length) {
+            // 6.0
+            $("span", $upgradeDialogsButton).text(label);
+        } else {
+            // 6.1
+            $upgradeDialogsButton.text(label);
+        }
     });
 
 
-    $("#upgrade-dialogs").click(function () {
+    $upgradeDialogsButton.click(function () {
         // get paths from table
         var paths = $(".path:checked").map(function () {
             return $(this).val();
@@ -77,7 +86,7 @@ $(document).ready(function () {
 
         $.post(url, data, function (data) {
             $("#dialogs").remove();
-            $("#upgrade-dialogs").remove();
+            $upgradeDialogsButton.remove();
             $("#upgrade-results").show();
 
             // build result table
