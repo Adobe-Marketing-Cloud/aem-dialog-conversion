@@ -23,7 +23,6 @@ import com.adobe.cq.dialogupgrade.treerewriter.RewriteException;
 import com.adobe.cq.dialogupgrade.treerewriter.RewriteRule;
 import com.adobe.cq.dialogupgrade.treerewriter.RewriteRulesFactory;
 import com.adobe.cq.dialogupgrade.treerewriter.TreeRewriter;
-import org.apache.felix.scr.annotations.Activate;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.ReferenceCardinality;
 import org.apache.felix.scr.annotations.ReferencePolicy;
@@ -35,8 +34,6 @@ import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
 import org.apache.sling.api.servlets.SlingAllMethodsServlet;
 import org.apache.sling.commons.json.JSONObject;
-import org.osgi.framework.ServiceReference;
-import org.osgi.service.component.ComponentContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,26 +83,16 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
             bind = "bindRule",
             unbind = "unbindRule"
     )
-    private List<ServiceReference> rulesReferences = Collections.synchronizedList(new LinkedList<ServiceReference>());
+    private List<DialogRewriteRule> rules = Collections.synchronizedList(new LinkedList<DialogRewriteRule>());
 
-    /**
-     * Used to retrieve the service from the service references
-     */
-    private ComponentContext context;
-
-    @Activate
-    protected void activate(ComponentContext context) {
-        this.context = context;
+    @SuppressWarnings("unused")
+    public void bindRule(DialogRewriteRule rule) {
+        rules.add(rule);
     }
 
     @SuppressWarnings("unused")
-    protected void bindRule(ServiceReference reference) {
-        rulesReferences.add(reference);
-    }
-
-    @SuppressWarnings("unused")
-    protected void unbindRule(ServiceReference reference) {
-        rulesReferences.remove(reference);
+    public void unbindRule(DialogRewriteRule rule) {
+        rules.remove(rule);
     }
 
     @Override
@@ -191,12 +178,8 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
         final List<RewriteRule> rules = new LinkedList<RewriteRule>();
 
         // rules provided as OSGi services
-        if (context != null) {
-            synchronized (rulesReferences) {
-                for (ServiceReference reference : rulesReferences) {
-                    rules.add((DialogRewriteRule) context.getBundleContext().getService(reference));
-                }
-            }
+        synchronized (this.rules) {
+            rules.addAll(this.rules);
         }
         int nb = rules.size();
 
