@@ -19,11 +19,12 @@
                                   org.apache.jackrabbit.util.ISO9075,
                                   javax.jcr.Node,
                                   javax.jcr.NodeIterator,
+                                  javax.jcr.RepositoryException,
                                   javax.jcr.Session,
+                                  javax.jcr.query.InvalidQueryException,
                                   javax.jcr.query.Query,
                                   javax.jcr.query.QueryManager,
-                                  java.util.LinkedList,
-                                  java.util.List" %><%
+                                  java.util.LinkedList, java.util.List" %><%
 %><%@include file="/libs/foundation/global.jsp"%>
 
 <div id="content">
@@ -51,24 +52,33 @@
             }
 
             // first check if the supplied path is a dialog node itself
-            if (session.nodeExists(path)) {
-                Node node = session.getNode(path);
-                if ("dialog".equals(node.getName()) && "cq:Dialog".equals(node.getPrimaryNodeType().getName())) {
-                    nodes.add(node);
+            try {
+                if (session.nodeExists(path)) {
+                    Node node = session.getNode(path);
+                    if ("dialog".equals(node.getName()) && "cq:Dialog".equals(node.getPrimaryNodeType().getName())) {
+                        nodes.add(node);
+                    }
                 }
+            } catch (RepositoryException e) {
+                // ignore
             }
 
             // the path does not point to a dialog node: we query for dialog nodes
             if (nodes.isEmpty()) {
-                // encode path and strip leading slash
-                String encodedPath = ISO9075.encodePath(path).substring(1);
-                String xpath = "/jcr:root/" + encodedPath + "//element(dialog, cq:Dialog) order by @jcr:path";
+                String encodedPath = "/".equals(path) ? "" : ISO9075.encodePath(path);
+                if (encodedPath.length() > 1 && encodedPath.endsWith("/")) {
+                    encodedPath = encodedPath.substring(0, encodedPath.length()-1);
+                }
+                String xpath = "/jcr:root" + encodedPath + "//element(dialog, cq:Dialog) order by @jcr:path";
                 QueryManager queryManager = session.getWorkspace().getQueryManager();
                 Query query = queryManager.createQuery(xpath, Query.XPATH);
-
-                NodeIterator iterator = query.execute().getNodes();
-                while (iterator.hasNext()) {
-                    nodes.add(iterator.nextNode());
+                try {
+                    NodeIterator iterator = query.execute().getNodes();
+                    while (iterator.hasNext()) {
+                        nodes.add(iterator.nextNode());
+                    }
+                } catch (InvalidQueryException e) {
+                    // ignore
                 }
             }
     %>
