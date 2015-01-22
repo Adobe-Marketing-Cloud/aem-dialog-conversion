@@ -16,8 +16,10 @@
  * from Adobe Systems Incorporated.
  **************************************************************************/
 
-package com.adobe.cq.dialogupgrade.treerewriter;
+package com.adobe.cq.dialogupgrade.treerewriter.impl;
 
+import com.adobe.cq.dialogupgrade.treerewriter.RewriteException;
+import com.adobe.cq.dialogupgrade.treerewriter.RewriteRule;
 import org.apache.jackrabbit.commons.flat.TreeTraverser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
