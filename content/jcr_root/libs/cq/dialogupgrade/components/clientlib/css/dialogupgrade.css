@@ -23,15 +23,16 @@
     display: none;
 }
 
-th.dialog-cell {
-    padding-left: 47px;
+#dialogs th:first-child {
+    width: 10px;
 }
 
-td.dialog-cell {
+#dialogs th:first-child,
+#dialogs td:first-child {
     padding-left: 15px;
 }
 
-.dialog-cell .coral-Checkbox-description {
+#dialogs .coral-Checkbox-description {
     margin-left: 15px;
 }
 

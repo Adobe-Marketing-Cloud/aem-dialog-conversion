@@ -97,11 +97,17 @@
 
             <br />
 
-            <div id="dialogs">
-                <table class="coral-Table coral-Table--hover">
+            <div id="dialogs-container">
+                <table class="coral-Table coral-Table--hover" id="dialogs">
                     <thead>
                         <tr class="coral-Table-row">
-                            <th class="coral-Table-headerCell dialog-cell">Dialog (Classic UI)</th>
+                            <th class="coral-Table-headerCell">
+                                <label class="coral-Checkbox">
+                                    <input class="coral-Checkbox-input" type="checkbox" id="check-all">
+                                    <span class="coral-Checkbox-checkmark"></span>
+                                </label>
+                            </th>
+                            <th class="coral-Table-headerCell" style="padding-left: 0.425rem;">Dialog (Classic UI)</th>
                             <th class="coral-Table-headerCell centered">Links</th>
                             <th class="coral-Table-headerCell centered">Dialog (Touch UI)</th>
                         </tr>
@@ -116,7 +122,7 @@
                 String disabled = parent.hasNode("cq:dialog") ? "disabled=\"disabled\"" : "";
                 %>
                         <tr class="coral-Table-row">
-                            <td class="coral-Table-cell dialog-cell">
+                            <td class="coral-Table-cell" colspan="2">
                                 <label class="coral-Checkbox">
                                     <input class="coral-Checkbox-input path" type="checkbox" value="<%= dialog.getPath()%>" <%= disabled %>>
                                     <span class="coral-Checkbox-checkmark"></span>

@@ -5,6 +5,7 @@ $(document).ready(function () {
     var $pathTextfield = $(".js-coral-pathbrowser-input", $("#path").closest(".coral-Form-fieldwrapper"));
     var $showDialogsButton = $("#show-dialogs");
     var $upgradeDialogsButton = $("#upgrade-dialogs");
+    var $checkAll = $("#check-all");
 
     /**
      * Click handler for the "show dialogs" button
@@ -40,7 +41,7 @@ $(document).ready(function () {
     /**
      * Delegate clicks on table rows to checkbox.
      */
-    $("td.dialog-cell").parent().click(function (e) {
+    $("#dialogs td").parent().click(function (e) {
         // handles clicks on table rows
         $(".coral-Checkbox", this).click();
     });
@@ -53,7 +54,7 @@ $(document).ready(function () {
         e.stopPropagation();
     });
 
-    $(".path").change(function () {debugger;
+    var adjustUpgradeButton = function () {
         var count = $(".path:checked").length;
         // hide "upgrade dialogs" button if no dialogs are selected
         $upgradeDialogsButton.toggle(count > 0);
@@ -66,6 +67,55 @@ $(document).ready(function () {
             // 6.1
             $upgradeDialogsButton.text(label);
         }
+    };
+
+    $(".path").change(function () {
+        adjustUpgradeButton();
+
+        // check if there are checked and / or unchecked checkboxes
+        var hasChecked = false;
+        var hasUnchecked = false;
+        $(".path").each(function() {
+            if ($(this).prop("disabled")) {
+                return true;
+            }
+            if ($(this).prop("checked")) {
+                hasChecked = true;
+            } else {
+                hasUnchecked = true;
+            }
+            if (hasChecked && hasUnchecked) {
+                return false;
+            }
+        });
+        // adjust state of main checkbox
+        if (hasChecked && hasUnchecked) {
+            $checkAll.attr("aria-checked", "mixed").prop({
+                "indeterminate": true,
+                "checked": false
+            });
+        } else {
+            $("#check-all").prop({
+                "indeterminate": false,
+                "checked": hasChecked
+            }).removeAttr("aria-checked");
+        }
+    });
+
+    $checkAll.change(function () {
+        var ariaChecked = $(this).attr("aria-checked");
+        if (ariaChecked === "mixed") {
+            $(this).indeterminate = false;
+            $(this).removeAttr("aria-checked");
+            // if the state is 'mixed', we check all checkboxes
+            $(".path").prop("checked", true);
+        } else {
+            $(".path").prop("checked", $(this).prop("checked"));
+        }
+        // uncheck disabled checkboxes
+        $(".path[disabled=disabled]").prop("checked", false);
+        // adjust the upgrade button
+        adjustUpgradeButton();
     });
 
 
@@ -85,7 +135,7 @@ $(document).ready(function () {
         ui.wait();
 
         $.post(url, data, function (data) {
-            $("#dialogs").remove();
+            $("#dialogs-container").remove();
             $upgradeDialogsButton.remove();
             $("#upgrade-results").show();
 
