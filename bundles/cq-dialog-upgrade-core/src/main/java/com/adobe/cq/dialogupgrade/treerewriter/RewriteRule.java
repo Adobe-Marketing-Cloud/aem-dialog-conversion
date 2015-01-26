@@ -37,20 +37,22 @@ public interface RewriteRule {
             throws RepositoryException;
 
     /**
-     * Applies this rule to the specified subtree. This rewrites the subtree according
-     * to the definition of this rule.
+     * <p>Applies this rule to the subtree rooted at the specified <code>root</code> node. The implementation of this
+     * method may either modify the properties and nodes contained in this subtree, or replace it by adding a new child
+     * to the parent of <code>root</code>. In the latter case, the implementation is responsible for removing the
+     * original subtree (no need to save the changes though).</p>
      *
-     * The rewrite algorithm does not detect rewrite loops, therefore rewrite rules must not rewrite trees in a
+     * <p>The rewrite algorithm does not detect rewrite loops, therefore rewrite rules must not rewrite trees in a
      * circular fashion. Also, a rewrite rule must not leave the original tree unchanged, as the algorithm will
-     * get stuck in an infinite loop (unless <code>finalNodes</code> is used appropriately, see below).
+     * get stuck in an infinite loop.</p>
      *
-     * Optionally, the <code>finalNodes</code> parameter can be used to control and optimize the rewrite algorithm.
+     * <p>Optionally, the <code>finalNodes</code> parameter can be used to control and optimize the rewrite algorithm.
      * The implementation can add to this set all nodes of the rewritten subtree which are final and therefore
-     * safe for the algorithm to ignore in subsequent traversals of the tree.
+     * safe for the algorithm to ignore in subsequent traversals of the tree.</p>
      *
-     * {@link com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils} provides utility methods that can
+     * <p>{@link com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils} provides utility methods that can
      * be used to temporarily rename (move) the original subtree, so that the resulting subtree can be built
-     * while still having the original around.
+     * while still having the original around.</p>
      *
      * @param root The root of the subtree to be rewritten
      * @return the root node of the rewritten tree, or null if it was removed
