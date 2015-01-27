@@ -99,7 +99,7 @@ import java.util.regex.Pattern;
 public class NodeBasedRewriteRule implements DialogRewriteRule {
 
     // pattern that matches the regex for mapped properties: ${<path>}
-    private static final Pattern MAPPED_PATTERN = Pattern.compile("^\\$\\{(.*)\\}$");
+    private static final Pattern MAPPED_PATTERN = Pattern.compile("^\\$\\{(.*?)(:(.+))?\\}$");
 
     // special properties
     private static final String PROPERTY_RANKING = "cq:rewriteRanking";
@@ -329,6 +329,13 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
                     // the mapping was successful
                     deleteProperty = false;
                     break;
+                } else {
+                    String defaultValue = matcher.group(3);
+                    if (defaultValue != null) {
+                        property.setValue(defaultValue);
+                        deleteProperty = false;
+                        break;
+                    }
                 }
             }
         }
