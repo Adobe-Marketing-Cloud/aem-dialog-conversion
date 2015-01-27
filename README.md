@@ -14,4 +14,4 @@ The tool runs on instances of AEM 6.0 (SP1, SP2 or none) and AEM 6.1-SNAPSHOT. T
 Documentation
 -------------
 
-Go to the following wiki page for documentation and implementation details: https://wiki.corp.adobe.com/display/~obrist/Dialog+Upgrade+Tool
+Go to the following wiki page for documentation and implementation details: https://wiki.corp.adobe.com/display/~obrist/Dialog+Conversion+Tool
