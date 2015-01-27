@@ -59,7 +59,7 @@ $(document).ready(function () {
         // hide "convert dialogs" button if no dialogs are selected
         $convertDialogsButton.toggle(count > 0);
         // adjust button label
-        var label = "Convert " + count + " dialog" + (count > 1 ? "s" : "");
+        var label = "Convert " + count + " dialog" + (count == 1 ? "" : "s");
         if ($("span", $convertDialogsButton).length) {
             // 6.0
             $("span", $convertDialogsButton).text(label);
@@ -141,9 +141,12 @@ $(document).ready(function () {
 
             // build result table
             var count = 0;
+            var successCount = 0;
+            var errorCount = 0;
             var $tbody = $("#conversion-results tbody");
             for (var path in data) {
                 count++;
+                // create row for the results table
                 var $tr = $('<tr class="coral-Table-row"></tr>').appendTo($tbody);
                 $tr.append('<td class="coral-Table-cell">' + path + '</td>');
                 var links = "";
@@ -151,10 +154,14 @@ $(document).ready(function () {
                 var message = Granite.I18n.get("Converted dialog successfully");
                 var resultPath = data[path].resultPath;
                 if (resultPath) {
+                    // success
+                    successCount++;
                     var href = Granite.HTTP.externalize(basePath + "/content/render.html" + resultPath);
                     var crxHref = Granite.HTTP.externalize("/crx/de/index.jsp#" + resultPath.replace(":", "%3A"));
                     links += '<a href="' + href + '" target="_blank" class="coral-Link">show</a> / <a href="' + crxHref + '" target="_blank" class="coral-Link">crxde</a>';
                 } else {
+                    // error
+                    errorCount++;
                     iconClass = "coral-Icon--close";
                     message = Granite.I18n.get("Error");
                     if (data[path].errorMessage) {
@@ -167,7 +174,10 @@ $(document).ready(function () {
 
             // change info text
             $("#info-text").empty();
-            $("#info-text").append("Ran conversion on <b>" + count + "</b> dialog" + (count > 1 ? "s" : "") + ":");
+            var text = "Ran dialog conversion on <b>" + count + "</b> dialog" + (count == 1 ? "" : "s") + " ";
+            text += "(<b>" + successCount + "</b> successful conversion" + (successCount == 1 ? "" : "s") + ", ";
+            text += "<b>" + errorCount + "</b> error" + (errorCount == 1 ? "" : "s") + "):";
+            $("#info-text").append(text);
         }).fail(function () {
             var title = "Error";
             var message = "Call to dialog conversion servlet failed. Please view the logs.";
