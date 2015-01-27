@@ -63,25 +63,27 @@ import java.util.regex.Pattern;
  *       + ...
  * </pre>
  *
- * This example defines a rule containing two patterns (the trees rooted at <code>foo</code> and <code>foo1</code>)
+ * <p>This example defines a rule containing two patterns (the trees rooted at <code>foo</code> and <code>foo1</code>)
  * and a replacement (the tree rooted at <code>bar</code>). The pattern and replacement trees are arbitrary trees
  * containing nodes and properties. The rule matches a subtree if any of the defined patterns matches. In order for
- * a pattern to match, the subject tree must contain the same nodes as the pattern (matching names), and all properties
- * defined in the pattern must match the properties on the tree.
+ * a pattern to match, the subject tree must contain the same nodes as the pattern (matching names, except for the
+ * root), and all properties defined in the pattern must match the properties on the tree.</p>
  *
- * In the case of a match, the matched subtree (called original tree) will be substituted by the replacement. The
+ * <p>In the case of a match, the matched subtree (called original tree) will be substituted by the replacement. The
  * replacement tree can define mapped properties that will inherit the value of a property in the original tree. They
- * need to be of type <code>string</code> and have the following format: <code>${&lt;path&gt;}. For instance, the
- * following property <code>one</code> will be assigned the value of the property <code>./two/three</code> of the
- * matched original tree. Mapped properties can be multivalued, in which case they will be assigned the value of the
- * first property that exists in the matched tree.
+ * need to be of type <code>string</code> and have the following format: <code>${&lt;path&gt;}</code>. If the referenced
+ * property doesn't exist in the original tree, then the property is omitted. Alternatively, a default value can be
+ * specified for that case (only for <code>string</code> properties): <code>${&lt;path&gt;:&lt;default&gt;}</code>.
+ * Mapped properties can be multivalued, in which case they will be assigned the value of the first property that
+ * exists in the original tree. The following example illustrates mapping properties:</p>
  *
  * <pre>
  * ...
  *   + replacement
  *     + bar
- *       - one = ${./two/three}
- *       - multi = [${./prop1}, ${./prop2}]
+ *       - prop = ${./some/prop}
+ *       - default = ${./non/existing:default string value}
+ *       - multi = [${./non/existing}, ${./some/prop}]
  * </pre>
  *
  * The replacement tree supports following special properties (named <code>cq:rewrite...</code>):
