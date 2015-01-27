@@ -31,7 +31,7 @@ import javax.jcr.Session;
 public class DialogUpgradeUtils {
 
     /**
-     * Shortcut method to check if a node has a certain xtype.
+     * Checks if a node has a certain xtype.
      *
      * @param node The node to check
      * @param xtype The xtype to check or null to check if the node has no xtype
@@ -48,7 +48,7 @@ public class DialogUpgradeUtils {
     }
 
     /**
-     * Shortcut method to check if a node has a certain type.
+     * Checks if a node has a certain type.
      *
      * @param node The node to check
      * @param type The type to check or null to check if the node has no type
@@ -65,7 +65,7 @@ public class DialogUpgradeUtils {
     }
 
     /**
-     * Shortcut method to check if a node has a certain primary type.
+     * Checks if a node has a certain primary type.
      *
      * @param node The node to check
      * @param typeName The name of the primary type to check
@@ -83,22 +83,11 @@ public class DialogUpgradeUtils {
      * @param node The node to be renamed
      * @throws RepositoryException
      */
-    public static void renameToTemp(Node node)
+    public static void rename(Node node)
             throws RepositoryException {
-        moveToTemp(node, node.getParent());
-    }
-
-    /**
-     * Moves the specified node to a be a child of the destination with a temporary name.
-     *
-     * @param node The node to be moved
-     * @param destination The destination where the node should be added as a child
-     * @throws RepositoryException
-     */
-    public static void moveToTemp(Node node, Node destination)
-            throws RepositoryException {
+        Node destination = node.getParent();
         Session session = node.getSession();
-        String tmpName = JcrUtil.createValidChildName(destination, "tree-rewriter-tmp-" + System.currentTimeMillis());
+        String tmpName = JcrUtil.createValidChildName(destination, "tmp-" + System.currentTimeMillis());
         String tmpPath = destination.getPath() + "/" + tmpName;
         session.move(node.getPath(), tmpPath);
     }

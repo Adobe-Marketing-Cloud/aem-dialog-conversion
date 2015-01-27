@@ -12,7 +12,7 @@ import java.util.Set;
 
 import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.copyProperty;
 import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.hasXtype;
-import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.renameToTemp;
+import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.rename;
 
 /**
  * Rewrites widgets of xtype "multifield". The "fieldConfig" subnode (if existing) is renamed to "field" and
@@ -35,7 +35,7 @@ public class MultifieldRewriteRule extends AbstractDialogRewriteRule {
             throws DialogRewriteException, RepositoryException {
         Node parent = root.getParent();
         String name = root.getName();
-        renameToTemp(root);
+        rename(root);
 
         // add node for multifield
         Node newRoot = parent.addNode(name, "nt:unstructured");

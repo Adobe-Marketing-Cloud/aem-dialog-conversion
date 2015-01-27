@@ -41,7 +41,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.hasPrimaryType;
-import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.renameToTemp;
+import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.rename;
 
 /**
  * A rule that rewrites a tree based on a given node structure. The node structure
@@ -219,7 +219,7 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
         // move (rename) original tree
         Node parent = root.getParent();
         String rootName = root.getName();
-        renameToTemp(root);
+        rename(root);
 
         // copy replacement to original tree under original name
         replacement = replacement.getNodes().nextNode();
