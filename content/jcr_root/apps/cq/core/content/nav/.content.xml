@@ -5,15 +5,15 @@
         <operations
             jcr:mixinTypes="[rep:AccessControllable]"
             jcr:primaryType="nt:unstructured">
-            <dialogupgrade
+            <dialogconversion
                 jcr:mixinTypes="[rep:AccessControllable]"
                 jcr:primaryType="nt:unstructured"
-                jcr:title="Dialog Upgrade"
+                jcr:title="Dialog Conversion"
                 sling:orderBefore="configuration"
-                href="/libs/cq/dialogupgrade/content/console.html"
-                id="cq-tools-dialogupgrade">
+                href="/libs/cq/dialogconversion/content/console.html"
+                id="cq-tools-dialogconversion">
                 <rep:policy/>
-            </dialogupgrade>
+            </dialogconversion>
         </operations>
     </tools>
 </jcr:root>

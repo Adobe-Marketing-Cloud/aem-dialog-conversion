@@ -29,15 +29,15 @@
     </parent>
 
     <groupId>com.adobe.cq</groupId>
-    <artifactId>dialog-upgrade-reactor</artifactId>
+    <artifactId>cq-dialog-conversion-reactor</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>Adobe AEM Dialog Upgrade Module Reactor</name>
-    <inceptionYear>2014</inceptionYear>
+    <name>Adobe AEM Dialog Conversion Tool Reactor</name>
+    <inceptionYear>2015</inceptionYear>
 
     <modules>
-        <module>bundles/cq-dialog-upgrade-core</module>
+        <module>bundles/cq-dialog-conversion</module>
         <module>content</module>
     </modules>
 </project>
