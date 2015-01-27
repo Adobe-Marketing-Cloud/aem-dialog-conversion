@@ -116,8 +116,8 @@
             String renderPath = "/libs/cq/dialogconversion/content/render";
             for (Node dialog : nodes) {
                 Node parent = dialog.getParent();
-                String href = externalizer.authorLink(resourceResolver, dialog.getPath()) + ".html";
-                String crxHref = externalizer.authorLink(resourceResolver, "/") + "crx/de/index.jsp#" + dialog.getPath();
+                String href = externalizer.relativeLink(slingRequest, dialog.getPath()) + ".html";
+                String crxHref = externalizer.relativeLink(slingRequest, "/crx/de/index") + ".jsp#" + dialog.getPath();
                 String disabled = parent.hasNode("cq:dialog") ? "disabled=\"disabled\"" : "";
                 %>
                         <tr class="coral-Table-row">
@@ -131,8 +131,8 @@
                             <td class="coral-Table-cell centered"><a href="<%= xssAPI.getValidHref(href) %>" target="_blank" class="coral-Link">show</a> / <a href="<%= xssAPI.getValidHref(crxHref) %>" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a></td>
                 <% if (parent.hasNode("cq:dialog")) {
                     Node touchDialog = parent.getNode("cq:dialog");
-                    href = externalizer.authorLink(resourceResolver, renderPath) + ".html" + touchDialog.getPath();
-                    crxHref = externalizer.authorLink(resourceResolver, "/") + "crx/de/index.jsp#" + touchDialog.getPath().replaceAll(":", "%3A");
+                    href = externalizer.relativeLink(slingRequest, renderPath) + ".html" + touchDialog.getPath();
+                    crxHref = externalizer.relativeLink(slingRequest, "/crx/de/index") + ".jsp#" + touchDialog.getPath().replaceAll(":", "%3A");
                 %>
                             <td class="coral-Table-cell centered"><i class="coral-Icon coral-Icon--check"></i><a href="<%= xssAPI.getValidHref(href) %>" target="_blank" class="coral-Link">show</a> / <a href="<%= xssAPI.getValidHref(crxHref) %>" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a></td>
                 <% } else { %>
