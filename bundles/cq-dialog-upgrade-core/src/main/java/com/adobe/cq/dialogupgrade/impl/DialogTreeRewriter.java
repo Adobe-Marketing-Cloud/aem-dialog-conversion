@@ -16,10 +16,10 @@
  * from Adobe Systems Incorporated.
  **************************************************************************/
 
-package com.adobe.cq.dialogupgrade.treerewriter.impl;
+package com.adobe.cq.dialogupgrade.impl;
 
-import com.adobe.cq.dialogupgrade.treerewriter.RewriteException;
-import com.adobe.cq.dialogupgrade.treerewriter.RewriteRule;
+import com.adobe.cq.dialogupgrade.DialogRewriteException;
+import com.adobe.cq.dialogupgrade.DialogRewriteRule;
 import org.apache.jackrabbit.commons.flat.TreeTraverser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,27 +32,43 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-public class TreeRewriter {
+public class DialogTreeRewriter {
 
-    private Logger logger = LoggerFactory.getLogger(TreeRewriter.class);
+    private Logger logger = LoggerFactory.getLogger(DialogTreeRewriter.class);
 
-    private List<RewriteRule> rules;
+    private List<DialogRewriteRule> rules;
 
-    public TreeRewriter(List<RewriteRule> rules) {
+    public DialogTreeRewriter(List<DialogRewriteRule> rules) {
         this.rules = rules;
     }
 
+    private void check(Node root)
+            throws DialogRewriteException, RepositoryException {
+        // verify that the node has a primary type of cq:Dialog
+        if (!"cq:Dialog".equals(root.getPrimaryNodeType().getName())) {
+            logger.debug("{} is not a Classic UI dialog", root.getPath());
+            throw new DialogRewriteException("Node is not a cq:Dialog");
+        }
+
+        // verify that the Touch UI version of the dialog doesn't exist
+        if (root.getParent().hasNode("cq:dialog")) {
+            logger.debug("Dialog {} already has a Touch UI counterpart", root.getPath());
+            throw new DialogRewriteException("Touch UI dialog already exists");
+        }
+    }
+
     /**
-     * Rewrites the specified tree according to the set of rules passed to the constructor.
+     * Rewrites the specified dialog tree according to the set of rules passed to the constructor.
      *
-     * @param root The root of the tree to be rewritten
-     * @return the root node of the rewritten tree, or null if it was removed
-     * @throws com.adobe.cq.dialogupgrade.treerewriter.RewriteException If the rewrite operation fails
+     * @param root The root of the dialog be rewritten (must be of primary type cq:Dialog)
+     * @return the root node of the rewritten dialog tree, or null if it was removed
+     * @throws com.adobe.cq.dialogupgrade.DialogRewriteException If the rewrite operation fails
      * @throws RepositoryException If there is a problem with the repository
      */
     public Node rewrite(Node root)
-            throws RewriteException, RepositoryException {
-        logger.debug("Rewriting tree rooted at {}", root.getPath());
+            throws DialogRewriteException, RepositoryException {
+        logger.debug("Rewriting dialog tree rooted at {}", root.getPath());
+        check(root);
         long tick = System.currentTimeMillis();
 
         /**
@@ -107,7 +123,7 @@ public class TreeRewriter {
 
                     // traverse all available rules
                     Set<Node> finalNodes = new LinkedHashSet<Node>();
-                    for (RewriteRule rule : rules) {
+                    for (DialogRewriteRule rule : rules) {
                         // check for a match
                         if (rule.matches(node)) {
                             logger.debug("Rule {} matched subtree rooted at {}", rule, node.getPath());
@@ -147,7 +163,7 @@ public class TreeRewriter {
         session.save();
 
         long tack = System.currentTimeMillis();
-        logger.debug("Rewrote tree rooted at {} in {} ms", root.getPath(), tack - tick);
+        logger.debug("Rewrote dialog tree rooted at {} in {} ms", root.getPath(), tack - tick);
 
         return startNode;
     }

@@ -34,8 +34,8 @@ import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import java.util.Set;
 
+import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.hasPrimaryType;
 import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.hasXtype;
-import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.hasPrimaryType;
 
 /**
  * Rewrites widgets of xtype "cqinclude". The referenced widget is copied over and will be handled by

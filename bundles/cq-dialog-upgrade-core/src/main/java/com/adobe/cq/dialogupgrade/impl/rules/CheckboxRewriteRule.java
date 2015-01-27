@@ -28,10 +28,10 @@ import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import java.util.Set;
 
+import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.copyProperty;
 import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.hasType;
 import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.hasXtype;
-import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.copyProperty;
-import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.renameToTemp;
+import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.renameToTemp;
 
 /**
  * Rewrites checkbox widgets to Granite UI checkboxes. Additionally, a hidden field is added as a sibling node,

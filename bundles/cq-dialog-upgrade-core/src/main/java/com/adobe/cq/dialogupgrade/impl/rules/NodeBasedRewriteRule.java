@@ -16,10 +16,10 @@
  * from Adobe Systems Incorporated.
  **************************************************************************/
 
-package com.adobe.cq.dialogupgrade.treerewriter.impl;
+package com.adobe.cq.dialogupgrade.impl.rules;
 
-import com.adobe.cq.dialogupgrade.treerewriter.RewriteException;
-import com.adobe.cq.dialogupgrade.treerewriter.RewriteRule;
+import com.adobe.cq.dialogupgrade.DialogRewriteException;
+import com.adobe.cq.dialogupgrade.DialogRewriteRule;
 import com.day.cq.commons.jcr.JcrUtil;
 import org.apache.jackrabbit.commons.flat.TreeTraverser;
 import org.slf4j.Logger;
@@ -40,8 +40,8 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.hasPrimaryType;
-import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.renameToTemp;
+import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.hasPrimaryType;
+import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.renameToTemp;
 
 /**
  * A rule that rewrites a tree based on a given node structure. The node structure
@@ -98,7 +98,7 @@ import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.renameTo
  *     node itself, the whole replacement tree is considered final.</li>
  * </ul>
  */
-public class NodeBasedRewriteRule implements RewriteRule {
+public class NodeBasedRewriteRule implements DialogRewriteRule {
 
     // pattern that matches the regex for mapped properties: ${<path>}
     private static final Pattern MAPPED_PATTERN = Pattern.compile("^\\$\\{(.*)\\}$");
@@ -187,10 +187,10 @@ public class NodeBasedRewriteRule implements RewriteRule {
     }
 
     public Node applyTo(Node root, Set<Node> finalNodes)
-            throws RewriteException, RepositoryException {
+            throws DialogRewriteException, RepositoryException {
         // check if the 'replacement' node exists
         if (!ruleNode.hasNode("replacement")) {
-            throw new RewriteException("The rule does not define a replacement node");
+            throw new DialogRewriteException("The rule does not define a replacement node");
         }
 
         // if the replacement node has no children, we replace the tree by the empty tree,

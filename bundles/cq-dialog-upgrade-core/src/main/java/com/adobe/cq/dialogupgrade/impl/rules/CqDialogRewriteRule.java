@@ -31,8 +31,8 @@ import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import java.util.Set;
 
+import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.hasPrimaryType;
 import static com.adobe.cq.dialogupgrade.DialogUpgradeUtils.hasXtype;
-import static com.adobe.cq.dialogupgrade.treerewriter.TreeRewriterUtils.hasPrimaryType;
 
 /**
  * Rule that rewrites the basic structure of dialogs. It creates a Granite UI container using either a "tabs" or

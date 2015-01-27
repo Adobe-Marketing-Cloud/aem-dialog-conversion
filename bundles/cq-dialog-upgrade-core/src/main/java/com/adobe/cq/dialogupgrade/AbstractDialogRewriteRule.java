@@ -10,7 +10,8 @@ import javax.jcr.RepositoryException;
 import java.util.Dictionary;
 
 /**
- * Abstract dialog upgrade rule implementing {@link DialogRewriteRule#getRanking}.
+ * Base class for services that implement a dialog rewrite rule. This class provides a default implementation of
+ * {@link DialogRewriteRule#getRanking} using the <code>service.ranking</code> OSGi property.
  */
 @Component(componentAbstract = true)
 public abstract class AbstractDialogRewriteRule implements DialogRewriteRule {

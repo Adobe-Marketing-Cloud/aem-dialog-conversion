@@ -18,11 +18,9 @@
 
 package com.adobe.cq.dialogupgrade.impl;
 
+import com.adobe.cq.dialogupgrade.DialogRewriteException;
 import com.adobe.cq.dialogupgrade.DialogRewriteRule;
-import com.adobe.cq.dialogupgrade.treerewriter.RewriteException;
-import com.adobe.cq.dialogupgrade.treerewriter.RewriteRule;
-import com.adobe.cq.dialogupgrade.treerewriter.impl.RewriteRulesFactory;
-import com.adobe.cq.dialogupgrade.treerewriter.impl.TreeRewriter;
+import com.adobe.cq.dialogupgrade.impl.rules.NodeBasedRewriteRule;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.ReferenceCardinality;
 import org.apache.felix.scr.annotations.ReferencePolicy;
@@ -38,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.jcr.Node;
+import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
 import javax.servlet.ServletException;
@@ -59,17 +58,8 @@ import static com.adobe.cq.dialogupgrade.DialogUpgradeConstants.RULES_SEARCH_PAT
 public class DialogUpgradeServlet extends SlingAllMethodsServlet {
 
     public static final String PARAM_PATHS = "paths";
-    private static final String KEY_RESULT = "result";
-    private static final String KEY_PATH = "path";
-    private static final String KEY_MESSAGE = "message";
-
-    private static enum UpgradeResult {
-        PATH_NOT_FOUND,
-        NOT_A_DIALOG,
-        ALREADY_UPGRADED,
-        SUCCESS,
-        ERROR
-    }
+    private static final String KEY_RESULT_PATH = "resultPath";
+    private static final String KEY_ERROR_MESSAGE = "errorMessage";
 
     private Logger logger = LoggerFactory.getLogger(DialogUpgradeServlet.class);
 
@@ -98,68 +88,46 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
     @Override
     protected void doPost(SlingHttpServletRequest request, SlingHttpServletResponse response)
             throws ServletException, IOException {
-        // collect rules
-        List<RewriteRule> rules;
-        try {
-            rules = collectRules(request.getResourceResolver());
-        } catch (RepositoryException e) {
-            throw new ServletException("Caught exception while collecting rewrite rules", e);
+        // validate 'paths' parameter
+        RequestParameter[] paths = request.getRequestParameters(PARAM_PATHS);
+        if (paths == null) {
+            logger.warn("Missing parameter '" + PARAM_PATHS + "'");
+            response.setContentType("text/html");
+            response.getWriter().println("Missing parameter '" + PARAM_PATHS + "'");
+            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            return;
         }
 
-        try {
-            // validate 'paths' parameter
-            RequestParameter[] paths = request.getRequestParameters(PARAM_PATHS);
-            if (paths == null) {
-                logger.warn("Missing parameter '" + PARAM_PATHS + "'");
-                response.setContentType("text/html");
-                response.getWriter().println("Missing parameter '" + PARAM_PATHS + "'");
-                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-                return;
-            }
+        // get dialog rewrite rules
+        List<DialogRewriteRule> rules = getRules(request.getResourceResolver());
 
-            long tick = System.currentTimeMillis();
-            Session session = request.getResourceResolver().adaptTo(Session.class);
-            TreeRewriter rewriter = new TreeRewriter(rules);
-            String path = "";
-            JSONObject results = new JSONObject();
-            logger.debug("Upgrading {} dialogs", paths.length);
+        long tick = System.currentTimeMillis();
+        Session session = request.getResourceResolver().adaptTo(Session.class);
+        DialogTreeRewriter rewriter = new DialogTreeRewriter(rules);
+        JSONObject results = new JSONObject();
+        logger.debug("Upgrading {} dialogs", paths.length);
+
+        try {
             // iterate over all paths
             for (RequestParameter parameter : paths) {
-                path = parameter.getString();
+                String path = parameter.getString();
                 JSONObject result = new JSONObject();
                 results.put(path, result);
 
-                // path doesn't exist
+                // verify that the path exists
                 if (!session.nodeExists(path)) {
-                    result.put(KEY_RESULT, UpgradeResult.PATH_NOT_FOUND);
+                    result.put(KEY_ERROR_MESSAGE, "Invalid path");
                     logger.debug("Path {} doesn't exist", path);
                     continue;
                 }
 
-                Node dialog = session.getNode(path);
-                // path does not point to a dialog
-                if (!"cq:Dialog".equals(dialog.getPrimaryNodeType().getName())) {
-                    result.put(KEY_RESULT, UpgradeResult.NOT_A_DIALOG);
-                    logger.debug("{} is not a Classic UI dialog", path);
-                    continue;
-                }
-
-                // Touch UI dialog already exists
-                if (dialog.getParent().hasNode("cq:dialog")) {
-                    result.put(KEY_RESULT, UpgradeResult.ALREADY_UPGRADED);
-                    logger.debug("Dialog {} already has a Touch UI counterpart", path);
-                    continue;
-                }
-
-                // do the upgrade
                 try {
-                    Node upgradedDialog = rewriter.rewrite(dialog);
-                    result.put(KEY_RESULT, UpgradeResult.SUCCESS);
-                    result.put(KEY_PATH, upgradedDialog.getPath());
-                    logger.debug("Successfully upgraded dialog {} to {}", path,  upgradedDialog.getPath());
-                } catch (RewriteException e) {
-                    result.put(KEY_RESULT, UpgradeResult.ERROR);
-                    result.put(KEY_MESSAGE, e.getMessage());
+                    // do the upgrade
+                    Node upgradedDialog = rewriter.rewrite(session.getNode(path));
+                    result.put(KEY_RESULT_PATH, upgradedDialog.getPath());
+                    logger.debug("Successfully upgraded dialog {} to {}", path, upgradedDialog.getPath());
+                } catch (DialogRewriteException e) {
+                    result.put(KEY_ERROR_MESSAGE, e.getMessage());
                     logger.warn("Upgrading dialog {} failed", path, e);
                 }
             }
@@ -173,37 +141,48 @@ public class DialogUpgradeServlet extends SlingAllMethodsServlet {
         }
     }
 
-    private List<RewriteRule> collectRules(ResourceResolver resolver)
-            throws RepositoryException {
-        final List<RewriteRule> rules = new LinkedList<RewriteRule>();
+    private List<DialogRewriteRule> getRules(ResourceResolver resolver)
+            throws ServletException {
+        final List<DialogRewriteRule> rules = new LinkedList<DialogRewriteRule>();
 
-        // rules provided as OSGi services
+        // 1) rules provided as OSGi services
+        // (we need to synchronize, since the 'addAll' will iterate over 'rules')
         synchronized (this.rules) {
             rules.addAll(this.rules);
         }
         int nb = rules.size();
 
-        // node-based rules
+        // 2) node-based rules
         Resource resource = resolver.getResource(RULES_SEARCH_PATH);
         if (resource != null) {
-            rules.addAll(RewriteRulesFactory.createRules(resource.adaptTo(Node.class)));
+            try {
+                Node rulesContainer = resource.adaptTo(Node.class);
+                NodeIterator iterator = rulesContainer.getNodes();
+                while (iterator.hasNext()) {
+                    rules.add(new NodeBasedRewriteRule(iterator.nextNode()));
+                }
+            } catch (RepositoryException e) {
+                throw new ServletException("Caught exception while collecting rewrite rules", e);
+            }
         }
 
         // sort rules according to their ranking
-        Collections.sort(rules, new Comparator<RewriteRule>() {
-
-            public int compare(RewriteRule rule1, RewriteRule rule2) {
-                int ranking1 = rule1.getRanking();
-                ranking1 = ranking1 < 0 ? Integer.MAX_VALUE : ranking1;
-                int ranking2 = rule2.getRanking();
-                ranking2 = ranking2 < 0 ? Integer.MAX_VALUE : ranking2;
-                return Double.compare(ranking1, ranking2);
-            }
-
-        });
+        Collections.sort(rules, new RuleComparator());
 
         logger.debug("Found {} rules ({} Java-based, {} node-based)", nb, rules.size() - nb);
         return rules;
+    }
+
+    private class RuleComparator implements Comparator<DialogRewriteRule> {
+
+        public int compare(DialogRewriteRule rule1, DialogRewriteRule rule2) {
+            int ranking1 = rule1.getRanking();
+            ranking1 = ranking1 < 0 ? Integer.MAX_VALUE : ranking1;
+            int ranking2 = rule2.getRanking();
+            ranking2 = ranking2 < 0 ? Integer.MAX_VALUE : ranking2;
+            return Double.compare(ranking1, ranking2);
+        }
+
     }
 
 }

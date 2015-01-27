@@ -18,23 +18,55 @@
 
 package com.adobe.cq.dialogupgrade;
 
-import com.adobe.cq.dialogupgrade.treerewriter.RewriteRule;
-
 import javax.jcr.Node;
 import javax.jcr.RepositoryException;
 import java.util.Set;
 
 /**
- * Interface for classes that implement a dialog rewrite rule.
- * @see com.adobe.cq.dialogupgrade.treerewriter.RewriteRule
+ * Interface for services that implement a dialog rewrite rule. A rewrite rule matches certain subtrees of the
+ * dialog tree (usually corresponding to one dialog component) and rewrites (i.e. modifies or replaces) them.
  */
-public interface DialogRewriteRule extends RewriteRule {
+public interface DialogRewriteRule {
 
     /**
-     * @throws DialogRewriteException if the dialog rewrite operation failed or cannot be completed
-     * @see com.adobe.cq.dialogupgrade.treerewriter.RewriteRule#applyTo
+     * Returns true if this rule matches the given subtree.
+     *
+     * @param root The root of the subtree to be checked for a match
+     * @return true if this rule applies, false otherwise
+     */
+    boolean matches(Node root)
+            throws RepositoryException;
+
+    /**
+     * <p>Applies this rule to the subtree rooted at the specified <code>root</code> node. The implementation of this
+     * method may either modify the properties and nodes contained in that tree, or replace it by adding a new child
+     * to the parent of <code>root</code>. In the latter case, the implementation is responsible for removing the
+     * original subtree (without saving).</p>
+     *
+     * <p>Rewrite rules must not rewrite trees in a circular fashion, as this might lead to infinite loops.</p>
+     *
+     * <p>Optionally, the implementation can indicate which nodes of the resulting tree are final and therefore
+     * safe for the algorithm to skip in subsequent traversals of the tree. Add the paths of final nodes to the
+     * specified set.
+     *
+     * <p>{@link com.adobe.cq.dialogupgrade.DialogUpgradeUtils} provides utility methods that can
+     * be used to temporarily rename (move) the original subtree, so that the resulting subtree can be built
+     * while still having the original around.</p>
+     *
+     * @param root The root of the subtree to be rewritten
+     * @return the root node of the rewritten tree, or null if it was removed
+     * @throws DialogRewriteException if the rewrite operation failed or cannot be completed
      */
     Node applyTo(Node root, Set<Node> finalNodes)
             throws DialogRewriteException, RepositoryException;
+
+    /**
+     * Returns the ranking of this rule (the lower the ranking the higher the priority). If the return value
+     * is negative, then the rule will have the lowest priority possible. The order of rules with equal rankings
+     * is arbitrary.
+     *
+     * @return The ranking
+     */
+    int getRanking();
 
 }
