@@ -61,9 +61,8 @@ public interface DialogRewriteRule {
             throws DialogRewriteException, RepositoryException;
 
     /**
-     * Returns the ranking of this rule (the lower the ranking the higher the priority). If the return value
-     * is negative, then the rule will have the lowest priority possible. The order of rules with equal rankings
-     * is arbitrary.
+     * Returns the ranking of this rule. The larger the returned value, the lower the priority of the rule (the lowest
+     * priority corresponds to <code>Integer.MAX_VALUE</code>. The order of rules with equal rankings is arbitrary.
      *
      * @return The ranking
      */

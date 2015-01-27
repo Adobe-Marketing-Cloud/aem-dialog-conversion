@@ -365,8 +365,7 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
                     long ranking = ruleNode.getProperty(PROPERTY_RANKING).getLong();
                     this.ranking = new Long(ranking).intValue();
                 } else {
-                    // we assign the default value
-                    this.ranking = -1;
+                    this.ranking = Integer.MAX_VALUE;
                 }
             } catch (RepositoryException e) {
                 logger.warn("Caught exception while reading the " + PROPERTY_RANKING + " property");

@@ -27,10 +27,13 @@ public abstract class AbstractDialogRewriteRule implements DialogRewriteRule {
         Dictionary<String, Object> props = context.getProperties();
         // read service ranking property
         Object ranking = props.get("service.ranking");
-        if (ranking == null) {
-            ranking = -1;
+        if (ranking != null) {
+            try {
+                this.ranking = (Integer) ranking;
+            } catch (ClassCastException e) {
+                // ignore
+            }
         }
-        this.ranking = (Integer) ranking;
     }
 
     public int getRanking() {
@@ -41,4 +44,5 @@ public abstract class AbstractDialogRewriteRule implements DialogRewriteRule {
     public String toString() {
         return this.getClass().getSimpleName() + "[ranking=" + getRanking() + "]";
     }
+
 }

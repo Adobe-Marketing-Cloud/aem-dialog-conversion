@@ -172,6 +172,9 @@ public class DialogConversionServlet extends SlingAllMethodsServlet {
         Collections.sort(rules, new RuleComparator());
 
         logger.debug("Found {} rules ({} Java-based, {} node-based)", nb, rules.size() - nb);
+        for (DialogRewriteRule rule : rules) {
+            logger.debug(rule.toString());
+        }
         return rules;
     }
 
@@ -179,9 +182,7 @@ public class DialogConversionServlet extends SlingAllMethodsServlet {
 
         public int compare(DialogRewriteRule rule1, DialogRewriteRule rule2) {
             int ranking1 = rule1.getRanking();
-            ranking1 = ranking1 < 0 ? Integer.MAX_VALUE : ranking1;
             int ranking2 = rule2.getRanking();
-            ranking2 = ranking2 < 0 ? Integer.MAX_VALUE : ranking2;
             return Double.compare(ranking1, ranking2);
         }
 
