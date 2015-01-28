@@ -8,7 +8,7 @@ Install
 
 The tool runs on instances of AEM 6.0 (SP1, SP2 or none) and AEM 6.1-SNAPSHOT. To install it, do one of the following:
 
-* Download and install the latest released version of [cq-dialog-conversion-content](http://nexus.bsl.eur.adobe.com/content/repositories/releases/com/adobe/cq/cq-dialog-upgrade-content/0.0.2/cq-dialog-upgrade-content-0.0.2.zip)
+* Download and install the latest released version of [cq-dialog-conversion-content](http://nexus.bsl.eur.adobe.com/content/repositories/releases/com/adobe/cq/cq-dialog-conversion-content/0.0.2/cq-dialog-conversion-content-0.0.2.zip)
 * Clone this git repository, then build and install the content package in located in `/content`
 
 Documentation
