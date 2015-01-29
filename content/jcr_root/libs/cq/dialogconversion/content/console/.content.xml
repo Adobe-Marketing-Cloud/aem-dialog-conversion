@@ -76,7 +76,7 @@
                                 jcr:primaryType="nt:unstructured"
                                 sling:resourceType="granite/ui/components/foundation/form/pathbrowser"
                                 id="path"
-                                placeHolder="e.g. /libs/foundation/components"/>
+                                placeHolder="Enter a path, e.g. /apps/geometrixx/components"/>
                             <showButton
                                 jcr:primaryType="nt:unstructured"
                                 sling:resourceType="granite/ui/components/foundation/button"
