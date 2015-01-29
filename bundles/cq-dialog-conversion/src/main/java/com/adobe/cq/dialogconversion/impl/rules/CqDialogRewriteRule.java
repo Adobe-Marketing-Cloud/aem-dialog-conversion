@@ -93,8 +93,8 @@ public class CqDialogRewriteRule extends AbstractDialogRewriteRule {
             JcrUtil.copy(item, items, item.getName());
         }
 
-        // we do not remove the original tree (as we want to keep the old dialog), so
-        // we simply return the new root
+        // remove old root and return new root
+        root.remove();
         return cqDialog;
     }
 

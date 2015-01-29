@@ -20,6 +20,7 @@ package com.adobe.cq.dialogconversion.impl;
 
 import com.adobe.cq.dialogconversion.DialogRewriteException;
 import com.adobe.cq.dialogconversion.DialogRewriteRule;
+import com.day.cq.commons.jcr.JcrUtil;
 import org.apache.jackrabbit.commons.flat.TreeTraverser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,7 +70,11 @@ public class DialogTreeRewriter {
             throws DialogRewriteException, RepositoryException {
         logger.debug("Rewriting dialog tree rooted at {}", root.getPath());
         check(root);
-        long tick = System.currentTimeMillis();
+
+        // make a copy of the dialog (which will be rewritten)
+        String name = JcrUtil.createValidChildName(root.getParent(), "dialog");
+        Node copy = JcrUtil.copy(root, root.getParent(), name);
+
 
         /**
          * Description of the algorithm:
@@ -81,9 +86,10 @@ public class DialogTreeRewriter {
          * - some special care has to be taken to keep the orderings of child nodes when rewriting subtrees
          */
 
+        long tick = System.currentTimeMillis();
         Session session = root.getSession();
         // reference to the node where the pre-order traversal is started from
-        Node startNode = root;
+        Node startNode = copy;
         // keeps track of whether or not there was a match during a traversal
         boolean foundMatch;
         // keeps track of whether or not the rewrite operation succeeded
