@@ -100,9 +100,9 @@ import java.util.regex.Pattern;
  *     </li>
  *     <li>
  *         <code>cq:rewriteFinal</code> (boolean)<br />
- *         Set this property on a node that is final and can be skipped on subsequent passes as an optimization
- *         measure. When placed on the replacement node itself (i.e. on <code>rule/replacement</code>), the whole
- *         replacement tree is considered final.
+ *         Set this property on a node that is final and can be disregarded for the rest of the conversion as an
+ *         optimization measure. When placed on the replacement node itself (i.e. on <code>rule/replacement</code>),
+ *         the whole replacement tree is considered final.
  *     </li>
  * </ul>
  */

@@ -32,6 +32,7 @@ public abstract class AbstractDialogRewriteRule implements DialogRewriteRule {
                 this.ranking = (Integer) ranking;
             } catch (ClassCastException e) {
                 // ignore
+                logger.warn("Could invalid service.ranking value {}", ranking);
             }
         }
     }
