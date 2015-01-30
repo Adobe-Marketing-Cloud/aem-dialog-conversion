@@ -66,16 +66,19 @@ import java.util.regex.Pattern;
  * <p>This example defines a rule containing two patterns (the trees rooted at <code>foo</code> and <code>foo1</code>)
  * and a replacement (the tree rooted at <code>bar</code>). The pattern and replacement trees are arbitrary trees
  * containing nodes and properties. The rule matches a subtree if any of the defined patterns matches. In order for
- * a pattern to match, the subject tree must contain the same nodes as the pattern (matching names, except for the
- * root), and all properties defined in the pattern must match the properties on the tree.</p>
+ * a pattern to match, the tree in question must contain the same nodes as the pattern (matching names, except for the
+ * root), and all properties defined in the pattern must match the properties on the tree. A node in a pattern
+ * can be marked as optional by setting <code>cq:rewriteOptional</code> to <code>true</code>, in which case it
+ * doesn't necessarily have to present for a tree to match.</p>
  *
  * <p>In the case of a match, the matched subtree (called original tree) will be substituted by the replacement. The
  * replacement tree can define mapped properties that will inherit the value of a property in the original tree. They
  * need to be of type <code>string</code> and have the following format: <code>${&lt;path&gt;}</code>. If the referenced
  * property doesn't exist in the original tree, then the property is omitted. Alternatively, a default value can be
- * specified for that case (only for <code>string</code> properties): <code>${&lt;path&gt;:&lt;default&gt;}</code>.
- * Mapped properties can be multivalued, in which case they will be assigned the value of the first property that
- * exists in the original tree. The following example illustrates mapping properties:</p>
+ * specified for that case (only possible for <code>string</code> properties):
+ * <code>${&lt;path&gt;:&lt;default&gt;}</code>. Mapped properties can be multivalued, in which case they will be
+ * assigned the value of the first property that exists in the original tree. The following example illustrates
+ * mapping properties:</p>
  *
  * <pre>
  * ...
@@ -86,16 +89,21 @@ import java.util.regex.Pattern;
  *       - multi = [${./non/existing}, ${./some/prop}]
  * </pre>
  *
- * The replacement tree supports following special properties (named <code>cq:rewrite...</code>):
+ * The replacement tree supports following special properties:
  *
  * <ul>
- *     <li><code>cq:rewriteMapChildren</code> (string)<br />
- *     The node containing this property will receive a copy of the children of the node in the original tree
- *     referenced by the property value (e.g. <code>cq:rewriteMapChildren=./items</code>).</li>
- *     <li><code>cq:rewriteIsFinal</code> (boolean)<br />
- *     Optimization measure, telling the algorithm that the node containing this
- *     property is final and doesn't have to be rechecked for matching rewrite rules. When placed on the replacement
- *     node itself, the whole replacement tree is considered final.</li>
+ *     <li>
+ *         <code>cq:rewriteMapChildren</code> (string)<br />
+ *         Copies the children of the referenced node in the original tree to the node containing this property
+ *         (e.g. <code>cq:rewriteMapChildren=./items</code> will copy the children of <code>./items</code> to the
+ *         current node).
+ *     </li>
+ *     <li>
+ *         <code>cq:rewriteIsFinal</code> (boolean)<br />
+ *         Set this property on a node that is final and can be skipped on subsequent passes as an optimization
+ *         measure. When placed on the replacement node itself (i.e. on <code>rule/replacement</code>), the whole
+ *         replacement tree is considered final.
+ *     </li>
  * </ul>
  */
 public class NodeBasedRewriteRule implements DialogRewriteRule {
@@ -105,6 +113,7 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
 
     // special properties
     private static final String PROPERTY_RANKING = "cq:rewriteRanking";
+    private static final String PROPERTY_OPTIONAL = "cq:rewriteOptional";
     private static final String PROPERTY_MAP_CHILDREN = "cq:rewriteMapChildren";
     private static final String PROPERTY_IS_FINAL = "cq:rewriteIsFinal";
 
@@ -151,24 +160,34 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
         PropertyIterator propertyIterator = pattern.getProperties();
         while (propertyIterator.hasNext()) {
             Property property = propertyIterator.nextProperty();
+            String name = property.getName();
             if (property.getDefinition().isProtected()) {
                 // skip protected properties
                 continue;
             }
-            if (!root.hasProperty(property.getName())) {
+            if (PROPERTY_OPTIONAL.equals(name)) {
+                // skip cq:rewriteOptional property
+                continue;
+            }
+            if (!root.hasProperty(name)) {
                 // property present on pattern does not exist in tree
                 return false;
             }
-            if (!root.getProperty(property.getName()).getValue().equals(property.getValue())) {
+            if (!root.getProperty(name).getValue().equals(property.getValue())) {
                 // property values on pattern and tree differ
                 return false;
             }
         }
 
-        // check that the tree contains all children defined in the pattern
+        // check that the tree contains all children defined in the pattern (optimization measure, before
+        // checking all children recursively)
         NodeIterator nodeIterator = pattern.getNodes();
         while (nodeIterator.hasNext()) {
             Node child = nodeIterator.nextNode();
+            // if the node is marked as optional, we can skip the check
+            if (child.hasProperty(PROPERTY_OPTIONAL) && child.getProperty(PROPERTY_OPTIONAL).getBoolean()) {
+                continue;
+            }
             if (!root.hasNode(child.getName())) {
                 // this child is not present in subject tree
                 return false;
@@ -179,6 +198,11 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
         nodeIterator = pattern.getNodes();
         while (nodeIterator.hasNext()) {
             Node child = nodeIterator.nextNode();
+            // if the node is marked as optional and is not present, then we skip it
+            if (child.hasProperty(PROPERTY_OPTIONAL) && child.getProperty(PROPERTY_OPTIONAL).getBoolean()
+                    && !root.hasNode(child.getName())) {
+                continue;
+            }
             return matches(root.getNode(child.getName()), child);
         }
 
