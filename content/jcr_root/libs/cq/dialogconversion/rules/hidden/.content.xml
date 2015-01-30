@@ -5,7 +5,7 @@
         <hidden/>
     </patterns>
     <replacement
-        cq:rewriteIsFinal="{Boolean}true"
+        cq:rewriteFinal="{Boolean}true"
         jcr:primaryType="nt:unstructured">
         <hidden
             jcr:primaryType="nt:unstructured"

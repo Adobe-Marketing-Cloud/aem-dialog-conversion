@@ -11,11 +11,11 @@
             name="${./name}"
             text="${./fieldLabel}"
             renderReadOnly="${./readOnly}"
-            cq:rewriteIsFinal="{Boolean}true">
+            cq:rewriteFinal="{Boolean}true">
             <items
                 cq:rewriteMapChildren="./items"
                 jcr:primaryType="nt:unstructured"
-                cq:rewriteIsFinal="{Boolean}true"/>
+                cq:rewriteFinal="{Boolean}true"/>
         </radiogroup>
     </replacement>
 </jcr:root>

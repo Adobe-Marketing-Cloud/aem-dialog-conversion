@@ -12,22 +12,22 @@
             jcr:primaryType="nt:unstructured"
             jcr:title="${./title}"
             sling:resourceType="granite/ui/components/foundation/container"
-            cq:rewriteIsFinal="{Boolean}true">
+            cq:rewriteFinal="{Boolean}true">
             <layout
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="granite/ui/components/foundation/layouts/fixedcolumns"
-                cq:rewriteIsFinal="{Boolean}true"/>
+                cq:rewriteFinal="{Boolean}true"/>
             <items
                 jcr:primaryType="nt:unstructured"
-                cq:rewriteIsFinal="{Boolean}true">
+                cq:rewriteFinal="{Boolean}true">
                 <columns
                     jcr:primaryType="nt:unstructured"
                     sling:resourceType="granite/ui/components/foundation/container"
-                    cq:rewriteIsFinal="{Boolean}true">
+                    cq:rewriteFinal="{Boolean}true">
                     <items
                         cq:rewriteMapChildren="./items"
                         jcr:primaryType="nt:unstructured"
-                        cq:rewriteIsFinal="{Boolean}true"/>
+                        cq:rewriteFinal="{Boolean}true"/>
                 </columns>
             </items>
         </panel>

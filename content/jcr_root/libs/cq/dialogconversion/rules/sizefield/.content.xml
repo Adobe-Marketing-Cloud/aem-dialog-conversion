@@ -5,7 +5,7 @@
         <sizefield/>
     </patterns>
     <replacement
-        cq:rewriteIsFinal="{Boolean}true"
+        cq:rewriteFinal="{Boolean}true"
         jcr:primaryType="nt:unstructured">
         <sizefield
             jcr:primaryType="nt:unstructured"

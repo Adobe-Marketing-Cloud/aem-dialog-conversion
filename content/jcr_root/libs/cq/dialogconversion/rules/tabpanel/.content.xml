@@ -11,16 +11,16 @@
         <tabpanel
             jcr:primaryType="nt:unstructured"
             sling:resourceType="granite/ui/components/foundation/container"
-            cq:rewriteIsFinal="{Boolean}true">
+            cq:rewriteFinal="{Boolean}true">
             <layout
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="granite/ui/components/foundation/layouts/tabs"
                 type="nav"
-                cq:rewriteIsFinal="{Boolean}true"/>
+                cq:rewriteFinal="{Boolean}true"/>
             <items
                 jcr:primaryType="nt:unstructured"
                 cq:rewriteMapChildren="./items"
-                cq:rewriteIsFinal="{Boolean}true"/>
+                cq:rewriteFinal="{Boolean}true"/>
         </tabpanel>
     </replacement>
 </jcr:root>

@@ -5,7 +5,7 @@
         <password/>
     </patterns>
     <replacement
-        cq:rewriteIsFinal="{Boolean}true"
+        cq:rewriteFinal="{Boolean}true"
         jcr:primaryType="nt:unstructured">
         <password
             jcr:primaryType="nt:unstructured"

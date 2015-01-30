@@ -11,11 +11,11 @@
             sling:resourceType="granite/ui/components/foundation/form/fieldset"
             jcr:title="${./title}"
             title="${./title}"
-            cq:rewriteIsFinal="{Boolean}true">
+            cq:rewriteFinal="{Boolean}true">
             <items
                 jcr:primaryType="nt:unstructured"
                 cq:rewriteMapChildren="./items"
-                cq:rewriteIsFinal="{Boolean}true"/>
+                cq:rewriteFinal="{Boolean}true"/>
         </fieldset>
     </replacement>
 </jcr:root>

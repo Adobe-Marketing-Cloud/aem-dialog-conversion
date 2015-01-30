@@ -99,7 +99,7 @@ import java.util.regex.Pattern;
  *         current node).
  *     </li>
  *     <li>
- *         <code>cq:rewriteIsFinal</code> (boolean)<br />
+ *         <code>cq:rewriteFinal</code> (boolean)<br />
  *         Set this property on a node that is final and can be skipped on subsequent passes as an optimization
  *         measure. When placed on the replacement node itself (i.e. on <code>rule/replacement</code>), the whole
  *         replacement tree is considered final.
@@ -115,7 +115,7 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
     private static final String PROPERTY_RANKING = "cq:rewriteRanking";
     private static final String PROPERTY_OPTIONAL = "cq:rewriteOptional";
     private static final String PROPERTY_MAP_CHILDREN = "cq:rewriteMapChildren";
-    private static final String PROPERTY_IS_FINAL = "cq:rewriteIsFinal";
+    private static final String PROPERTY_IS_FINAL = "cq:rewriteFinal";
 
     private Logger logger = LoggerFactory.getLogger(NodeBasedRewriteRule.class);
 

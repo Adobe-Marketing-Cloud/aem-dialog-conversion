@@ -13,7 +13,7 @@
             value="${./inputValue}"
             disabled="${./disabled}"
             checked="${./checked}"
-            cq:rewriteIsFinal="{Boolean}true">
+            cq:rewriteFinal="{Boolean}true">
         </radio>
     </replacement>
 </jcr:root>
