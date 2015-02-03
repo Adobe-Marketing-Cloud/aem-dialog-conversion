@@ -39,7 +39,7 @@
     <artifactId>cq-dialog-conversion-content</artifactId>
     <packaging>content-package</packaging>
     <name>Adobe AEM Dialog Conversion Tool</name>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <description>Content package containing the dialog conversion tool</description>
 
     <!-- ====================================================================== -->
@@ -49,7 +49,7 @@
         <connection>scm:git:git@git.corp.adobe.com:obrist/dialog-conversion.git</connection>
         <developerConnection>scm:git:git@git.corp.adobe.com:obrist/dialog-conversion.git</developerConnection>
         <url>https://git.corp.adobe.com/obrist/dialog-conversion/tree/master/content</url>
-        <tag>cq-dialog-conversion-content-1.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <!-- ====================================================================== -->
