@@ -13,7 +13,7 @@
             name="${./name}"
             fieldLabel="${./fieldLabel}"
             fieldDescription="${./fieldDescription}"
-            required="${./allowBlank}"
+            required="!${./allowBlank}"
             disabled="${./disabled}"/>
     </replacement>
 </jcr:root>

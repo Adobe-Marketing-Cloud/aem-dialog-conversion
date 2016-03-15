@@ -15,7 +15,7 @@
             name="${./name}"
             value="${./value}"
             defaultValue="${./defaultValue}"
-            required="${./allowBlank}"
+            required="!${./allowBlank}"
             disabled="${./disabled}"
             min="${./minValue}"
             max="${./maxValue}"/>

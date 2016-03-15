@@ -76,17 +76,23 @@ import java.util.regex.Pattern;
  * need to be of type <code>string</code> and have the following format: <code>${&lt;path&gt;}</code>. If the referenced
  * property doesn't exist in the original tree, then the property is omitted. Alternatively, a default value can be
  * specified for that case (only possible for <code>string</code> properties):
- * <code>${&lt;path&gt;:&lt;default&gt;}</code>. Mapped properties can be multivalued, in which case they will be
- * assigned the value of the first property that exists in the original tree. The following example illustrates
- * mapping properties:</p>
+ * <code>${&lt;path&gt;:&lt;default&gt;}</code>. Boolean properties are negated if the expression is prefixed with
+ * <code>!</code>. Mapped properties can also be multivalued, in which case they will be assigned the value of the first
+ * property that exists in the original tree. The following example illustrates mapping properties:</p>
  *
  * <pre>
- * ...
+ * rule
+ *   ...
  *   + replacement
  *     + bar
  *       - prop = ${./some/prop}
- *       - default = ${./non/existing:default string value}
- *       - multi = [${./non/existing}, ${./some/prop}]
+ *         // 'prop' will be assigned the value of 'some/prop' in the original tree
+ *       - negated = !${./some/boolean/prop}
+ *         // 'negated' will be assigned the negated value of 'some/boolean/prop' in the original tree
+ *       - default = ${./some/prop:default string value}
+ *         // 'default' will be assigned the value of 'some/prop' if it exists, else the string 'default string'
+ *       - multi = [${./some/prop1}, ${./some/prop2}]
+ *         // 'multi' will be assigned the value of 'some/prop1' if it exists, else the value of 'some/prop2'
  * </pre>
  *
  * The replacement tree supports following special properties:
@@ -109,7 +115,7 @@ import java.util.regex.Pattern;
 public class NodeBasedRewriteRule implements DialogRewriteRule {
 
     // pattern that matches the regex for mapped properties: ${<path>}
-    private static final Pattern MAPPED_PATTERN = Pattern.compile("^\\$\\{(.*?)(:(.+))?\\}$");
+    private static final Pattern MAPPED_PATTERN = Pattern.compile("^(\\!{0,1})\\$\\{(.*?)(:(.+))?\\}$");
 
     // special properties
     private static final String PROPERTY_RANKING = "cq:rewriteRanking";
@@ -344,19 +350,24 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
                 // this is a mapped property, we will delete it if the mapped destination
                 // property doesn't exist
                 deleteProperty = true;
-                String path = matcher.group(1);
+                String path = matcher.group(2);
                 if (root.hasProperty(path)) {
                     // replace property by mapped value in the original tree
                     Property originalProperty = root.getProperty(path);
                     String name = property.getName();
                     Node parent = property.getParent();
                     property.remove();
-                    JcrUtil.copy(originalProperty, parent, name);
+                    Property newProperty = JcrUtil.copy(originalProperty, parent, name);
+                    // negate boolean properties if negation character has been set
+                    String negate = matcher.group(1);
+                    if ("!".equals(negate) && originalProperty.getType() == PropertyType.BOOLEAN) {
+                        newProperty.setValue(!newProperty.getBoolean());
+                    }
                     // the mapping was successful
                     deleteProperty = false;
                     break;
                 } else {
-                    String defaultValue = matcher.group(3);
+                    String defaultValue = matcher.group(4);
                     if (defaultValue != null) {
                         property.setValue(defaultValue);
                         deleteProperty = false;
