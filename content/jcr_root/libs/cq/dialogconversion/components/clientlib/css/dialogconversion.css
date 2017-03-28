@@ -2,7 +2,7 @@
     padding: 30px;
 }
 
-#path {
+.cq-DialogConverter-searchPath {
     width: 400px;
 }
 
@@ -11,28 +11,33 @@
     margin-right: 20px;
 }
 
-.centered {
+.cq-DialogConverter-cell--centered {
     text-align: center;
 }
 
-#convert-dialogs {
+.cq-DialogConverter-Header--title {
+    padding-left: 0.425rem;
+}
+
+.cq-DialogConverter-convertDialogs {
     display: none;
 }
 
-#conversion-results {
+.cq-DialogConverter-conversionResults {
     display: none;
+    width: 100%;
 }
 
-#dialogs th:first-child {
+.cq-DialogConverter-dialogs th:first-child {
     width: 10px;
 }
 
-#dialogs th:first-child,
-#dialogs td:first-child {
+.cq-DialogConverter-dialogs th:first-child,
+.cq-DialogConverter-dialogs td:first-child {
     padding-left: 15px;
 }
 
-#dialogs .coral-Checkbox-description {
+.cq-DialogConverter-dialogs .coral-Checkbox-description {
     margin-left: 15px;
 }
 

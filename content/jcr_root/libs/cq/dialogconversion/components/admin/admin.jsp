@@ -24,14 +24,14 @@
                                   javax.jcr.query.Query,
                                   javax.jcr.query.QueryManager,
                                   java.util.LinkedList, java.util.List" %><%
-%><%@include file="/libs/foundation/global.jsp"%>
+%><%@include file="/libs/granite/ui/global.jsp"%>
 
 <div id="content">
 
-    <cq:include path="showButton" resourceType="granite/ui/components/foundation/button"/>
+    <sling:include path="showButton" resourceType="granite/ui/components/coral/foundation/button"/>
 
     <div class="left">
-        <cq:include path="path" resourceType="granite/ui/components/foundation/form/pathbrowser"/>
+        <sling:include path="path" resourceType="granite/ui/components/foundation/form/pathbrowser"/>
     </div>
 
     <br /><br /><br />
@@ -81,80 +81,70 @@
                 }
             }
     %>
-            <script>
-
-                $(document).ready(function () {
-                    // prefill pathbrowser with value from the url
-                    $(".js-coral-pathbrowser-input", $("#path").closest(".coral-Form-fieldwrapper")).val("<%= xssAPI.encodeForJSString(path) %>");
-                });
-
-            </script>
-
-            <div id="info-text">
+            <div class="js-cq-DialogConverter-infoText">
                 Found <b><%= nodes.size() %></b> dialog<%= nodes.size() > 1 ? "s" : "" %> below <b><%= path %></b>
             </div>
 
             <br />
 
-            <div id="dialogs-container">
-                <table class="coral-Table coral-Table--hover" id="dialogs">
-                    <thead>
-                        <tr class="coral-Table-row">
-                            <th class="coral-Table-headerCell">
-                                <label class="coral-Checkbox">
-                                    <input class="coral-Checkbox-input" type="checkbox" id="check-all">
-                                    <span class="coral-Checkbox-checkmark"></span>
-                                </label>
+            <div class="js-cq-DialogConverter-dialogsContainer" data-search-path="<%= xssAPI.getValidHref(path) %>">
+                <table is="coral-table" class="cq-DialogConverter-dialogs">
+                    <thead is="coral-table-head">
+                        <tr is="coral-table-row">
+                            <th is="coral-table-headercell">
+                                <coral-checkbox class="js-cq-DialogConverter-toggleDialogPaths" type="checkbox"/>
                             </th>
-                            <th class="coral-Table-headerCell" style="padding-left: 0.425rem;">Dialog (Classic UI)</th>
-                            <th class="coral-Table-headerCell centered">Links</th>
-                            <th class="coral-Table-headerCell centered">Dialog (Touch UI)</th>
+                            <th is="coral-table-headercell" class="cq-DialogConverter-Header--title"><%= i18n.get("Dialog (Classic UI)") %></th>
+                            <th is="coral-table-headercell" class="cq-DialogConverter-cell--centered"><%= i18n.get("Links") %></th>
+                            <th is="coral-table-headercell" class="cq-DialogConverter-cell--centered"><%= i18n.get("Dialog (Touch UI)") %></th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody is="coral-table-body">
         <%
-            String renderPath = "/libs/cq/dialogconversion/content/render";
             for (Node dialog : nodes) {
                 Node parent = dialog.getParent();
                 String href = externalizer.relativeLink(slingRequest, dialog.getPath()) + ".html";
                 String crxHref = externalizer.relativeLink(slingRequest, "/crx/de/index") + ".jsp#" + dialog.getPath();
                 String disabled = parent.hasNode("cq:dialog") ? "disabled=\"disabled\"" : "";
                 %>
-                        <tr class="coral-Table-row">
-                            <td class="coral-Table-cell" colspan="2">
+                        <tr is="coral-table-row">
+                            <td is="coral-table-cell" colspan="2">
                                 <label class="coral-Checkbox">
-                                    <input class="coral-Checkbox-input path" type="checkbox" value="<%= dialog.getPath()%>" <%= disabled %>>
+                                    <input class="coral-Checkbox-input js-cq-DialogConverter-path" type="checkbox" value="<%= dialog.getPath()%>" <%= disabled %>>
                                     <span class="coral-Checkbox-checkmark"></span>
                                     <span class="coral-Checkbox-description"><%= dialog.getPath()%></span>
                                 </label>
                             </td>
-                            <td class="coral-Table-cell centered"><a href="<%= xssAPI.getValidHref(href) %>" target="_blank" class="coral-Link">show</a> / <a href="<%= xssAPI.getValidHref(crxHref) %>" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a></td>
+                            <td is="coral-table-cell" class="cq-DialogConverter-cell--centered"><a href="<%= xssAPI.getValidHref(href) %>" target="_blank" class="coral-Link">show</a> / <a href="<%= xssAPI.getValidHref(crxHref) %>" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a></td>
                 <% if (parent.hasNode("cq:dialog")) {
                     Node touchDialog = parent.getNode("cq:dialog");
-                    href = externalizer.relativeLink(slingRequest, renderPath) + ".html" + touchDialog.getPath();
+                    href = externalizer.relativeLink(slingRequest, "/libs/cq/dialogconversion/content/render") + ".html" + touchDialog.getPath();
                     crxHref = externalizer.relativeLink(slingRequest, "/crx/de/index") + ".jsp#" + touchDialog.getPath().replaceAll(":", "%3A");
                 %>
-                            <td class="coral-Table-cell centered"><i class="coral-Icon coral-Icon--check"></i><a href="<%= xssAPI.getValidHref(href) %>" target="_blank" class="coral-Link">show</a> / <a href="<%= xssAPI.getValidHref(crxHref) %>" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a></td>
+                            <td is="coral-table-cell" class="cq-DialogConverter-cell--centered">
+                                <coral-icon icon="check"></coral-icon>
+                                <a href="<%= xssAPI.getValidHref(href) %>" target="_blank" class="coral-Link">show</a>&nbsp;/&nbsp;<a href="<%= xssAPI.getValidHref(crxHref) %>" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a>
+                            </td>
                 <% } else { %>
-                            <td class="coral-Table-cell centered">-</td>
+                            <td is="coral-table-cell" class="cq-DialogConverter-cell--centered">-</td>
                 <% } %>
                         </tr>
             <% } %>
                     </tbody>
                 </table>
                 <br />
-                <cq:include path="convertButton" resourceType="granite/ui/components/foundation/button"/>
+                <sling:include path="convertButton" resourceType="granite/ui/components/coral/foundation/button"/>
             </div>
 
-            <table class="coral-Table coral-Table--hover" id="conversion-results">
-                <thead>
-                    <tr class="coral-Table-row">
-                        <th class="coral-Table-headerCell">Dialog (Classic UI)</th>
-                        <th class="coral-Table-headerCell centered">Conversion to Touch UI</th>
-                        <th class="coral-Table-headerCell">Message</th>
+            <table is="coral-table" class="js-cq-DialogConverter-conversionResults cq-DialogConverter-conversionResults">
+                <thead is="coral-table-head">
+                    <tr is="coral-table-row">
+                        <th is="coral-table-headercell" class="cq-DialogConverter-Header--title"><%= i18n.get("Dialog (Classic UI)") %></th>
+                        <th is="coral-table-headercell"><%= i18n.get("Conversion to Touch UI") %></th>
+                        <th is="coral-table-headercell"><%= i18n.get("Message") %></th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody is="coral-table-body">
                 </tbody>
             </table>
     <% } %>
