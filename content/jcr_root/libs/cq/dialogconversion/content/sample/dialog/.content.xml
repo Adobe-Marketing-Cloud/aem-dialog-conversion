@@ -36,6 +36,22 @@
                             fieldDescription="Pathfield description"
                             name="./pathfield-name"
                             rootPath="/apps"/>
+                        <colorfield
+                            jcr:primaryType="cq:Widget"
+                            xtype="colorfield"
+                            fieldLabel="Colorfield label"
+                            fieldDescription="Colorfield description"
+                            name="./colorfield-name"
+                            defaultValue="fff"/>
+                        <multifield
+                            jcr:primaryType="cq:Widget"
+                            xtype="multifield"
+                            fieldLabel="Multifield label"
+                            fieldDescription="Multifield description"
+                            name="./multifield-name"/>
+                            <fieldConfig
+                                jcr:primaryType="nt:unstructured"
+                                xtype="textfield"/>
                         <numberfield
                             jcr:primaryType="cq:Widget"
                             xtype="numberfield"
@@ -120,18 +136,6 @@
                             fieldLabel="Checkbox label"
                             fieldDescription="Checkbox description"
                             name="./checkbox-name"/>
-                        <radio1
-                            jcr:primaryType="cq:Widget"
-                            xtype="radio"
-                            fieldLabel="Radio 1 label"
-                            name="./radio"
-                            value="radio-1-value"/>
-                        <radio2
-                            jcr:primaryType="cq:Widget"
-                            xtype="radio"
-                            fieldLabel="Radio 2 label"
-                            name="./radio"
-                            value="radio-2-value"/>
                         <radiogroup
                             jcr:primaryType="cq:Widget"
                             xtype="radiogroup"
@@ -181,57 +185,6 @@
                             fieldLabel="Fileupload label"
                             fieldDescription="Fileupload description"
                             name="./fileupload-name"/>
-                        <!--
-                        <tabpanel
-                            jcr:primaryType="cq:TabPanel">
-                            <items jcr:primaryType="cq:WidgetCollection">
-                                <tab1
-                                    jcr:primaryType="cq:Panel"
-                                    title="Tab 1">
-                                    <items jcr:primaryType="cq:WidgetCollection">
-                                        <textfield
-                                            jcr:primaryType="cq:Widget"
-                                            xtype="textfield"
-                                            fieldLabel="Textfield label (tab 1)"
-                                            fieldDescription="Textfield description (tab 1)"/>
-                                    </items>
-                                </tab1>
-                                <tab2
-                                    jcr:primaryType="cq:Panel"
-                                    title="Tab 2">
-                                    <items jcr:primaryType="cq:WidgetCollection">
-                                        <textfield
-                                            jcr:primaryType="cq:Widget"
-                                            xtype="textfield"
-                                            fieldLabel="Textfield label (tab 2)"
-                                            fieldDescription="Textfield description (tab 2)"/>
-                                    </items>
-                                </tab2>
-                                <tab3
-                                    jcr:primaryType="cq:Panel"
-                                    title="Tab 3">
-                                    <items jcr:primaryType="cq:WidgetCollection">
-                                        <textfield
-                                            jcr:primaryType="cq:Widget"
-                                            xtype="textfield"
-                                            fieldLabel="Textfield label (tab 3)"
-                                            fieldDescription="Textfield description (tab 3)"/>
-                                    </items>
-                                </tab3>
-                            </items>
-                        </tabpanel>
-                        <panel
-                            jcr:primaryType="cq:Panel"
-                            title="Panel title">
-                            <items jcr:primaryType="cq:WidgetCollection">
-                                <textfield
-                                    jcr:primaryType="cq:Widget"
-                                    xtype="textfield"
-                                    fieldLabel="Textfield label (panel)"
-                                    fieldDescription="Textfield description (panel)"/>
-                            </items>
-                        </panel>
-                        -->
                     </items>
                 </other>
             </items>

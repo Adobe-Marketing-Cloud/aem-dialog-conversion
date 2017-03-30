@@ -9,7 +9,7 @@
         jcr:primaryType="nt:unstructured">
         <hidden
             jcr:primaryType="nt:unstructured"
-            sling:resourceType="granite/ui/components/foundation/form/hidden"
+            sling:resourceType="granite/ui/components/coral/foundation/form/hidden"
             name="${./name}"
             value="${./value}"
             disabled="${./disabled}"/>

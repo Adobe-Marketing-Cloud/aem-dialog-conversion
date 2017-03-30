@@ -7,10 +7,9 @@
     <replacement jcr:primaryType="nt:unstructured">
         <radiogroup
             jcr:primaryType="nt:unstructured"
-            sling:resourceType="granite/ui/components/foundation/form/radiogroup"
+            sling:resourceType="granite/ui/components/coral/foundation/form/radiogroup"
             name="${./name}"
             text="${./fieldLabel}"
-            renderReadOnly="${./readOnly}"
             cq:rewriteFinal="{Boolean}true">
             <items
                 cq:rewriteMapChildren="./items"

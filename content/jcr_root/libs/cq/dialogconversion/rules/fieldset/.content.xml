@@ -8,9 +8,8 @@
     <replacement jcr:primaryType="nt:unstructured">
         <fieldset
             jcr:primaryType="nt:unstructured"
-            sling:resourceType="granite/ui/components/foundation/form/fieldset"
+            sling:resourceType="granite/ui/components/coral/foundation/form/fieldset"
             jcr:title="${./title}"
-            title="${./title}"
             cq:rewriteFinal="{Boolean}true">
             <items
                 jcr:primaryType="nt:unstructured"
