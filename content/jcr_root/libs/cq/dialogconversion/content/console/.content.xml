@@ -48,28 +48,28 @@
                             sling:resourceType="granite/ui/components/coral/foundation/text"
                             text=""/>
                         <dialogs
-                                granite:class="js-cq-DialogConverter-dialogs cq-DialogConverter-dialogs"
-                                jcr:primaryType="nt:unstructured"
-                                sling:resourceType="granite/ui/components/coral/foundation/table"
-                                itemResourceType="cq/dialogconversion/components/dialogs/item"
-                                layoutId="list"
-                                orderable="{Boolean}false"
-                                path="${param.path}">
+                            granite:class="js-cq-DialogConverter-dialogs cq-DialogConverter-dialogs"
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/table"
+                            itemResourceType="cq/dialogconversion/components/dialogs/item"
+                            layoutId="list"
+                            orderable="{Boolean}false"
+                            path="${param.path}">
                             <columns jcr:primaryType="nt:unstructured">
                                 <checkboxContainer jcr:primaryType="nt:unstructured"/>
                                 <classicDialog
-                                        jcr:primaryType="nt:unstructured"
-                                        jcr:title="Dialog (Classic UI)"/>
+                                    jcr:primaryType="nt:unstructured"
+                                    jcr:title="Dialog (Classic UI)"/>
                                 <links
-                                        jcr:primaryType="nt:unstructured"
-                                        jcr:title="Links"/>
+                                    jcr:primaryType="nt:unstructured"
+                                    jcr:title="Links"/>
                                 <touchDialog
-                                        jcr:primaryType="nt:unstructured"
-                                        jcr:title="Dialog (Touch UI)"/>
+                                    jcr:primaryType="nt:unstructured"
+                                    jcr:title="Dialog (Touch UI)"/>
                             </columns>
                             <datasource
-                                    jcr:primaryType="nt:unstructured"
-                                    sling:resourceType="cq/dialogconversion/components/dialogs/datasource"/>
+                                jcr:primaryType="nt:unstructured"
+                                sling:resourceType="cq/dialogconversion/components/dialogs/datasource"/>
                         </dialogs>
                         <convertButton
                             granite:class="js-cq-DialogConverter-convertDialogs"
@@ -80,11 +80,11 @@
                     </items>
                 </searchDialogContent>
                 <convertedDialogs
-                        granite:class="js-cq-DialogConverter-conversionResults cq-DialogConverter-conversionResults"
-                        granite:hidden="{Boolean}true"
-                        jcr:primaryType="nt:unstructured"
-                        sling:resourceType="granite/ui/components/coral/foundation/table"
-                        layoutId="list">
+                    granite:class="js-cq-DialogConverter-conversionResults cq-DialogConverter-conversionResults"
+                    granite:hidden="{Boolean}true"
+                    jcr:primaryType="nt:unstructured"
+                    sling:resourceType="granite/ui/components/coral/foundation/table"
+                    layoutId="list">
                     <columns jcr:primaryType="nt:unstructured">
                         <classicDialog
                             jcr:primaryType="nt:unstructured"
