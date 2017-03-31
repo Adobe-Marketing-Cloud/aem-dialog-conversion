@@ -64,7 +64,7 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
 
     private static final String NN_CQ_DIALOG = "cq:dialog";
     private static final String DIALOG_CONVERSION_CONTENT_PATH = "/libs/cq/dialogconversion/content/render";
-    private static final String CRX_LIGHT_PATH = "/crx/de/index";
+    private static final String CRX_LITE_PATH = "/crx/de/index";
 
     @Reference
     private ExpressionResolver expressionResolver;
@@ -145,7 +145,7 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
 
                 String dialogPath = dialog.getPath();
                 String href = externalizer.relativeLink(request, dialogPath) + ".html";
-                String crxHref = externalizer.relativeLink(request, CRX_LIGHT_PATH) + ".jsp#" + dialogPath;
+                String crxHref = externalizer.relativeLink(request, CRX_LITE_PATH) + ".jsp#" + dialogPath;
                 boolean touchDialog = parent.hasNode(NN_CQ_DIALOG);
 
                 Map<String, Object> map = new HashMap<String, Object>();
@@ -157,7 +157,7 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
                 if (touchDialog) {
                     Node touchDialogNode = parent.getNode(NN_CQ_DIALOG);
                     String touchHref = externalizer.relativeLink(request, DIALOG_CONVERSION_CONTENT_PATH) + ".html" + touchDialogNode.getPath();
-                    String touchCrxHref = externalizer.relativeLink(request, CRX_LIGHT_PATH) + ".jsp#" + touchDialogNode.getPath().replaceAll(":", "%3A");
+                    String touchCrxHref = externalizer.relativeLink(request, CRX_LITE_PATH) + ".jsp#" + touchDialogNode.getPath().replaceAll(":", "%3A");
 
                     map.put("touchHref", touchHref);
                     map.put("touchCrxHref", touchCrxHref);
