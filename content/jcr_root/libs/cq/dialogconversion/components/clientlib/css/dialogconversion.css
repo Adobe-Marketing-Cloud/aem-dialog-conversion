@@ -1,46 +1,32 @@
-#content {
-    padding: 30px;
+.cq-DialogConverter-container {
+    padding: 2rem;
 }
 
 .cq-DialogConverter-searchPath {
     width: 400px;
 }
 
-.left {
+.cq-DialogConverter-floatLeft {
     float: left;
     margin-right: 20px;
 }
 
-.cq-DialogConverter-cell--centered {
-    text-align: center;
+.cq-DialogConverter-infoText {
+    display: block;
+    clear: both;
+    padding-top: 1rem;
 }
 
-.cq-DialogConverter-Header--title {
-    padding-left: 0.425rem;
-}
-
-.cq-DialogConverter-convertDialogs {
-    display: none;
+.cq-DialogConverter-dialogs {
+    margin: 1rem 0;
 }
 
 .cq-DialogConverter-conversionResults {
-    display: none;
     width: 100%;
-}
-
-.cq-DialogConverter-dialogs th:first-child {
-    width: 10px;
 }
 
 .cq-DialogConverter-dialogs th:first-child,
 .cq-DialogConverter-dialogs td:first-child {
-    padding-left: 15px;
-}
-
-.cq-DialogConverter-dialogs .coral-Checkbox-description {
-    margin-left: 15px;
-}
-
-.coral-Icon--check {
-    margin-right: 10px;
+    width: 40px;
+    text-align: center;
 }
