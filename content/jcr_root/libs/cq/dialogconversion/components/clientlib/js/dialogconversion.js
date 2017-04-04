@@ -55,6 +55,14 @@ $(document).ready(function () {
         displayToggleDialogPaths();
         displayToggleConvertedDialogs();
 
+        for (var i = 0, length = dialogRows.length; i < length; i++) {
+            var dialogRow = dialogRows[i];
+
+            if (dialogRow.hasAttribute('coral-table-rowlock')) {
+                dialogRow.removeAttribute(CORAL_TABLE_ROW_SELECTABLE);
+            }
+        }
+
         // Prefill pathbrowser with value from the url
         if (searchPathField) {
             searchPathField.value = dialogsContainer.dataset.searchPath;

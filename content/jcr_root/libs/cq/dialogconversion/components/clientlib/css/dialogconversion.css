@@ -26,16 +26,16 @@
     display: none;
 }
 
-table[is="coral-table"] th:first-child,
-table[is="coral-table"] td:first-child {
+.cq-DialogConverter-dialogsContainer th:first-child,
+.cq-DialogConverter-dialogsContainer td:first-child {
     width: 50px;
     text-align: center;
 }
 
-table[is="coral-table"] tr[selected] .cq-DialogConverter-check {
+.cq-DialogConverter-dialogsContainer tr[selected] .cq-DialogConverter-check {
     display: inline;
 }
 
-table[is="coral-table"] tr[coral-table-rowlock] .cq-DialogConverter-lock {
+.cq-DialogConverter-dialogsContainer tr[coral-table-rowlock] .cq-DialogConverter-lock {
     display: inline;
 }
