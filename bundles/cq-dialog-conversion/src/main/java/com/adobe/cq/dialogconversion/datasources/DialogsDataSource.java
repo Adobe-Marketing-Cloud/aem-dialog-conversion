@@ -146,15 +146,15 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
                 String dialogPath = dialog.getPath();
                 String href = externalizer.relativeLink(request, dialogPath) + ".html";
                 String crxHref = externalizer.relativeLink(request, CRX_LITE_PATH) + ".jsp#" + dialogPath;
-                boolean touchDialog = parent.hasNode(NN_CQ_DIALOG);
+                boolean converted = parent.hasNode(NN_CQ_DIALOG);
 
                 Map<String, Object> map = new HashMap<String, Object>();
                 map.put("dialogPath", dialogPath);
                 map.put("href", href);
-                map.put("touchDialog", touchDialog);
+                map.put("converted", converted);
                 map.put("crxHref", crxHref);
 
-                if (touchDialog) {
+                if (converted) {
                     Node touchDialogNode = parent.getNode(NN_CQ_DIALOG);
                     String touchHref = externalizer.relativeLink(request, DIALOG_CONVERSION_CONTENT_PATH) + ".html" + touchDialogNode.getPath();
                     String touchCrxHref = externalizer.relativeLink(request, CRX_LITE_PATH) + ".jsp#" + touchDialogNode.getPath().replaceAll(":", "%3A");

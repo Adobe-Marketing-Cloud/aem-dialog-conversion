@@ -1,24 +1,21 @@
 $(document).ready(function () {
     'use strict';
 
-    var DIALOG_PATHS = ".js-cq-DialogConverter-path";
-    var DIALOG_SEARCH_PATH_FIELD = ".js-cq-DialogConverter-searchPath";
     var REMOTE_DIALOG_CONVERSION_SERVICE_PATH = "/libs/cq/dialogconversion";
-
-    var ARIA_CHECKED_ATTRIBUTE = "aria-checked";
+    var CORAL_TABLE_ROW_SELECTABLE = 'coral-table-rowselect';
 
     var ui = $(window).adaptTo("foundation-ui");
 
-    var toggleDialogPaths;
+    var dialogRows;
     var dialogConverterContainer = document.querySelector(".js-cq-DialogConverter-container");
-    var searchPathField = dialogConverterContainer.querySelector(DIALOG_SEARCH_PATH_FIELD);
+    var toggleDialogRows = dialogConverterContainer.querySelector(".js-cq-DialogConverter-toggleDialogRows");
+    var searchPathField = dialogConverterContainer.querySelector(".js-cq-DialogConverter-searchPath");
     var infoText = dialogConverterContainer.querySelector(".js-cq-DialogConverter-infoText");
     var showDialogsButton = dialogConverterContainer.querySelector(".js-cq-DialogConverter-showDialogs");
     var convertDialogsButton = dialogConverterContainer.querySelector(".js-cq-DialogConverter-convertDialogs");
     var dialogsContainer = dialogConverterContainer.querySelector(".js-cq-DialogConverter-dialogsContainer");
     var conversionResults = dialogConverterContainer.querySelector(".js-cq-DialogConverter-conversionResults");
     var dialogTable = dialogConverterContainer.querySelector(".js-cq-DialogConverter-dialogs");
-    var dialogPaths = dialogTable.querySelectorAll(DIALOG_PATHS);
 
     function updateRepositoryPathParameter () {
         if (!searchPathField) {
@@ -30,22 +27,35 @@ $(document).ready(function () {
         window.location = window.location.pathname + "?path=" + path;
     }
 
-    function init () {
-        var firstTableHeader = dialogTable.querySelector("th:first-child > coral-table-headercell-content");
+    function adjustConvertButton (selectionCount) {
+        // hide "convert dialogs" button if no dialogs are selected
+        convertDialogsButton.hidden = selectionCount < 1;
+        // adjust button label
+        convertDialogsButton.textContent = Granite.I18n.get("Convert {0} dialog(s)", selectionCount, "Number of dialogs to be converted");
+    }
 
-        if (firstTableHeader) {
-            toggleDialogPaths = new Coral.Checkbox();
-            toggleDialogPaths.classList.add("js-cq-DialogConverter-toggleDialogPaths");
-            firstTableHeader.appendChild(toggleDialogPaths);
+    function init () {
+        dialogRows = dialogTable.items.getAll();
+
+        for (var i = 0, length = dialogRows.length; i < length; i++) {
+            var dialogRow = dialogRows[i];
+
+            if (dialogRow.hasAttribute('data-converted')) {
+                dialogRow.removeAttribute('selected');
+                dialogRow.removeAttribute(CORAL_TABLE_ROW_SELECTABLE);
+            } else {
+                dialogRow.setAttribute(CORAL_TABLE_ROW_SELECTABLE, true);
+            }
         }
+
         // Prefill pathbrowser with value from the url
         if (searchPathField) {
             searchPathField.value = dialogsContainer.dataset.searchPath;
         }
 
         infoText.textContent = "";
-        if (infoText && dialogPaths && dialogPaths.length > 0) {
-            infoText.textContent = Granite.I18n.get("Found {0} dialog(s)", dialogPaths.length);
+        if (infoText && dialogRows && dialogRows.length > 0) {
+            infoText.textContent = Granite.I18n.get("Found {0} dialog(s)", dialogRows.length);
         }
 
         /**
@@ -53,109 +63,58 @@ $(document).ready(function () {
          */
         showDialogsButton.on("click", updateRepositoryPathParameter);
 
-        /**
-         * Keeps track of the time of the last selection of the pathbrowser select list.
-         */
-        var selectedMillis;
-        // var selectSearchList = dialogSearchFormField.querySelector(".coral-SelectList");
-        // selectSearchList.on("selected", function () {
-        //     selectedMillis = new Date().getTime();
-        // });
+        dialogTable.on("coral-table:change", function (event) {
+            var selectionCount = event && event.detail && event.detail.selection ? event.detail.selection.length : 0;
+            adjustConvertButton(selectionCount);
 
-        /**
-         * Enable enter key for the path field
-         */
-        $(searchPathField).on("keyup", function(event){
-            // Enter key
-            if (event.keyCode === 13) {
-                // if the time between this event and the last selection is small, then we ignore this event
-                // (needed to ignore events coming from hitting enter when using the pathbrowser select list)
-                if (selectedMillis && (new Date().getTime()) - selectedMillis <= 150) {
-                    return;
-                }
-
-                updateRepositoryPathParameter();
+            if (event.target.dataset.toggleAll) {
+                return;
             }
-        });
 
-        var adjustConvertButton = function () {
-            var count = dialogTable.querySelectorAll(DIALOG_PATHS + "[checked]").length;
-            // hide "convert dialogs" button if no dialogs are selected
-            convertDialogsButton.hidden = count < 1;
-            // adjust button label
-            convertDialogsButton.textContent = Granite.I18n.get("Convert {0} dialog(s)", count, "Number of dialogs to be converted");
-        };
+            var totalDialogPaths = dialogRows.length;
 
-        $(dialogPaths).change(function () {
-            adjustConvertButton();
-
-            // check if there are checked and / or unchecked checkboxes
-            var hasChecked = false;
-            var hasUnchecked = false;
-
-            var i = 0;
-            do {
-                var dialogPath = dialogPaths[i];
-
-                if (dialogPath.disabled) {
-                    i++;
-                    continue;
-                }
-
-                if (dialogPath.checked) {
-                    hasChecked = true;
-                } else {
-                    hasUnchecked = true;
-                }
-
-                i++;
-            } while (dialogPaths && i < dialogPaths.length && !(hasChecked && hasUnchecked));
-
-            // adjust state of main checkbox
-            if (hasChecked && hasUnchecked) {
-                toggleDialogPaths.setAttribute(ARIA_CHECKED_ATTRIBUTE, "mixed");
-                toggleDialogPaths.setAttribute("indeterminate", true);
-                toggleDialogPaths.checked = false;
+            // Adjust state of toggle all checkbox
+            if (selectionCount > 0 && selectionCount < totalDialogPaths) {
+                toggleDialogRows.setAttribute("indeterminate", true);
+                toggleDialogRows.checked = false;
             } else {
-                toggleDialogPaths.setAttribute(ARIA_CHECKED_ATTRIBUTE, false);
-                toggleDialogPaths.removeAttribute("indeterminate");
-                toggleDialogPaths.checked = hasChecked;
+                toggleDialogRows.removeAttribute("indeterminate");
+                toggleDialogRows.checked = selectionCount > 0;
             }
         });
 
-        $(toggleDialogPaths).on("change", function () {
+        toggleDialogRows.on("change", function () {
             var i;
-            var ariaCheckedMixed = "mixed" === toggleDialogPaths.getAttribute(ARIA_CHECKED_ATTRIBUTE);
+            var checkedMixed = !!(toggleDialogRows.getAttribute("indeterminate"));
 
-            if (ariaCheckedMixed) {
+            if (checkedMixed) {
                 this.removeAttribute("indeterminate");
-                this.setAttribute(ARIA_CHECKED_ATTRIBUTE, false);
-            } else {
-                this.setAttribute(ARIA_CHECKED_ATTRIBUTE, true);
             }
 
-            for (i = 0, length = dialogPaths.length; i < length; i++) {
-                // if the state is 'mixed', we check all checkboxes
-                dialogPaths[i].checked = ariaCheckedMixed ? true : this.checked;
+            // Flag the table as being edited by the toggle all checkbox
+            dialogTable.dataset.toggleAll = true;
+
+            for (i = 0, length = dialogRows.length; i < length; i++) {
+                var dialogPath = dialogRows[i];
+
+                if (dialogPath.hasAttribute('data-converted')) {
+                    dialogPath.removeAttribute('selected');
+                } else {
+                    // if the state is 'mixed', we select the row
+                    dialogPath.selected = checkedMixed ? true : this.checked;
+                }
             }
 
-            // uncheck disabled checkboxes
-            var disabledDialogPaths = dialogTable.querySelectorAll(DIALOG_PATHS + "[disabled]");
-            for (i = 0, length = disabledDialogPaths.length; i < length; i++) {
-                disabledDialogPaths[i].checked = false;
-            }
-
-            // adjust the convert button
-            adjustConvertButton();
+            delete dialogTable.dataset.toggleAll;
         });
 
         convertDialogsButton.on("click", function () {
             // get paths from table
             var paths = [];
 
-            var selectedDialogPaths = dialogTable.querySelectorAll(DIALOG_PATHS + "[checked]");
-            for (var i = 0, length = selectedDialogPaths.length; i < length; i++) {
-                var value = selectedDialogPaths[i].value;
+            var selectedDialogRows = dialogTable.selectedItems;
+            for (var i = 0, length = selectedDialogRows.length; i < length; i++) {
+                var value = selectedDialogRows[i].dataset.path;
 
                 if (value) {
                     paths.push(value);

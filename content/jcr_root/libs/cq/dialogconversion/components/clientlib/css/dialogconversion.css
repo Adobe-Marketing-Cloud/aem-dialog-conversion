@@ -4,10 +4,6 @@
 
 .cq-DialogConverter-searchPath {
     width: 400px;
-}
-
-.cq-DialogConverter-floatLeft {
-    float: left;
     margin-right: 20px;
 }
 
@@ -17,16 +13,16 @@
     padding-top: 1rem;
 }
 
-.cq-DialogConverter-dialogs {
-    margin: 1rem 0;
+.cq-DialogConverter-convertDialogs {
+    margin-top: 1rem;
 }
 
 .cq-DialogConverter-conversionResults {
     width: 100%;
 }
 
-.cq-DialogConverter-dialogs th:first-child,
-.cq-DialogConverter-dialogs td:first-child {
-    width: 40px;
-    text-align: center;
+/* Display cells of converted rows as disabled */
+table[is="coral-table"] tr[data-converted] td {
+    color: rgb(92, 92, 92);
+    background: rgb(226, 226, 226);
 }

@@ -31,14 +31,12 @@
                         search-path="${empty param.path ? &quot;&quot; : param.path}"/>
                     <items jcr:primaryType="nt:unstructured">
                         <pathBrowser
-                            granite:class="js-cq-DialogConverter-searchPath cq-DialogConverter-searchPath cq-DialogConverter-floatLeft"
+                            granite:class="js-cq-DialogConverter-searchPath cq-DialogConverter-searchPath u-coral-pullLeft"
                             jcr:primaryType="nt:unstructured"
                             sling:resourceType="granite/ui/components/coral/foundation/form/pathfield"
-                            name="Open path browser"
-                            emptyText="Enter a path, e.g. /apps/geometrixx/components">
-                        </pathBrowser>
+                            emptyText="Enter a path, e.g. /apps/geometrixx/components"/>
                         <showButton
-                            granite:class="js-cq-DialogConverter-showDialogs cq-DialogConverter-showDialogs cq-DialogConverter-floatLeft"
+                            granite:class="js-cq-DialogConverter-showDialogs cq-DialogConverter-showDialogs u-coral-pullLeft"
                             jcr:primaryType="nt:unstructured"
                             sling:resourceType="granite/ui/components/coral/foundation/button"
                             text="Show dialogs"/>
@@ -47,16 +45,20 @@
                             jcr:primaryType="nt:unstructured"
                             sling:resourceType="granite/ui/components/coral/foundation/text"
                             text=""/>
+                        <toggleAll
+                            granite:class="js-cq-DialogConverter-toggleDialogRows"
+                            jcr:primaryType="nt:unstructured"
+                            sling:resourceType="granite/ui/components/coral/foundation/form/checkbox"
+                            text="Select all convertible dialogs"/>
                         <dialogs
                             granite:class="js-cq-DialogConverter-dialogs cq-DialogConverter-dialogs"
                             jcr:primaryType="nt:unstructured"
                             sling:resourceType="granite/ui/components/coral/foundation/table"
                             itemResourceType="cq/dialogconversion/components/dialogs/item"
-                            layoutId="list"
+                            selectionMode="row"
                             orderable="{Boolean}false"
                             path="${param.path}">
                             <columns jcr:primaryType="nt:unstructured">
-                                <checkboxContainer jcr:primaryType="nt:unstructured"/>
                                 <classicDialog
                                     jcr:primaryType="nt:unstructured"
                                     jcr:title="Dialog (Classic UI)"/>
@@ -72,7 +74,7 @@
                                 sling:resourceType="cq/dialogconversion/components/dialogs/datasource"/>
                         </dialogs>
                         <convertButton
-                            granite:class="js-cq-DialogConverter-convertDialogs"
+                            granite:class="js-cq-DialogConverter-convertDialogs cq-DialogConverter-convertDialogs"
                             granite:hidden="{Boolean}true"
                             jcr:primaryType="nt:unstructured"
                             sling:resourceType="granite/ui/components/coral/foundation/button"

@@ -1,15 +1,12 @@
-<tr is="coral-table-row">
+<tr is="coral-table-row" class="js-cq-DialogConverter-row" data-sly-attribute.data-path="${properties.dialogPath @ uri}" data-sly-attribute.data-converted="${properties.converted ? properties.converted : ''}">
     <td is="coral-table-cell">
-        <coral-checkbox class="js-cq-DialogConverter-path" value="${properties.dialogPath @ uri}" data-sly-attribute.disabled="${properties.touchDialog}"/>
-    </td>
-    <td is="coral-table-cell">
-         <span class="coral-Checkbox-description">${properties.dialogPath @ uri}</span>
+        ${properties.dialogPath @ uri}
     </td>
     <td is="coral-table-cell" class="cq-DialogConverter-cell--centered">
         <a href="${properties.href @ uri}" target="_blank" class="coral-Link">show</a>&nbsp;/&nbsp;<a href="${properties.crxHref @ uri}" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a>
     </td>
-    <td data-sly-test="${properties.touchDialog}" is="coral-table-cell">
+    <td data-sly-test="${properties.converted}" is="coral-table-cell">
         <a href="${properties.properties.touchHref @ uri}" target="_blank" class="coral-Link">show</a>&nbsp;/&nbsp;<a href="${properties.touchCrxHref @ uri}" x-cq-linkchecker="skip" target="_blank" class="coral-Link">crxde</a>
     </td>
-    <td data-sly-test="${!properties.touchDialog}" is="coral-table-cell">-</td>
+    <td data-sly-test="${!properties.converted}" is="coral-table-cell">-</td>
 </tr>
