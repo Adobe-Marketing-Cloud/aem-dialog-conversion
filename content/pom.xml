@@ -28,7 +28,7 @@
     <parent>
         <groupId>com.day.cq</groupId>
         <artifactId>parent</artifactId>
-        <version>40</version>
+        <version>46</version>
         <relativePath />
     </parent>
 
@@ -59,6 +59,7 @@
         <vault.package.version>${project.version}</vault.package.version>
         <vault.package.group>day/cq600/tools</vault.package.group>
         <vault.package.company>Adobe Systems</vault.package.company>
+        <quickstart.url>http://localhost:4502</quickstart.url>
     </properties>
 
     <!-- ====================================================================== -->
@@ -118,9 +119,11 @@
                 <groupId>com.day.jcr.vault</groupId>
                 <artifactId>content-package-maven-plugin</artifactId>
                 <extensions>true</extensions>
+                <version>0.0.24</version>
                 <configuration>
                     <group>${vault.package.group}</group>
                     <requiresRoot>true</requiresRoot>
+                    <targetURL>${quickstart.url}/crx/packmgr/service.jsp</targetURL>
 
                     <properties>
                         <acHandling>overwrite</acHandling>

@@ -1,190 +1,231 @@
 $(document).ready(function () {
+    'use strict';
 
-    var basePath = "/libs/cq/dialogconversion";
+    var REMOTE_DIALOG_CONVERSION_SERVICE_PATH = "/libs/cq/dialogconversion";
+    var CORAL_TABLE_ROW_SELECTABLE = 'coral-table-rowselect';
 
-    var $pathTextfield = $(".js-coral-pathbrowser-input", $("#path").closest(".coral-Form-fieldwrapper"));
-    var $showDialogsButton = $("#show-dialogs");
-    var $convertDialogsButton = $("#convert-dialogs");
-    var $checkAll = $("#check-all");
+    var ui = $(window).adaptTo("foundation-ui");
 
-    /**
-     * Click handler for the "show dialogs" button
-     */
-    $showDialogsButton.click(function () {
-        var path = $pathTextfield.val();
+    var dialogRows;
+    var dialogConverterContainer = document.querySelector(".js-cq-DialogConverter-container");
+    var toggleDialogRows = dialogConverterContainer.querySelector(".js-cq-DialogConverter-toggleDialogRows");
+    var showConverted = dialogConverterContainer.querySelector(".js-cq-DialogConverter-showConvertedDialogRows");
+    var searchPathField = dialogConverterContainer.querySelector(".js-cq-DialogConverter-searchPath");
+    var infoText = dialogConverterContainer.querySelector(".js-cq-DialogConverter-infoText");
+    var showDialogsButton = dialogConverterContainer.querySelector(".js-cq-DialogConverter-showDialogs");
+    var convertDialogsButton = dialogConverterContainer.querySelector(".js-cq-DialogConverter-convertDialogs");
+    var dialogsContainer = dialogConverterContainer.querySelector(".js-cq-DialogConverter-dialogsContainer");
+    var conversionResults = dialogConverterContainer.querySelector(".js-cq-DialogConverter-conversionResults");
+    var dialogTable = dialogConverterContainer.querySelector(".js-cq-DialogConverter-dialogs");
+
+    function updateRepositoryPathParameter () {
+        if (!searchPathField) {
+            return;
+        }
+
+        var path = searchPathField.value;
+        // Set the path query parameter
         window.location = window.location.pathname + "?path=" + path;
-    });
+    }
 
-    /**
-     * Keeps track of the time of the last selection of the pathbrowser select list.
-     */
-    var selectedMillis;
-    var selectList = $(".coral-SelectList", $("#path").closest(".coral-Form-fieldwrapper")).data("selectList");
-    selectList.on("selected", function (e) {
-        selectedMillis = new Date().getTime();
-    });
+    function adjustConvertButton (selectionCount) {
+        // hide "convert dialogs" button if no dialogs are selected
+        convertDialogsButton.hidden = selectionCount < 1;
+        // adjust button label
+        convertDialogsButton.textContent = Granite.I18n.get("Convert {0} dialog(s)", selectionCount, "Number of dialogs to be converted");
+    }
 
-    /**
-     * Enable enter key for the path field
-     */
-    $($pathTextfield).keyup(function(event){
-        if (event.keyCode == 13) {
-            // if the time between this event and the last selection is small, then we ignore this event
-            // (needed to ignore events coming from hitting enter when using the pathbrowser select list)
-            if (selectedMillis && (new Date().getTime()) - selectedMillis <= 150) {
+    function displayToggleDialogPaths () {
+        var totalDialogPaths = dialogRows.length;
+
+        if (totalDialogPaths > 0) {
+            toggleDialogRows.classList.remove("hide");
+        }
+    }
+
+    function displayToggleConvertedDialogs () {
+        if (dialogConverterContainer.querySelector("tr[coral-table-rowlock]")) {
+            showConverted.classList.remove("hide");
+        }
+    }
+
+    function init () {
+        dialogRows = dialogTable.items.getAll();
+
+        displayToggleDialogPaths();
+        displayToggleConvertedDialogs();
+
+        // Prefill pathbrowser with value from the url
+        if (searchPathField) {
+            searchPathField.value = dialogsContainer.dataset.searchPath;
+        }
+
+        infoText.textContent = "";
+        if (infoText && dialogRows && dialogRows.length > 0) {
+            infoText.textContent = Granite.I18n.get("Found {0} dialog(s)", dialogRows.length);
+        }
+
+        /**
+         * Click handler for the "show dialogs" button
+         */
+        showDialogsButton.on("click", updateRepositoryPathParameter);
+
+        dialogTable.on("coral-table:change", function (event) {
+            var selectionCount = event && event.detail && event.detail.selection ? event.detail.selection.length : 0;
+            adjustConvertButton(selectionCount);
+
+            if (event.target.dataset.toggleAll) {
                 return;
             }
-            $showDialogsButton.click();
-        }
-    });
 
-    /**
-     * Delegate clicks on table rows to checkbox.
-     */
-    $("#dialogs td").parent().click(function (e) {
-        // handles clicks on table rows
-        $(".coral-Checkbox", this).click();
-    });
+            var totalDialogPaths = dialogRows.length;
 
-    /**
-     * Prevent events from bubbling down to the table row when clicking
-     * on the checkboxes or links in the table.
-     */
-    $("#dialogs td a, .coral-Checkbox").click(function (e) {
-        e.stopPropagation();
-    });
+            displayToggleDialogPaths();
+            displayToggleConvertedDialogs();
 
-    var adjustConvertButton = function () {
-        var count = $(".path:checked").length;
-        // hide "convert dialogs" button if no dialogs are selected
-        $convertDialogsButton.toggle(count > 0);
-        // adjust button label
-        var label = "Convert " + count + " dialog" + (count == 1 ? "" : "s");
-        if ($("span", $convertDialogsButton).length) {
-            // 6.0
-            $("span", $convertDialogsButton).text(label);
-        } else {
-            // 6.1
-            $convertDialogsButton.text(label);
-        }
-    };
-
-    $(".path").change(function () {
-        adjustConvertButton();
-
-        // check if there are checked and / or unchecked checkboxes
-        var hasChecked = false;
-        var hasUnchecked = false;
-        $(".path").each(function() {
-            if ($(this).prop("disabled")) {
-                return true;
-            }
-            if ($(this).prop("checked")) {
-                hasChecked = true;
+            // Adjust state of toggle all checkbox
+            if (selectionCount > 0 && selectionCount < totalDialogPaths) {
+                toggleDialogRows.setAttribute("indeterminate", true);
+                toggleDialogRows.checked = false;
             } else {
-                hasUnchecked = true;
-            }
-            if (hasChecked && hasUnchecked) {
-                return false;
+                toggleDialogRows.removeAttribute("indeterminate");
+                toggleDialogRows.checked = selectionCount > 0;
             }
         });
-        // adjust state of main checkbox
-        if (hasChecked && hasUnchecked) {
-            $checkAll.attr("aria-checked", "mixed").prop({
-                "indeterminate": true,
-                "checked": false
-            });
-        } else {
-            $("#check-all").prop({
-                "indeterminate": false,
-                "checked": hasChecked
-            }).removeAttr("aria-checked");
-        }
-    });
 
-    $checkAll.change(function () {
-        var ariaChecked = $(this).attr("aria-checked");
-        if (ariaChecked === "mixed") {
-            $(this).indeterminate = false;
-            $(this).removeAttr("aria-checked");
-            // if the state is 'mixed', we check all checkboxes
-            $(".path").prop("checked", true);
-        } else {
-            $(".path").prop("checked", $(this).prop("checked"));
-        }
-        // uncheck disabled checkboxes
-        $(".path[disabled=disabled]").prop("checked", false);
-        // adjust the convert button
-        adjustConvertButton();
-    });
+        toggleDialogRows.on("change", function () {
+            var i;
+            var checkedMixed = !!(toggleDialogRows.getAttribute("indeterminate"));
 
+            if (checkedMixed) {
+                this.removeAttribute("indeterminate");
+            }
 
-    $convertDialogsButton.click(function () {
-        // get paths from table
-        var paths = $(".path:checked").map(function () {
-            return $(this).val();
-        }).get();
+            // Flag the table as being edited by the toggle all checkbox
+            dialogTable.dataset.toggleAll = true;
 
-        var url = basePath + "/content/convert.json";
-        var data = {
-            paths : paths
-        };
+            for (i = 0, length = dialogRows.length; i < length; i++) {
+                var dialogPath = dialogRows[i];
 
-        // show overlay and wait
-        var ui = $(window).adaptTo("foundation-ui");
-        ui.wait();
-
-        $.post(url, data, function (data) {
-            $("#dialogs-container").remove();
-            $convertDialogsButton.remove();
-            $("#conversion-results").show();
-
-            // build result table
-            var count = 0;
-            var successCount = 0;
-            var errorCount = 0;
-            var $tbody = $("#conversion-results tbody");
-            for (var path in data) {
-                count++;
-                // create row for the results table
-                var $tr = $('<tr class="coral-Table-row"></tr>').appendTo($tbody);
-                $tr.append('<td class="coral-Table-cell">' + path + '</td>');
-                var links = "";
-                var iconClass = "coral-Icon--check";
-                var message = Granite.I18n.get("Converted dialog successfully");
-                var resultPath = data[path].resultPath;
-                if (resultPath) {
-                    // success
-                    successCount++;
-                    var href = Granite.HTTP.externalize(basePath + "/content/render.html" + resultPath);
-                    var crxHref = Granite.HTTP.externalize("/crx/de/index.jsp#" + resultPath.replace(":", "%3A"));
-                    links += '<a href="' + href + '" target="_blank" class="coral-Link">show</a> / <a href="' + crxHref + '" target="_blank" class="coral-Link">crxde</a>';
+                if (dialogPath.hasAttribute('coral-table-rowlock')) {
+                    dialogPath.removeAttribute('selected');
                 } else {
-                    // error
-                    errorCount++;
-                    iconClass = "coral-Icon--close";
-                    message = Granite.I18n.get("Error");
-                    if (data[path].errorMessage) {
-                        message += ": " + data[path].errorMessage;
+                    // if the state is 'mixed', we select the row
+                    dialogPath.selected = checkedMixed ? true : this.checked;
+                }
+            }
+
+            delete dialogTable.dataset.toggleAll;
+        });
+
+        showConverted.on("change", function () {
+            for (var i = 0, length = dialogRows.length; i < length; i++) {
+                var row = dialogRows[i];
+
+                if (row.hasAttribute("coral-table-rowlock")) {
+                    if (showConverted.checked) {
+                        row.removeAttribute("hidden");
+                    } else {
+                        row.setAttribute("hidden", true);
                     }
                 }
-                $tr.append('<td class="coral-Table-cell centered"><i class="coral-Icon ' + iconClass + '" />' + links + '</td>');
-                $tr.append('<td class="coral-Table-cell">' + message + '</td>');
+            }
+        });
+
+        convertDialogsButton.on("click", function () {
+            // get paths from table
+            var paths = [];
+
+            var selectedDialogRows = dialogTable.selectedItems;
+            for (var i = 0, length = selectedDialogRows.length; i < length; i++) {
+                var value = selectedDialogRows[i].dataset.path;
+
+                if (value) {
+                    paths.push(value);
+                }
             }
 
-            // change info text
-            $("#info-text").empty();
-            var text = "Ran dialog conversion on <b>" + count + "</b> dialog" + (count == 1 ? "" : "s") + " ";
-            text += "(<b>" + successCount + "</b> successful conversion" + (successCount == 1 ? "" : "s") + ", ";
-            text += "<b>" + errorCount + "</b> error" + (errorCount == 1 ? "" : "s") + "):";
-            $("#info-text").append(text);
-        }).fail(function () {
-            var title = "Error";
-            var message = "Call to dialog conversion servlet failed. Please view the logs.";
-            ui.alert(title, message, "error");
-        }).always(function () {
-            ui.clearWait();
-        });
-    });
+            var url = REMOTE_DIALOG_CONVERSION_SERVICE_PATH + "/content/convert.json";
+            var data = {
+                paths : paths
+            };
 
+            // show overlay and wait
+            ui.wait();
+
+            $.post(url, data, function (data) {
+                convertDialogsButton.hidden = true;
+                dialogsContainer.hidden = true;
+                conversionResults.hidden = false;
+
+                // build result table
+                var count = 0;
+                var successCount = 0;
+                var errorCount = 0;
+
+                if (Object.keys(data).length) {
+                    conversionResults.items.clear();
+                }
+
+                for (var path in data) {
+                    count++;
+
+                    // Create a row for the results table
+                    var row = new Coral.Table.Row();
+                    conversionResults.items.add(row);
+
+                    // Create a cell that will contain the path to the dialog
+                    var pathCell = new Coral.Table.Cell();
+                    pathCell.textContent = path;
+
+                    row.appendChild(pathCell);
+
+                    var links = "-";
+                    var message = Granite.I18n.get("Converted dialog successfully");
+                    var resultPath = data[path].resultPath;
+
+                    if (resultPath) {
+                        // success
+                        successCount++;
+                        var crxHref = Granite.HTTP.externalize("/crx/de/index.jsp#" + resultPath.replace(":", "%3A"));
+                        links = '<a href="' + crxHref + '" target="_blank" class="coral-Link">crxde</a>';
+                    } else {
+                        // error
+                        errorCount++;
+                        message = Granite.I18n.get("Error");
+
+                        if (data[path].errorMessage) {
+                            message += ": " + data[path].errorMessage;
+                        }
+                    }
+
+                    // Create the cell that contains the links
+                    var linksCell = new Coral.Table.Cell();
+                    row.appendChild(linksCell);
+                    linksCell.innerHTML = links;
+
+                    // Add the cell that contains the message
+                    var messageCell = new Coral.Table.Cell();
+                    messageCell.textContent = message;
+                    row.appendChild(messageCell);
+                }
+
+                // Change info text
+                var text = "Ran dialog conversion on <b>" + count + "</b> dialog" + (count == 1 ? "" : "s") + " ";
+                text += "(<b>" + successCount + "</b> successful conversion" + (successCount == 1 ? "" : "s") + ", ";
+                text += "<b>" + errorCount + "</b> error" + (errorCount == 1 ? "" : "s") + "):";
+
+                infoText.innerHTML = text;
+
+            }).fail(function () {
+                var title = Granite.I18n.get("Error");
+                var message = Granite.I18n.get("Call to dialog conversion servlet failed. Please view the logs.");
+                ui.alert(title, message, "error");
+            }).always(function () {
+                ui.clearWait();
+            });
+        });
+    }
+
+    Coral.commons.ready(dialogConverterContainer, init);
 });
