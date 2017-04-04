@@ -59,15 +59,18 @@
                             orderable="{Boolean}false"
                             path="${param.path}">
                             <columns jcr:primaryType="nt:unstructured">
-                                <classicDialog
+                                <dialogPath
                                     jcr:primaryType="nt:unstructured"
-                                    jcr:title="Dialog (Classic UI)"/>
+                                    jcr:title="Dialog path"
+                                    sortable="{Boolean}true"/>
                                 <links
                                     jcr:primaryType="nt:unstructured"
-                                    jcr:title="Links"/>
+                                    jcr:title="Classic UI"
+                                    sortable="{Boolean}true"/>
                                 <touchDialog
                                     jcr:primaryType="nt:unstructured"
-                                    jcr:title="Dialog (Touch UI)"/>
+                                    jcr:title="Touch UI"
+                                    sortable="{Boolean}true"/>
                             </columns>
                             <datasource
                                 jcr:primaryType="nt:unstructured"
@@ -86,17 +89,20 @@
                     granite:hidden="{Boolean}true"
                     jcr:primaryType="nt:unstructured"
                     sling:resourceType="granite/ui/components/coral/foundation/table"
-                    layoutId="list">
+                    orderable="{Boolean}false">
                     <columns jcr:primaryType="nt:unstructured">
-                        <classicDialog
+                        <dialogPath
                             jcr:primaryType="nt:unstructured"
-                            jcr:title="Dialog (Classic UI)"/>
+                            jcr:title="Dialog path"
+                            sortable="{Boolean}true"/>
                         <conversion
                             jcr:primaryType="nt:unstructured"
-                            jcr:title="Conversion to Touch UI"/>
+                            jcr:title="Conversion to Touch UI"
+                            sortable="{Boolean}true"/>
                         <message
                             jcr:primaryType="nt:unstructured"
-                            jcr:title="Message"/>
+                            jcr:title="Message"
+                            sortable="{Boolean}true"/>
                     </columns>
                 </convertedDialogs>
             </items>
