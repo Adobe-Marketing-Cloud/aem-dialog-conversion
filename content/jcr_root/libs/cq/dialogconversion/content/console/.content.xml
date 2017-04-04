@@ -72,8 +72,7 @@
                                     sortable="{Boolean}true"/>
                                 <links
                                     jcr:primaryType="nt:unstructured"
-                                    jcr:title="Classic UI"
-                                    sortable="{Boolean}true"/>
+                                    jcr:title="Classic UI"/>
                                 <touchDialog
                                     jcr:primaryType="nt:unstructured"
                                     jcr:title="Touch UI"
@@ -104,8 +103,7 @@
                             sortable="{Boolean}true"/>
                         <conversion
                             jcr:primaryType="nt:unstructured"
-                            jcr:title="Conversion to Touch UI"
-                            sortable="{Boolean}true"/>
+                            jcr:title="Conversion to Touch UI"/>
                         <message
                             jcr:primaryType="nt:unstructured"
                             jcr:title="Message"
