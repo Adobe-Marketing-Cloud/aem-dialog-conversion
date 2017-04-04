@@ -1,7 +1,7 @@
 <tr is="coral-table-row" class="js-cq-DialogConverter-row" data-sly-attribute.data-path="${properties.dialogPath @ uri}" data-sly-attribute.coral-table-rowlock="${properties.converted ? properties.converted : ''}" data-sly-attribute.hidden="${properties.converted ? properties.converted : ''}">
     <td is="coral-table-cell">
         <coral-icon icon="check" class="cq-DialogConverter-check"></coral-icon>
-        <coral-icon icon="lockOn" class="cq-DialogConverter-lock"></coral-icon>
+        <coral-icon icon="lockOn" class="cq-DialogConverter-lock" title="${'Dialog already converted' @ i18n}"></coral-icon>
     </td>
     <td is="coral-table-cell">
         ${properties.dialogPath @ uri}
