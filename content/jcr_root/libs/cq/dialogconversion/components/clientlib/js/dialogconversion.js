@@ -55,17 +55,6 @@ $(document).ready(function () {
         displayToggleDialogPaths();
         displayToggleConvertedDialogs();
 
-        for (var i = 0, length = dialogRows.length; i < length; i++) {
-            var dialogRow = dialogRows[i];
-
-            if (dialogRow.hasAttribute('coral-table-rowlock')) {
-                dialogRow.removeAttribute('selected');
-                dialogRow.removeAttribute(CORAL_TABLE_ROW_SELECTABLE);
-            } else {
-                dialogRow.setAttribute(CORAL_TABLE_ROW_SELECTABLE, true);
-            }
-        }
-
         // Prefill pathbrowser with value from the url
         if (searchPathField) {
             searchPathField.value = dialogsContainer.dataset.searchPath;
@@ -130,7 +119,7 @@ $(document).ready(function () {
         });
 
         showConverted.on("change", function () {
-            for (i = 0, length = dialogRows.length; i < length; i++) {
+            for (var i = 0, length = dialogRows.length; i < length; i++) {
                 var row = dialogRows[i];
 
                 if (row.hasAttribute("coral-table-rowlock")) {
