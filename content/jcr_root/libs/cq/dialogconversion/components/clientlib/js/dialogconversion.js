@@ -9,6 +9,7 @@ $(document).ready(function () {
     var dialogRows;
     var dialogConverterContainer = document.querySelector(".js-cq-DialogConverter-container");
     var toggleDialogRows = dialogConverterContainer.querySelector(".js-cq-DialogConverter-toggleDialogRows");
+    var showConverted = dialogConverterContainer.querySelector(".js-cq-DialogConverter-showConvertedDialogRows");
     var searchPathField = dialogConverterContainer.querySelector(".js-cq-DialogConverter-searchPath");
     var infoText = dialogConverterContainer.querySelector(".js-cq-DialogConverter-infoText");
     var showDialogsButton = dialogConverterContainer.querySelector(".js-cq-DialogConverter-showDialogs");
@@ -34,13 +35,30 @@ $(document).ready(function () {
         convertDialogsButton.textContent = Granite.I18n.get("Convert {0} dialog(s)", selectionCount, "Number of dialogs to be converted");
     }
 
+    function displayToggleDialogPaths () {
+        var totalDialogPaths = dialogRows.length;
+
+        if (totalDialogPaths > 0) {
+            toggleDialogRows.classList.remove("hide");
+        }
+    }
+
+    function displayToggleConvertedDialogs () {
+        if (dialogConverterContainer.querySelector("tr[coral-table-rowlock]")) {
+            showConverted.classList.remove("hide");
+        }
+    }
+
     function init () {
         dialogRows = dialogTable.items.getAll();
+
+        displayToggleDialogPaths();
+        displayToggleConvertedDialogs();
 
         for (var i = 0, length = dialogRows.length; i < length; i++) {
             var dialogRow = dialogRows[i];
 
-            if (dialogRow.hasAttribute('data-converted')) {
+            if (dialogRow.hasAttribute('coral-table-rowlock')) {
                 dialogRow.removeAttribute('selected');
                 dialogRow.removeAttribute(CORAL_TABLE_ROW_SELECTABLE);
             } else {
@@ -73,6 +91,9 @@ $(document).ready(function () {
 
             var totalDialogPaths = dialogRows.length;
 
+            displayToggleDialogPaths();
+            displayToggleConvertedDialogs();
+
             // Adjust state of toggle all checkbox
             if (selectionCount > 0 && selectionCount < totalDialogPaths) {
                 toggleDialogRows.setAttribute("indeterminate", true);
@@ -97,7 +118,7 @@ $(document).ready(function () {
             for (i = 0, length = dialogRows.length; i < length; i++) {
                 var dialogPath = dialogRows[i];
 
-                if (dialogPath.hasAttribute('data-converted')) {
+                if (dialogPath.hasAttribute('coral-table-rowlock')) {
                     dialogPath.removeAttribute('selected');
                 } else {
                     // if the state is 'mixed', we select the row
@@ -106,6 +127,20 @@ $(document).ready(function () {
             }
 
             delete dialogTable.dataset.toggleAll;
+        });
+
+        showConverted.on("change", function () {
+            for (i = 0, length = dialogRows.length; i < length; i++) {
+                var row = dialogRows[i];
+
+                if (row.hasAttribute("coral-table-rowlock")) {
+                    if (showConverted.checked) {
+                        row.removeAttribute("hidden");
+                    } else {
+                        row.setAttribute("hidden", true);
+                    }
+                }
+            }
         });
 
         convertDialogsButton.on("click", function () {
