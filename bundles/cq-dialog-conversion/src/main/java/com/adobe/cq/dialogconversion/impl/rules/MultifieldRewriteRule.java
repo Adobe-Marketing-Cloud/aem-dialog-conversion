@@ -23,8 +23,8 @@ import static com.adobe.cq.dialogconversion.DialogRewriteUtils.rename;
 public class MultifieldRewriteRule extends AbstractDialogRewriteRule {
 
     private static final String XTYPE = "multifield";
-    private static final String GRANITEUI_MULTIFIELD_RT = "granite/ui/components/foundation/form/multifield";
-    private static final String GRANITEUI_TEXTFIELD_RT = "granite/ui/components/foundation/form/textfield";
+    private static final String GRANITEUI_MULTIFIELD_RT = "granite/ui/components/coral/foundation/form/multifield";
+    private static final String GRANITEUI_TEXTFIELD_RT = "granite/ui/components/coral/foundation/form/textfield";
 
     public boolean matches(Node root)
             throws RepositoryException {

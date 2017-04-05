@@ -9,11 +9,10 @@
         cq:rewriteFinal="{Boolean}true">
         <fileupload
             jcr:primaryType="nt:unstructured"
-            sling:resourceType="granite/ui/components/foundation/form/fileupload"
+            sling:resourceType="cq/gui/components/authoring/dialog/fileupload"
             fieldLabel="${./fieldLabel}"
             fieldDescription="${./fieldDescription}"
             name="${./name}"
-            disabled="${./disabled}"
-            title="Upload"/>
+            disabled="${./disabled}"/>
     </replacement>
 </jcr:root>

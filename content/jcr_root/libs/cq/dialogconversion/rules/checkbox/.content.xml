@@ -2,22 +2,20 @@
 <jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:cq="http://www.day.com/jcr/cq/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0" xmlns:nt="http://www.jcp.org/jcr/nt/1.0"
     jcr:primaryType="nt:unstructured">
     <patterns jcr:primaryType="nt:unstructured">
-        <text/>
+        <checkbox/>
     </patterns>
-    <replacement
-        jcr:primaryType="nt:unstructured"
-        cq:rewriteFinal="{Boolean}true">
-        <text
+    <replacement jcr:primaryType="nt:unstructured">
+        <checkbox
             jcr:primaryType="nt:unstructured"
-            sling:resourceType="granite/ui/components/foundation/form/textfield"
+            sling:resourceType="granite/ui/components/coral/foundation/form/checkbox"
             fieldLabel="${./fieldLabel}"
             fieldDescription="${./fieldDescription}"
             name="${./name}"
-            value="${./value}"
-            required="!${./allowBlank}"
+            text="[${./fieldLabel},${./boxLabel}]"
+            value="[${./inputValue},${./value}]"
             disabled="${./disabled}"
-            renderReadOnly="${./readOnly}"
-            emptyText="${./emptyText}"
-            maxlength="${./maxLength}"/>
+            checked="${./checked}"
+            cq:rewriteFinal="{Boolean}true">
+        </checkbox>
     </replacement>
 </jcr:root>

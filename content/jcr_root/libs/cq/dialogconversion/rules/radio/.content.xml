@@ -7,9 +7,7 @@
     <replacement jcr:primaryType="nt:unstructured">
         <radio
             jcr:primaryType="nt:unstructured"
-            sling:resourceType="granite/ui/components/foundation/form/radio"
             text="${./fieldLabel}"
-            name="${./name}"
             value="${./inputValue}"
             disabled="${./disabled}"
             checked="${./checked}"
