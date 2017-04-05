@@ -21,9 +21,11 @@ package com.adobe.cq.dialogconversion.datasources;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 
 import javax.jcr.Node;
 import javax.jcr.NodeIterator;
@@ -62,9 +64,29 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
 
     private final static Logger log = LoggerFactory.getLogger(DialogsDataSource.class);
 
+    private static final String NT_DIALOG = "cq:Dialog";
     private static final String NN_CQ_DIALOG = "cq:dialog";
+    private static final String NN_DIALOG = "dialog";
+    private static final String DIALOG_CONTENT_RESOURCETYPE_PREFIX_CORAL3 = "granite/ui/components/coral/";
     private static final String DIALOG_CONVERSION_CONTENT_PATH = "/libs/cq/dialogconversion/content/render";
     private static final String CRX_LITE_PATH = "/crx/de/index";
+
+    private enum DialogType {
+        CLASSIC_UI("Classic UI"),
+        CORAL_2("Coral 2"),
+        CORAL_3("Coral 3"),
+        UNKNOWN("");
+
+        private final String text;
+
+        DialogType(String text) {
+            this.text = text;
+        }
+
+        public String getString() {
+            return text;
+        }
+    }
 
     @Reference
     private ExpressionResolver expressionResolver;
@@ -98,7 +120,7 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
         if (StringUtils.isNotEmpty(path)) {
             Externalizer externalizer = resourceResolver.adaptTo(Externalizer.class);
             Session session = request.getResourceResolver().adaptTo(Session.class);
-            List<Node> nodes = new LinkedList<Node>();
+            TreeMap<String, Node> nodeMap = new TreeMap<String, Node>();
 
             // sanitize path
             path = path.trim();
@@ -109,29 +131,47 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
             // First check if the supplied path is a dialog node itself
             if (session.nodeExists(path)) {
                 Node node = session.getNode(path);
-                if ("dialog".equals(node.getName()) && "cq:Dialog".equals(node.getPrimaryNodeType().getName())) {
-                    nodes.add(node);
+                DialogType type = getDialogType(node);
+
+                if (type != DialogType.UNKNOWN && type != DialogType.CORAL_3) {
+                    nodeMap.put(node.getPath(), node);
                 }
             }
 
             // If the path does not point to a dialog node: we query for dialog nodes
-            if (nodes.isEmpty()) {
+            if (nodeMap.isEmpty()) {
                 String encodedPath = "/".equals(path) ? "" : ISO9075.encodePath(path);
                 if (encodedPath.length() > 1 && encodedPath.endsWith("/")) {
                     encodedPath = encodedPath.substring(0, encodedPath.length() - 1);
                 }
-                String xpath = "/jcr:root" + encodedPath + "//element(dialog, cq:Dialog) order by @jcr:path";
-                QueryManager queryManager = session.getWorkspace().getQueryManager();
-                Query query = queryManager.createQuery(xpath, Query.XPATH);
+                String classicUIStatement = "SELECT * FROM [" + NT_DIALOG + "] AS s WHERE ISDESCENDANTNODE(s, '" + encodedPath + "') AND NAME() = '" + NN_DIALOG + "'";
+                String coral2Statement = "SELECT parent.* FROM [nt:unstructured] AS parent INNER JOIN [nt:unstructured] " +
+                        "AS child on ISCHILDNODE(child, parent) WHERE ISDESCENDANTNODE(parent, '" + encodedPath + "') AND NAME(parent) = '" + NN_CQ_DIALOG + "' " +
+                        "AND NAME(child) = 'content' AND child.[sling:resourceType] NOT LIKE '" + DIALOG_CONTENT_RESOURCETYPE_PREFIX_CORAL3 + "%'";
 
-                NodeIterator iterator = query.execute().getNodes();
-                while (iterator.hasNext()) {
-                    nodes.add(iterator.nextNode());
+                QueryManager queryManager = session.getWorkspace().getQueryManager();
+                List<Query> queries = new ArrayList<Query>();
+                queries.add(queryManager.createQuery(classicUIStatement, Query.JCR_SQL2));
+                queries.add(queryManager.createQuery(coral2Statement, Query.JCR_SQL2));
+
+                for (Query query : queries) {
+                    NodeIterator iterator = query.execute().getNodes();
+                    while (iterator.hasNext()) {
+                        Node node = iterator.nextNode();
+                        Node parent = node.getParent();
+                        if (parent != null) {
+                            nodeMap.put(parent.getPath(), node);
+                        }
+                    }
                 }
             }
 
-            for (int index = 0; index < nodes.size(); index++) {
-                Node dialog = nodes.get(index);
+            int index = 0;
+            Iterator iterator = nodeMap.entrySet().iterator();
+
+            while (iterator.hasNext()) {
+                Map.Entry entry = (Map.Entry)iterator.next();
+                Node dialog = (Node)entry.getValue();
 
                 if (dialog == null) {
                     continue;
@@ -143,13 +183,17 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
                     continue;
                 }
 
+                DialogType dialogType = getDialogType(dialog);
+
                 String dialogPath = dialog.getPath();
+                String type = dialogType.getString();
                 String href = externalizer.relativeLink(request, dialogPath) + ".html";
                 String crxHref = externalizer.relativeLink(request, CRX_LITE_PATH) + ".jsp#" + dialogPath;
-                boolean converted = parent.hasNode(NN_CQ_DIALOG);
+                boolean converted = (dialogType == DialogType.CLASSIC_UI) && parent.hasNode(NN_CQ_DIALOG);
 
                 Map<String, Object> map = new HashMap<String, Object>();
                 map.put("dialogPath", dialogPath);
+                map.put("type", type);
                 map.put("href", href);
                 map.put("converted", converted);
                 map.put("crxHref", crxHref);
@@ -164,11 +208,36 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
                 }
 
                 resources.add(new ValueMapResource(resourceResolver, resource.getPath() + "/dialog_" + index, itemResourceType, new ValueMapDecorator(map)));
+                index++;
             }
         }
 
         DataSource ds = new SimpleDataSource(resources.iterator());
 
         request.setAttribute(DataSource.class.getName(), ds);
+    }
+
+    private DialogType getDialogType(Node node) throws RepositoryException {
+        DialogType type = DialogType.UNKNOWN;
+
+        if (node == null) {
+            return type;
+        }
+
+        if (NN_DIALOG.equals(node.getName()) && NT_DIALOG.equals(node.getPrimaryNodeType().getName())) {
+            type = DialogType.CLASSIC_UI;
+        } else if (NN_CQ_DIALOG.equals(node.getName()) && node.hasNode("content")) {
+            Node contentNode = node.getNode("content");
+            type = DialogType.CORAL_2;
+
+            if (contentNode != null) {
+                if (contentNode.hasProperty(ResourceResolver.PROPERTY_RESOURCE_TYPE)) {
+                    String resourceType = contentNode.getProperty(ResourceResolver.PROPERTY_RESOURCE_TYPE).getString();
+                    type = resourceType.startsWith(DIALOG_CONTENT_RESOURCETYPE_PREFIX_CORAL3) ? DialogType.CORAL_3 : DialogType.CORAL_2;
+                }
+            }
+        }
+
+        return type;
     }
 }

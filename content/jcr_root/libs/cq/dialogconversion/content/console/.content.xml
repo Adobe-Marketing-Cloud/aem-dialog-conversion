@@ -4,94 +4,112 @@
     <jcr:content
         jcr:mixinTypes="[]"
         jcr:primaryType="nt:unstructured"
-        jcr:title="AEM Dialog Conversion Tool"
+        jcr:title="Dialog Conversion Tool"
         sling:resourceType="granite/ui/components/shell/page"
-        consoleId="dialogConversion">
+        consoleId="cq-dialogconversion">
         <head jcr:primaryType="nt:unstructured">
             <clientlibs
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="granite/ui/components/coral/foundation/includeclientlibs"
-                categories="[granite.ui.foundation,granite.ui.foundation.admin,cq.jquery,cq.dialogconversion]"/>
+                categories="[granite.shared,coralui3,granite.ui.coral.foundation,granite.ui.coral.foundation.admin,cq.dialogconversion]"/>
         </head>
         <title
             jcr:primaryType="nt:unstructured"
             sling:resourceType="granite/ui/components/coral/foundation/text"
-            text="AEM Dialog Conversion Tool"/>
+            text="Dialog Conversion Tool"/>
+        <actions jcr:primaryType="nt:unstructured">
+            <secondary jcr:primaryType="nt:unstructured">
+                <convert
+                    granite:class="js-cq-DialogConverter-convertDialogs"
+                    granite:hidden="{Boolean}true"
+                    jcr:primaryType="nt:unstructured"
+                    sling:resourceType="granite/ui/components/coral/foundation/button"
+                    text="Convert dialog(s)"
+                    variant="primary">
+                </convert>
+            </secondary>
+        </actions>
         <content
-            granite:class="js-cq-DialogConverter-container cq-DialogConverter-container"
+            granite:class="js-cq-DialogConverter-container"
             jcr:primaryType="nt:unstructured"
             sling:resourceType="granite/ui/components/coral/foundation/container">
             <items jcr:primaryType="nt:unstructured">
-                <searchDialogContent
-                    granite:class="js-cq-DialogConverter-dialogsContainer cq-DialogConverter-dialogsContainer"
+                <dialogSearch
+                    granite:class="js-cq-DialogConverter-dialogSearch"
                     jcr:primaryType="nt:unstructured"
                     sling:resourceType="granite/ui/components/coral/foundation/container">
                     <granite:data
                         jcr:primaryType="nt:unstructured"
-                        search-path="${empty param.path ? &quot;&quot; : param.path}"/>
+                        dialogconversion-search-path="${empty param.path ? &quot;&quot; : param.path}"/>
                     <items jcr:primaryType="nt:unstructured">
-                        <pathBrowser
-                            granite:class="js-cq-DialogConverter-searchPath cq-DialogConverter-searchPath u-coral-pullLeft"
+                        <actionbar
                             jcr:primaryType="nt:unstructured"
-                            sling:resourceType="granite/ui/components/coral/foundation/form/pathfield"
-                            emptyText="Enter a path, e.g. /apps/geometrixx/components"/>
-                        <showButton
-                            granite:class="js-cq-DialogConverter-showDialogs cq-DialogConverter-showDialogs u-coral-pullLeft"
-                            jcr:primaryType="nt:unstructured"
-                            sling:resourceType="granite/ui/components/coral/foundation/button"
-                            text="Show dialogs"/>
-                        <text
-                            granite:class="js-cq-DialogConverter-infoText cq-DialogConverter-infoText"
-                            jcr:primaryType="nt:unstructured"
-                            sling:resourceType="granite/ui/components/coral/foundation/text"
-                            text=""/>
-                        <toggleAll
-                            granite:class="js-cq-DialogConverter-toggleDialogRows hide"
-                            jcr:primaryType="nt:unstructured"
-                            sling:resourceType="granite/ui/components/coral/foundation/form/checkbox"
-                            text="Select all convertible dialogs"/>
-                        <showConverted
-                            granite:class="js-cq-DialogConverter-showConvertedDialogRows hide"
-                            jcr:primaryType="nt:unstructured"
-                            sling:resourceType="granite/ui/components/coral/foundation/form/checkbox"
-                            text="Show converted dialogs"/>
+                            sling:resourceType="granite/ui/components/coral/foundation/actionbar">
+                            <primary jcr:primaryType="nt:unstructured">
+                                <pathField
+                                    granite:class="js-cq-DialogConverter-searchPath cq-DialogConverter-searchPath"
+                                    jcr:primaryType="nt:unstructured"
+                                    sling:resourceType="granite/ui/components/coral/foundation/form/pathfield"
+                                    emptyText="Enter a path, e.g. /apps/weretail/components"/>
+                                <showButton
+                                    granite:class="js-cq-DialogConverter-showDialogs"
+                                    jcr:primaryType="nt:unstructured"
+                                    sling:resourceType="granite/ui/components/coral/foundation/button"
+                                    text="Show dialogs"/>
+                                <showConverted
+                                    granite:class="js-cq-DialogConverter-showConvertedDialogRows"
+                                    jcr:primaryType="nt:unstructured"
+                                    sling:resourceType="granite/ui/components/coral/foundation/form/checkbox"
+                                    text="Show converted dialogs"/>
+                            </primary>
+                            <secondary jcr:primaryType="nt:unstructured">
+                                <text
+                                    granite:class="js-cq-DialogConverter-infoText cq-DialogConverter-infoText"
+                                    jcr:primaryType="nt:unstructured"
+                                    sling:resourceType="granite/ui/components/coral/foundation/text"
+                                    text=""/>
+                            </secondary>
+                        </actionbar>
                         <dialogs
-                            granite:class="js-cq-DialogConverter-dialogs cq-DialogConverter-dialogs"
+                            granite:class="js-cq-DialogConverter-dialogs"
                             jcr:primaryType="nt:unstructured"
                             sling:resourceType="granite/ui/components/coral/foundation/table"
                             itemResourceType="cq/dialogconversion/components/dialogs/item"
                             orderable="{Boolean}false"
                             path="${param.path}"
-                            selectionMode="row"
-                            skipEmptyRow="{Boolean}true">
+                            selectionMode="row">
                             <columns jcr:primaryType="nt:unstructured">
-                                <check jcr:primaryType="nt:unstructured"/>
+                                <select
+                                    jcr:primaryType="nt:unstructured"
+                                    fixedWidth="{Boolean}true"
+                                    select="{Boolean}true"/>
                                 <dialogPath
                                     jcr:primaryType="nt:unstructured"
                                     jcr:title="Dialog path"
                                     sortable="{Boolean}true"/>
+                                <type
+                                    jcr:primaryType="nt:unstructured"
+                                    jcr:title="Type"
+                                    alignment="center"
+                                    sortable="{Boolean}true"/>
                                 <links
                                     jcr:primaryType="nt:unstructured"
-                                    jcr:title="Classic UI"/>
-                                <touchDialog
+                                    jcr:title="Links"
+                                    alignment="center"/>
+                                <convertedLinks
                                     jcr:primaryType="nt:unstructured"
-                                    jcr:title="Touch UI"
+                                    jcr:title="Converted dialog"
+                                    alignment="center"
                                     sortable="{Boolean}true"/>
                             </columns>
                             <datasource
                                 jcr:primaryType="nt:unstructured"
                                 sling:resourceType="cq/dialogconversion/components/dialogs/datasource"/>
                         </dialogs>
-                        <convertButton
-                            granite:class="js-cq-DialogConverter-convertDialogs cq-DialogConverter-convertDialogs"
-                            granite:hidden="{Boolean}true"
-                            jcr:primaryType="nt:unstructured"
-                            sling:resourceType="granite/ui/components/coral/foundation/button"
-                            text="Convert dialogs"/>
                     </items>
-                </searchDialogContent>
+                </dialogSearch>
                 <convertedDialogs
-                    granite:class="js-cq-DialogConverter-conversionResults cq-DialogConverter-conversionResults"
+                    granite:class="js-cq-DialogConverter-convertedDialogs"
                     granite:hidden="{Boolean}true"
                     jcr:primaryType="nt:unstructured"
                     sling:resourceType="granite/ui/components/coral/foundation/table"
@@ -103,7 +121,7 @@
                             sortable="{Boolean}true"/>
                         <conversion
                             jcr:primaryType="nt:unstructured"
-                            jcr:title="Conversion to Touch UI"/>
+                            jcr:title="Conversion result"/>
                         <message
                             jcr:primaryType="nt:unstructured"
                             jcr:title="Message"
