@@ -1,41 +1,7 @@
-.cq-DialogConverter-container {
-    padding: 2rem;
-}
-
 .cq-DialogConverter-searchPath {
-    width: 400px;
-    margin-right: 20px;
+    width: 380px;
 }
 
 .cq-DialogConverter-infoText {
-    display: block;
-    clear: both;
-    padding-top: 1rem;
-}
-
-.cq-DialogConverter-convertDialogs {
-    margin-top: 1rem;
-}
-
-.cq-DialogConverter-conversionResults {
-    width: 100%;
-}
-
-.cq-DialogConverter-check,
-.cq-DialogConverter-lock {
-    display: none;
-}
-
-.cq-DialogConverter-dialogsContainer th:first-child,
-.cq-DialogConverter-dialogsContainer td:first-child {
-    width: 50px;
-    text-align: center;
-}
-
-.cq-DialogConverter-dialogsContainer tr[selected] .cq-DialogConverter-check {
-    display: inline;
-}
-
-.cq-DialogConverter-dialogsContainer tr[coral-table-rowlock] .cq-DialogConverter-lock {
-    display: inline;
+    line-height: 38px;
 }
