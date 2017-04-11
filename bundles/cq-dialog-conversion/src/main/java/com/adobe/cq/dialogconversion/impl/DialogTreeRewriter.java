@@ -44,7 +44,7 @@ public class DialogTreeRewriter {
 
     private static final String NN_CQ_DIALOG = "cq:dialog";
     private static final String NN_DIALOG = "dialog";
-    private static final String BACKUP_SUFFIX = ".bak";
+    private static final String BACKUP_SUFFIX = ".coral2";
 
     public DialogTreeRewriter(List<DialogRewriteRule> rules) {
         this.rules = rules;

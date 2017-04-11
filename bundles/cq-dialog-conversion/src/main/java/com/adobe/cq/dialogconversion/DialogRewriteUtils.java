@@ -31,8 +31,10 @@ import javax.jcr.Session;
  */
 public class DialogRewriteUtils {
 
+    private static final String CORAL_2_BACKUP_SUFFIX = ".coral2";
     private static final String NT_DIALOG = "cq:Dialog";
     private static final String NN_CQ_DIALOG = "cq:dialog";
+    private static final String NN_CQ_DIALOG_BACKUP = "cq:dialog" + CORAL_2_BACKUP_SUFFIX;
     private static final String NN_DIALOG = "dialog";
     private static final String DIALOG_CONTENT_RESOURCETYPE_PREFIX_CORAL3 = "granite/ui/components/coral/";
 
@@ -132,7 +134,7 @@ public class DialogRewriteUtils {
 
         if (NN_DIALOG.equals(node.getName()) && NT_DIALOG.equals(node.getPrimaryNodeType().getName())) {
             type = DialogType.CLASSIC;
-        } else if (NN_CQ_DIALOG.equals(node.getName()) && node.hasNode("content")) {
+        } else if ((NN_CQ_DIALOG.equals(node.getName()) || NN_CQ_DIALOG_BACKUP.equals(node.getName())) && node.hasNode("content")) {
             Node contentNode = node.getNode("content");
             type = DialogType.CORAL_2;
 

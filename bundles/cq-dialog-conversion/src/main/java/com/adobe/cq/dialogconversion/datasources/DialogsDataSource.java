@@ -66,8 +66,10 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
 
     private final static Logger log = LoggerFactory.getLogger(DialogsDataSource.class);
 
+    private static final String CORAL_2_BACKUP_SUFFIX = ".coral2";
     private static final String NT_DIALOG = "cq:Dialog";
     private static final String NN_CQ_DIALOG = "cq:dialog";
+    private static final String NN_CQ_DIALOG_BACKUP = "cq:dialog" + CORAL_2_BACKUP_SUFFIX;
     private static final String NN_DIALOG = "dialog";
     private static final String DIALOG_CONTENT_RESOURCETYPE_PREFIX_CORAL3 = "granite/ui/components/coral/foundation";
     private static final String CRX_LITE_PATH = "/crx/de/index";
@@ -130,7 +132,8 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
                 }
                 String classicUIStatement = "SELECT * FROM [" + NT_DIALOG + "] AS s WHERE ISDESCENDANTNODE(s, '" + encodedPath + "') AND NAME() = '" + NN_DIALOG + "'";
                 String coral2Statement = "SELECT parent.* FROM [nt:unstructured] AS parent INNER JOIN [nt:unstructured] " +
-                        "AS child on ISCHILDNODE(child, parent) WHERE ISDESCENDANTNODE(parent, '" + encodedPath + "') AND NAME(parent) = '" + NN_CQ_DIALOG + "' " +
+                        "AS child on ISCHILDNODE(child, parent) WHERE ISDESCENDANTNODE(parent, '" + encodedPath + "') " +
+                        "AND (NAME(parent) = '" + NN_CQ_DIALOG + "' OR NAME(parent) = '" + NN_CQ_DIALOG_BACKUP + "') " +
                         "AND NAME(child) = 'content' AND child.[sling:resourceType] NOT LIKE '" + DIALOG_CONTENT_RESOURCETYPE_PREFIX_CORAL3 + "%'";
 
                 QueryManager queryManager = session.getWorkspace().getQueryManager();
@@ -169,11 +172,17 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
 
                 DialogType dialogType = DialogRewriteUtils.getDialogType(dialog);
 
+                // ignore backup Coral 2 dialogs for which there's no replacement
+                if (dialogType == DialogType.CORAL_2 && dialog.getName().endsWith(CORAL_2_BACKUP_SUFFIX) && !parent.hasNode(NN_CQ_DIALOG)) {
+                    continue;
+                }
+
                 String dialogPath = dialog.getPath();
                 String type = dialogType.getString();
                 String href = externalizer.relativeLink(request, dialogPath) + ".html";
                 String crxHref = externalizer.relativeLink(request, CRX_LITE_PATH) + ".jsp#" + dialogPath;
-                boolean converted = (dialogType == DialogType.CLASSIC) && parent.hasNode(NN_CQ_DIALOG);
+                boolean converted = parent.hasNode(NN_CQ_DIALOG) && (dialogType == DialogType.CLASSIC) ||
+                    (dialogType == DialogType.CORAL_2 && dialog.getName().endsWith(CORAL_2_BACKUP_SUFFIX));
 
                 Map<String, Object> map = new HashMap<String, Object>();
                 map.put("dialogPath", dialogPath);
