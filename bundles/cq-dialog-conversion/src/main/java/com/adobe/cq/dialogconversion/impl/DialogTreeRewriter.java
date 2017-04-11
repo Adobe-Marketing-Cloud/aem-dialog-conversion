@@ -20,8 +20,11 @@ package com.adobe.cq.dialogconversion.impl;
 
 import com.adobe.cq.dialogconversion.DialogRewriteException;
 import com.adobe.cq.dialogconversion.DialogRewriteRule;
+import com.adobe.cq.dialogconversion.DialogRewriteUtils;
+import com.adobe.cq.dialogconversion.DialogType;
 import com.day.cq.commons.jcr.JcrUtil;
 import org.apache.jackrabbit.commons.flat.TreeTraverser;
+import org.apache.sling.api.resource.ResourceResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,29 +42,42 @@ public class DialogTreeRewriter {
 
     private List<DialogRewriteRule> rules;
 
+    private static final String NN_CQ_DIALOG = "cq:dialog";
+    private static final String NN_DIALOG = "dialog";
+    private static final String BACKUP_SUFFIX = ".bak";
+
     public DialogTreeRewriter(List<DialogRewriteRule> rules) {
         this.rules = rules;
     }
 
     private void check(Node root)
             throws DialogRewriteException, RepositoryException {
-        // verify that the node has a primary type of cq:Dialog
-        if (!"cq:Dialog".equals(root.getPrimaryNodeType().getName())) {
-            logger.debug("{} is not a Classic UI dialog", root.getPath());
-            throw new DialogRewriteException("Node is not a cq:Dialog");
+        // if it's not a classic or coral 2 dialog, throw an exception
+        DialogType type = DialogRewriteUtils.getDialogType(root);
+
+        // verify that the node is a dialog and is convertible
+        if (type == DialogType.UNKNOWN || type == DialogType.CORAL_3) {
+            logger.debug("{} is not a Classic or Coral 2 dialog", root.getPath());
+            throw new DialogRewriteException("Node is not a cq:Dialog or Coral 2 dialog");
         }
 
-        // verify that the Touch UI version of the dialog doesn't exist
-        if (root.getParent().hasNode("cq:dialog")) {
-            logger.debug("Dialog {} already has a Touch UI counterpart", root.getPath());
-            throw new DialogRewriteException("Touch UI dialog already exists");
+        if (type == DialogType.CLASSIC) {
+            // verify that a Coral 3 version of the dialog doesn't already exist
+            if (root.getParent().hasNode(NN_CQ_DIALOG)) {
+                Node node = root.getParent().getNode(NN_CQ_DIALOG);
+                type = DialogRewriteUtils.getDialogType(node);
+                if (type == DialogType.CORAL_3) {
+                    logger.debug("Dialog {} already has a Coral 3 counterpart", root.getPath());
+                    throw new DialogRewriteException("Coral 3 dialog already exists");
+                }
+            }
         }
     }
 
     /**
      * Rewrites the specified dialog tree according to the set of rules passed to the constructor.
      *
-     * @param root The root of the dialog be rewritten (must be of primary type cq:Dialog)
+     * @param root The root of the dialog be rewritten
      * @return the root node of the rewritten dialog tree, or null if it was removed
      * @throws com.adobe.cq.dialogconversion.DialogRewriteException If the rewrite operation fails
      * @throws RepositoryException If there is a problem with the repository
@@ -71,10 +87,25 @@ public class DialogTreeRewriter {
         logger.debug("Rewriting dialog tree rooted at {}", root.getPath());
         check(root);
 
-        // make a copy of the dialog (which will be rewritten)
-        String name = JcrUtil.createValidChildName(root.getParent(), "dialog");
-        Node copy = JcrUtil.copy(root, root.getParent(), name);
+        DialogType type = DialogRewriteUtils.getDialogType(root);
+        String name = "";
 
+        if (type == DialogType.CORAL_2) {
+            name = NN_CQ_DIALOG + BACKUP_SUFFIX;
+            Node parent = root.getParent();
+            if (parent != null) {
+                if (parent.hasNode(name)) {
+                    // remove any existing backup node
+                    parent.getNode(name).remove();
+                }
+            }
+        } else {
+            name = JcrUtil.createValidChildName(root.getParent(), NN_DIALOG);
+        }
+
+        // make a copy of the dialog. If the dialog is Classic, the copy will be rewritten.
+        // Otherwise, it serves as a backup.
+        Node copy = JcrUtil.copy(root, root.getParent(), name);
 
         /**
          * Description of the algorithm:
@@ -88,8 +119,9 @@ public class DialogTreeRewriter {
 
         long tick = System.currentTimeMillis();
         Session session = root.getSession();
-        // reference to the node where the pre-order traversal is started from
-        Node startNode = copy;
+        // reference to the node where the pre-order traversal is started from. If the dialog is
+        // Coral 2 start from the root, leaving the backup copy
+        Node startNode = type == DialogType.CORAL_2 ? root : copy;
         // keeps track of whether or not there was a match during a traversal
         boolean foundMatch;
         // keeps track of whether or not the rewrite operation succeeded
@@ -180,5 +212,4 @@ public class DialogTreeRewriter {
             paths.add(node.getPath());
         }
     }
-
 }

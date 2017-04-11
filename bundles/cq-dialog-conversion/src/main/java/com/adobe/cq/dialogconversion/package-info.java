@@ -16,7 +16,7 @@
  * from Adobe Systems Incorporated.
  **************************************************************************/
 
-@Version("1.0.0")
+@Version("1.1.0")
 @Export(optional = "provide:=true")
 package com.adobe.cq.dialogconversion;
 

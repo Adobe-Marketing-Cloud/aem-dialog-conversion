@@ -39,6 +39,8 @@ import com.adobe.granite.ui.components.ExpressionResolver;
 import com.adobe.granite.ui.components.ds.DataSource;
 import com.adobe.granite.ui.components.ds.SimpleDataSource;
 import com.adobe.granite.ui.components.ds.ValueMapResource;
+import com.adobe.cq.dialogconversion.DialogRewriteUtils;
+import com.adobe.cq.dialogconversion.DialogType;
 import com.day.cq.commons.Externalizer;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.scr.annotations.Reference;
@@ -67,26 +69,8 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
     private static final String NT_DIALOG = "cq:Dialog";
     private static final String NN_CQ_DIALOG = "cq:dialog";
     private static final String NN_DIALOG = "dialog";
-    private static final String DIALOG_CONTENT_RESOURCETYPE_PREFIX_CORAL3 = "granite/ui/components/coral/";
-    private static final String DIALOG_CONVERSION_CONTENT_PATH = "/libs/cq/dialogconversion/content/render";
+    private static final String DIALOG_CONTENT_RESOURCETYPE_PREFIX_CORAL3 = "granite/ui/components/coral/foundation";
     private static final String CRX_LITE_PATH = "/crx/de/index";
-
-    private enum DialogType {
-        CLASSIC_UI("Classic UI"),
-        CORAL_2("Coral 2"),
-        CORAL_3("Coral 3"),
-        UNKNOWN("");
-
-        private final String text;
-
-        DialogType(String text) {
-            this.text = text;
-        }
-
-        public String getString() {
-            return text;
-        }
-    }
 
     @Reference
     private ExpressionResolver expressionResolver;
@@ -131,7 +115,7 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
             // First check if the supplied path is a dialog node itself
             if (session.nodeExists(path)) {
                 Node node = session.getNode(path);
-                DialogType type = getDialogType(node);
+                DialogType type = DialogRewriteUtils.getDialogType(node);
 
                 if (type != DialogType.UNKNOWN && type != DialogType.CORAL_3) {
                     nodeMap.put(node.getPath(), node);
@@ -183,13 +167,13 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
                     continue;
                 }
 
-                DialogType dialogType = getDialogType(dialog);
+                DialogType dialogType = DialogRewriteUtils.getDialogType(dialog);
 
                 String dialogPath = dialog.getPath();
                 String type = dialogType.getString();
                 String href = externalizer.relativeLink(request, dialogPath) + ".html";
                 String crxHref = externalizer.relativeLink(request, CRX_LITE_PATH) + ".jsp#" + dialogPath;
-                boolean converted = (dialogType == DialogType.CLASSIC_UI) && parent.hasNode(NN_CQ_DIALOG);
+                boolean converted = (dialogType == DialogType.CLASSIC) && parent.hasNode(NN_CQ_DIALOG);
 
                 Map<String, Object> map = new HashMap<String, Object>();
                 map.put("dialogPath", dialogPath);
@@ -200,7 +184,7 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
 
                 if (converted) {
                     Node touchDialogNode = parent.getNode(NN_CQ_DIALOG);
-                    String touchHref = externalizer.relativeLink(request, DIALOG_CONVERSION_CONTENT_PATH) + ".html" + touchDialogNode.getPath();
+                    String touchHref = externalizer.relativeLink(request, touchDialogNode.getPath()) + ".html";
                     String touchCrxHref = externalizer.relativeLink(request, CRX_LITE_PATH) + ".jsp#" + touchDialogNode.getPath().replaceAll(":", "%3A");
 
                     map.put("touchHref", touchHref);
@@ -215,29 +199,5 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
         DataSource ds = new SimpleDataSource(resources.iterator());
 
         request.setAttribute(DataSource.class.getName(), ds);
-    }
-
-    private DialogType getDialogType(Node node) throws RepositoryException {
-        DialogType type = DialogType.UNKNOWN;
-
-        if (node == null) {
-            return type;
-        }
-
-        if (NN_DIALOG.equals(node.getName()) && NT_DIALOG.equals(node.getPrimaryNodeType().getName())) {
-            type = DialogType.CLASSIC_UI;
-        } else if (NN_CQ_DIALOG.equals(node.getName()) && node.hasNode("content")) {
-            Node contentNode = node.getNode("content");
-            type = DialogType.CORAL_2;
-
-            if (contentNode != null) {
-                if (contentNode.hasProperty(ResourceResolver.PROPERTY_RESOURCE_TYPE)) {
-                    String resourceType = contentNode.getProperty(ResourceResolver.PROPERTY_RESOURCE_TYPE).getString();
-                    type = resourceType.startsWith(DIALOG_CONTENT_RESOURCETYPE_PREFIX_CORAL3) ? DialogType.CORAL_3 : DialogType.CORAL_2;
-                }
-            }
-        }
-
-        return type;
     }
 }

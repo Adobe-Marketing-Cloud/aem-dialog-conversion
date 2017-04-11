@@ -22,7 +22,9 @@ import com.adobe.cq.dialogconversion.DialogRewriteException;
 import com.adobe.cq.dialogconversion.DialogRewriteRule;
 import com.adobe.cq.dialogconversion.DialogRewriteUtils;
 import com.day.cq.commons.jcr.JcrUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.jackrabbit.commons.flat.TreeTraverser;
+import org.apache.sling.api.resource.ResourceResolver;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +78,8 @@ import java.util.regex.Pattern;
  * need to be of type <code>string</code> and have the following format: <code>${&lt;path&gt;}</code>. If the referenced
  * property doesn't exist in the original tree, then the property is omitted. Alternatively, a default value can be
  * specified for that case (only possible for <code>string</code> properties):
- * <code>${&lt;path&gt;:&lt;default&gt;}</code>. Boolean properties are negated if the expression is prefixed with
+ * <code>${&lt;path&gt;:&lt;default&gt;}</code>. Properties that contain ':' characters can be single quoted to avoid
+ * conflict with providing a default value. Boolean properties are negated if the expression is prefixed with
  * <code>!</code>. Mapped properties can also be multivalued, in which case they will be assigned the value of the first
  * property that exists in the original tree. The following example illustrates mapping properties:</p>
  *
@@ -110,18 +113,43 @@ import java.util.regex.Pattern;
  *         optimization measure. When placed on the replacement node itself (i.e. on <code>rule/replacement</code>),
  *         the whole replacement tree is considered final.
  *     </li>
+ *     <li>
+ *         <code>cq:rewriteCommonAttrs</code> (boolean)<br />
+ *         Set this property on the replacement node (<code>rule/replacement</code>) to map relevant properties
+ *         of the original root node to Granite common attribute equivalents in the copy root. It will handle data
+ *         attributes by copying/creating the granite:data subnode on the target and writing data-* properties there.
+ *     </li>
+ *     <li>
+ *         <code>cq:rewriteRenderCondition</code> (boolean)<br />
+ *         Set this property on the replacement node (<code>rule/replacement</code>) to copy any render condition
+ *         (rendercondition or granite:rendercondition) child node from the original root node to a
+ *         granite:rendercondition child of the copy root.
+ *     </li>
  * </ul>
  */
 public class NodeBasedRewriteRule implements DialogRewriteRule {
 
     // pattern that matches the regex for mapped properties: ${<path>}
-    private static final Pattern MAPPED_PATTERN = Pattern.compile("^(\\!{0,1})\\$\\{(.*?)(:(.+))?\\}$");
+    private static final Pattern MAPPED_PATTERN = Pattern.compile("^(\\!{0,1})\\$\\{(\'.*?\'|.*?)(:(.+))?\\}$");
 
     // special properties
     private static final String PROPERTY_RANKING = "cq:rewriteRanking";
     private static final String PROPERTY_OPTIONAL = "cq:rewriteOptional";
     private static final String PROPERTY_MAP_CHILDREN = "cq:rewriteMapChildren";
     private static final String PROPERTY_IS_FINAL = "cq:rewriteFinal";
+    private static final String PROPERTY_COMMON_ATTRS = "cq:rewriteCommonAttrs";
+    private static final String PROPERTY_RENDER_CONDITION = "cq:rewriteRenderCondition";
+
+    // node names
+    private static final String NN_RENDER_CONDITION = "rendercondition";
+    private static final String NN_GRANITE_RENDER_CONDITION = "granite:rendercondition";
+    private static final String NN_GRANITE_DATA = "granite:data";
+
+    // Granite
+    private static final String[] GRANITE_COMMON_ATTR_PROPERTIES = {"id", "rel", "class", "title", "hidden", "itemscope", "itemtype", "itemprop"};
+    private static final String RENDER_CONDITION_CORAL2_RESOURCE_TYPE_PREFIX = "granite/ui/components/foundation/renderconditions";
+    private static final String RENDER_CONDITION_CORAL3_RESOURCE_TYPE_PREFIX = "granite/ui/components/coral/foundation/renderconditions";
+    private static final String DATA_PREFIX = "data-";
 
     private Logger logger = LoggerFactory.getLogger(NodeBasedRewriteRule.class);
 
@@ -252,8 +280,35 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
         DialogRewriteUtils.rename(root);
 
         // copy replacement to original tree under original name
-        replacement = replacement.getNodes().nextNode();
-        Node copy = JcrUtil.copy(replacement, parent, rootName);
+        Node replacementNext = replacement.getNodes().nextNode();
+        Node copy = JcrUtil.copy(replacementNext, parent, rootName);
+
+        // common attribute mapping
+        if (replacement.hasProperty(PROPERTY_COMMON_ATTRS)) {
+            addCommonAttrMappings(root, copy);
+        }
+
+        // render condition mapping
+        if (replacement.hasProperty(PROPERTY_RENDER_CONDITION)) {
+            if (root.hasNode(NN_GRANITE_RENDER_CONDITION) || root.hasNode(NN_RENDER_CONDITION)) {
+                Node renderConditionRoot = root.hasNode(NN_GRANITE_RENDER_CONDITION) ?
+                    root.getNode(NN_GRANITE_RENDER_CONDITION) : root.getNode(NN_RENDER_CONDITION);
+                Node renderConditionCopy = JcrUtil.copy(renderConditionRoot, copy, NN_GRANITE_RENDER_CONDITION);
+
+                // convert render condition resource types recursively
+                TreeTraverser renderConditionTraverser = new TreeTraverser(renderConditionCopy);
+                Iterator<Node> renderConditionIterator = renderConditionTraverser.iterator();
+
+                while (renderConditionIterator.hasNext()) {
+                    Node renderConditionNode = renderConditionIterator.next();
+                    String resourceType = renderConditionNode.getProperty(ResourceResolver.PROPERTY_RESOURCE_TYPE).getString();
+                    if (resourceType.startsWith(RENDER_CONDITION_CORAL2_RESOURCE_TYPE_PREFIX)) {
+                        resourceType = resourceType.replace(RENDER_CONDITION_CORAL2_RESOURCE_TYPE_PREFIX, RENDER_CONDITION_CORAL3_RESOURCE_TYPE_PREFIX);
+                        renderConditionNode.setProperty(ResourceResolver.PROPERTY_RESOURCE_TYPE, resourceType);
+                    }
+                }
+            }
+        }
 
         // collect mappings: (node in original tree) -> (node in replacement tree)
         Map<String, String> mappings = new HashMap<String, String>();
@@ -351,6 +406,8 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
                 // property doesn't exist
                 deleteProperty = true;
                 String path = matcher.group(2);
+                // unwrap quoted property paths
+                path = StringUtils.removeStart(StringUtils.stripEnd(path,"\'"),"\'");
                 if (root.hasProperty(path)) {
                     // replace property by mapped value in the original tree
                     Property originalProperty = root.getProperty(path);
@@ -379,6 +436,48 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
         if (deleteProperty) {
             // mapped destination does not exist, we don't include the property in replacement tree
             property.remove();
+        }
+    }
+
+    /**
+     * Adds property mappings on a replacement node for Granite common attributes.
+     *
+     * @param root the root node
+     * @param node the replacement node
+     */
+    private void addCommonAttrMappings(Node root, Node node) throws RepositoryException {
+        for (String property: GRANITE_COMMON_ATTR_PROPERTIES) {
+            String[] mapping = {"${./" + property + "}","${\'./granite:" + property + "\'}"};
+            mapProperty(root, node.setProperty("granite:" + property, mapping));
+        }
+
+        if (root.hasNode(NN_GRANITE_DATA)) {
+            // the root has granite:data defined, copy it before applying data-* properties
+            JcrUtil.copy(root.getNode(NN_GRANITE_DATA), node, NN_GRANITE_DATA);
+        }
+
+        // map data-* prefixed properties to granite:data child
+        PropertyIterator propertyIterator = root.getProperties(DATA_PREFIX + "*");
+        while (propertyIterator.hasNext()) {
+            Property property = propertyIterator.nextProperty();
+            String name = property.getName();
+
+            // skip protected properties
+            if (property.getDefinition().isProtected()) {
+                continue;
+            }
+
+            // add the granite:data child if necessary
+            if (!node.hasNode(NN_GRANITE_DATA)) {
+                node.addNode(NN_GRANITE_DATA);
+            }
+
+            // set up the property mapping
+            if (node.hasNode(NN_GRANITE_DATA)) {
+                Node dataNode = node.getNode(NN_GRANITE_DATA);
+                String nameWithoutPrefix = name.substring(DATA_PREFIX.length());
+                mapProperty(root, dataNode.setProperty(nameWithoutPrefix, "${./" + name + "}"));
+            }
         }
     }
 

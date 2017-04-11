@@ -1,46 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jcr:root xmlns:sling="http://sling.apache.org/jcr/sling/1.0" xmlns:jcr="http://www.jcp.org/jcr/1.0"
     jcr:primaryType="sling:OrderedFolder">
-    <button/>
-    <combobox/>
-    <datetime/>
-    <fieldset/>
-    <fileupload/>
-    <hidden/>
-    <numberfield/>
-    <panel/>
-    <password/>
-    <pathfield/>
-    <radio/>
-    <radiogroup/>
-    <select/>
-    <sizefield/>
-    <tabpanel/>
-    <tags/>
-    <textfield/>
-    <textarea/>
-    <coral2_autocomplete/>
-    <coral2_button/>
-    <coral2_checkbox/>
-    <coral2_colorpicker/>
-    <coral2_datepicker/>
-    <coral2_fieldset/>
-    <coral2_fileupload/>
-    <coral2_heading/>
-    <coral2_hidden/>
-    <coral2_hyperlink/>
-    <coral2_numberfield/>
-    <coral2_password/>
-    <coral2_pathbrowser/>
-    <coral2_radio/>
-    <coral2_radiogroup/>
-    <coral2_reset/>
-    <coral2_select/>
-    <coral2_submit/>
-    <coral2_switch/>
-    <coral2_text/>
-    <coral2_textarea/>
-    <coral2_textfield/>
-    <coral2_userpicker/>
-    <coral2_well/>
+    <classic/>
+    <coral2/>
 </jcr:root>

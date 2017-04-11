@@ -18,6 +18,7 @@
 
 package com.adobe.cq.dialogconversion.impl;
 
+import com.day.cq.commons.jcr.JcrConstants;
 import com.adobe.cq.dialogconversion.DialogRewriteException;
 import com.adobe.cq.dialogconversion.DialogRewriteRule;
 import com.adobe.cq.dialogconversion.impl.rules.NodeBasedRewriteRule;
@@ -161,7 +162,17 @@ public class DialogConversionServlet extends SlingAllMethodsServlet {
                 Node rulesContainer = resource.adaptTo(Node.class);
                 NodeIterator iterator = rulesContainer.getNodes();
                 while (iterator.hasNext()) {
-                    rules.add(new NodeBasedRewriteRule(iterator.nextNode()));
+                    Node nextNode = iterator.nextNode();
+                    if (isFolder(nextNode)) {
+                        NodeIterator nodeIterator = nextNode.getNodes();
+                        while (nodeIterator.hasNext()) {
+                            // add first level folder rules
+                            rules.add(new NodeBasedRewriteRule(nodeIterator.nextNode()));
+                        }
+                    } else {
+                        // add rules directly at the rules search path
+                        rules.add(new NodeBasedRewriteRule(nextNode));
+                    }
                 }
             } catch (RepositoryException e) {
                 throw new ServletException("Caught exception while collecting rewrite rules", e);
@@ -188,4 +199,11 @@ public class DialogConversionServlet extends SlingAllMethodsServlet {
 
     }
 
+    private boolean isFolder(Node node) throws RepositoryException {
+        String primaryType = node.getPrimaryNodeType().getName();
+
+        return primaryType.equals("sling:Folder")
+            || primaryType.equals("sling:OrderedFolder")
+            || primaryType.equals(JcrConstants.NT_FOLDER);
+    }
 }

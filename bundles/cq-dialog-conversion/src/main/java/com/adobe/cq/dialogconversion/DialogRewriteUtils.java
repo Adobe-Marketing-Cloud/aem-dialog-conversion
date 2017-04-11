@@ -19,6 +19,7 @@
 package com.adobe.cq.dialogconversion;
 
 import com.day.cq.commons.jcr.JcrUtil;
+import org.apache.sling.api.resource.ResourceResolver;
 
 import javax.jcr.Node;
 import javax.jcr.Property;
@@ -29,6 +30,11 @@ import javax.jcr.Session;
  * Provides helper methods to be used by dialog rewrite rules.
  */
 public class DialogRewriteUtils {
+
+    private static final String NT_DIALOG = "cq:Dialog";
+    private static final String NN_CQ_DIALOG = "cq:dialog";
+    private static final String NN_DIALOG = "dialog";
+    private static final String DIALOG_CONTENT_RESOURCETYPE_PREFIX_CORAL3 = "granite/ui/components/coral/";
 
     /**
      * Checks if a node has a certain xtype.
@@ -110,4 +116,34 @@ public class DialogRewriteUtils {
         return JcrUtil.copy(source.getProperty(relPropertyPath), destination, name);
     }
 
+    /**
+     * Determines the dialog type of a node in the repository.
+     *
+     * @param node The dialog node
+     * @return The dialog type of the node
+     * @throws RepositoryException
+     */
+    public static DialogType getDialogType(Node node) throws RepositoryException {
+        DialogType type = DialogType.UNKNOWN;
+
+        if (node == null) {
+            return type;
+        }
+
+        if (NN_DIALOG.equals(node.getName()) && NT_DIALOG.equals(node.getPrimaryNodeType().getName())) {
+            type = DialogType.CLASSIC;
+        } else if (NN_CQ_DIALOG.equals(node.getName()) && node.hasNode("content")) {
+            Node contentNode = node.getNode("content");
+            type = DialogType.CORAL_2;
+
+            if (contentNode != null) {
+                if (contentNode.hasProperty(ResourceResolver.PROPERTY_RESOURCE_TYPE)) {
+                    String resourceType = contentNode.getProperty(ResourceResolver.PROPERTY_RESOURCE_TYPE).getString();
+                    type = resourceType.startsWith(DIALOG_CONTENT_RESOURCETYPE_PREFIX_CORAL3) ? DialogType.CORAL_3 : DialogType.CORAL_2;
+                }
+            }
+        }
+
+        return type;
+    }
 }

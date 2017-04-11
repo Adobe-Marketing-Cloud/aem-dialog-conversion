@@ -149,8 +149,10 @@ $(document).ready(function () {
                     if (resultPath) {
                         // success
                         successCount++;
+
+                        var href = Granite.HTTP.externalize(resultPath) + ".html";
                         var crxHref = Granite.HTTP.externalize("/crx/de/index.jsp#" + resultPath.replace(":", "%3A"));
-                        links = '<a href="' + crxHref + '" target="_blank" class="coral-Link">crxde</a>';
+                        links = '<a href="' + href + '" target="_blank" class="coral-Link">show</a> / <a href="' + crxHref + '" target="_blank" class="coral-Link">crxde</a>';
                     } else {
                         // error
                         errorCount++;
