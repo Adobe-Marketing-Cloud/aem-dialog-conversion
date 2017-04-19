@@ -20,13 +20,21 @@
         <actions jcr:primaryType="nt:unstructured">
             <secondary jcr:primaryType="nt:unstructured">
                 <convert
-                    granite:class="js-cq-DialogConverter-convertDialogs"
-                    granite:hidden="{Boolean}true"
+                    granite:class="cq-DialogConverter-convertDialogs js-cq-DialogConverter-convertDialogs"
                     jcr:primaryType="nt:unstructured"
-                    sling:resourceType="granite/ui/components/coral/foundation/button"
+                    sling:resourceType="granite/ui/components/coral/foundation/collection/action"
+                    activeSelectionCount="multiple"
+                    target=".cq-dialogconversion-dialogs"
                     text="Convert dialog(s)"
                     variant="primary">
                 </convert>
+                <back
+                    granite:class="js-cq-DialogConverter-back"
+                    granite:hidden="{Boolean}true"
+                    jcr:primaryType="nt:unstructured"
+                    sling:resourceType="granite/ui/components/coral/foundation/button"
+                    text="Back">
+                </back>
             </secondary>
         </actions>
         <content
@@ -38,9 +46,6 @@
                     granite:class="js-cq-DialogConverter-dialogSearch"
                     jcr:primaryType="nt:unstructured"
                     sling:resourceType="granite/ui/components/coral/foundation/container">
-                    <granite:data
-                        jcr:primaryType="nt:unstructured"
-                        dialogconversion-search-path="${empty param.path ? &quot;&quot; : param.path}"/>
                     <items jcr:primaryType="nt:unstructured">
                         <actionbar
                             jcr:primaryType="nt:unstructured"
@@ -50,7 +55,8 @@
                                     granite:class="js-cq-DialogConverter-searchPath cq-DialogConverter-searchPath"
                                     jcr:primaryType="nt:unstructured"
                                     sling:resourceType="granite/ui/components/coral/foundation/form/pathfield"
-                                    emptyText="Enter a path, e.g. /apps/weretail/components"/>
+                                    emptyText="Enter a path, e.g. /apps/weretail/components"
+                                    value="${empty param.path ? &quot;&quot; : param.path}"/>
                                 <showButton
                                     granite:class="js-cq-DialogConverter-showDialogs"
                                     jcr:primaryType="nt:unstructured"
@@ -72,6 +78,7 @@
                         </actionbar>
                         <dialogs
                             granite:class="js-cq-DialogConverter-dialogs"
+                            granite:rel="cq-dialogconversion-dialogs"
                             jcr:primaryType="nt:unstructured"
                             sling:resourceType="granite/ui/components/coral/foundation/table"
                             itemResourceType="cq/dialogconversion/components/dialogs/item"

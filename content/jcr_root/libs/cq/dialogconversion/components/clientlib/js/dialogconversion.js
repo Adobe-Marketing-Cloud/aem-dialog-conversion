@@ -12,6 +12,7 @@ $(document).ready(function () {
     var searchPathField = document.querySelector(".js-cq-DialogConverter-searchPath");
     var infoText = document.querySelector(".js-cq-DialogConverter-infoText");
     var showDialogsButton = document.querySelector(".js-cq-DialogConverter-showDialogs");
+    var backButton = document.querySelector(".js-cq-DialogConverter-back");
     var convertDialogsButton = document.querySelector(".js-cq-DialogConverter-convertDialogs");
     var dialogSearch = document.querySelector(".js-cq-DialogConverter-dialogSearch");
     var convertedDialogs = document.querySelector(".js-cq-DialogConverter-convertedDialogs");
@@ -28,8 +29,6 @@ $(document).ready(function () {
     }
 
     function adjustConvertButton (selectionCount) {
-        // hide "convert dialogs" button if no dialogs are selected
-        convertDialogsButton.hidden = selectionCount < 1;
         // adjust button label
         convertDialogsButton.textContent = Granite.I18n.get("Convert {0} dialog(s)", selectionCount, "Number of dialogs to be converted");
     }
@@ -45,16 +44,11 @@ $(document).ready(function () {
             }
         }
 
-        // Prefill pathfield with value from the url
-        if (searchPathField) {
-            searchPathField.value = dialogSearch.dataset["dialogconversionSearchPath"];
-        }
-
         if (infoText) {
           infoText.textContent = "";
 
           if (dialogRows && dialogRows.length > 0) {
-            if (dialogRows.length === 1 && !dialogRows[0].dataset["dialogconversionDialogPath"]) {
+            if (dialogRows.length === 1 && !dialogRows[0].dataset["foundationCollectionItemId"]) {
               // The empty row, hide the infoText
               infoText.setAttribute("hidden", true);
             } else {
@@ -64,6 +58,7 @@ $(document).ready(function () {
         }
 
         showDialogsButton.on("click", updateRepositoryPathParameter);
+        backButton.on("click", updateRepositoryPathParameter);
 
         dialogTable.on("coral-table:change", function (event) {
             var selection = event && event.detail && event.detail.selection ? event.detail.selection : [];
@@ -100,7 +95,7 @@ $(document).ready(function () {
 
             var selectedDialogRows = dialogTable.selectedItems;
             for (var i = 0, length = selectedDialogRows.length; i < length; i++) {
-                var value = selectedDialogRows[i].dataset["dialogconversionDialogPath"];
+                var value = selectedDialogRows[i].dataset["foundationCollectionItemId"];
 
                 if (value) {
                     paths.push(value);
@@ -117,6 +112,7 @@ $(document).ready(function () {
 
             $.post(url, data, function (data) {
                 convertDialogsButton.hidden = true;
+                backButton.hidden = false;
                 dialogSearch.hidden = true;
                 convertedDialogs.hidden = false;
 
@@ -174,12 +170,22 @@ $(document).ready(function () {
                     row.appendChild(messageCell);
                 }
 
-                // Change info text
-                var text = "Ran dialog conversion on <b>" + count + "</b> dialog" + (count == 1 ? "" : "s") + " ";
-                text += "(<b>" + successCount + "</b> successful conversion" + (successCount == 1 ? "" : "s") + ", ";
-                text += "<b>" + errorCount + "</b> error" + (errorCount == 1 ? "" : "s") + "):";
+                var type = "success";
+                var successes = Granite.I18n.get("Converted <strong>{0}</strong> dialog(s)", successCount, "");
+                var errors = Granite.I18n.get("Failed converting <strong>{0}</strong> dialog(s)", errorCount, "");
+                var content = successes;
 
-                infoText.innerHTML = text;
+                if (errorCount > 0 && successCount > 0) {
+                    // mixed (errors and successes)
+                    type = "warning";
+                    content = errors + " : " + successes;
+                } else if (errorCount > 0) {
+                    // error
+                    type = "error";
+                    content = errors;
+                }
+
+                ui.notify(undefined, content, type);
 
             }).fail(function () {
                 var title = Granite.I18n.get("Error");

@@ -1,7 +1,7 @@
 <sly data-sly-test.converted="${properties.converted}"/>
-<tr is="coral-table-row"
+<tr is="coral-table-row" class="foundation-collection-item"
+    data-foundation-collection-item-id="${properties.dialogPath @ uri}"
     data-sly-attribute.hidden="${converted ? converted : ''}"
-    data-sly-attribute.data-dialogconversion-dialog-path="${properties.dialogPath @ uri}"
     data-sly-attribute.data-dialogconversion-dialog-converted="${converted ? converted : ''}">
     <td is="coral-table-cell">
         <coral-checkbox data-sly-test="${!converted}" coral-table-rowselect></coral-checkbox>
