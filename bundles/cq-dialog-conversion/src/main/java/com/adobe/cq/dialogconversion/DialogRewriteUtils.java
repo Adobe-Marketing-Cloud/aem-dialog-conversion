@@ -19,24 +19,28 @@
 package com.adobe.cq.dialogconversion;
 
 import com.day.cq.commons.jcr.JcrUtil;
+import com.day.cq.wcm.api.NameConstants;
 import org.apache.sling.api.resource.ResourceResolver;
 
 import javax.jcr.Node;
 import javax.jcr.Property;
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
+import java.util.Arrays;
 
 /**
  * Provides helper methods to be used by dialog rewrite rules.
  */
 public class DialogRewriteUtils {
 
-    private static final String CORAL_2_BACKUP_SUFFIX = ".coral2";
-    private static final String NT_DIALOG = "cq:Dialog";
-    private static final String NN_CQ_DIALOG = "cq:dialog";
-    private static final String NN_CQ_DIALOG_BACKUP = "cq:dialog" + CORAL_2_BACKUP_SUFFIX;
-    private static final String NN_DIALOG = "dialog";
-    private static final String DIALOG_CONTENT_RESOURCETYPE_PREFIX_CORAL3 = "granite/ui/components/coral/";
+    public static final String CORAL_2_BACKUP_SUFFIX = ".coral2";
+    public static final String NT_DIALOG = "cq:Dialog";
+    public static final String NN_CQ_DIALOG = "cq:dialog";
+    public static final String NN_CQ_DESIGN_DIALOG = "cq:design_dialog";
+    public static final String DIALOG_CONTENT_RESOURCETYPE_PREFIX_CORAL3 = "granite/ui/components/coral/foundation";
+
+    private static final String[] CLASSIC_DIALOG_NAMES = {NameConstants.NN_DIALOG, NameConstants.NN_DESIGN_DIALOG};
+    private static final String[] DIALOG_NAMES = {NN_CQ_DIALOG, NN_CQ_DESIGN_DIALOG, NN_CQ_DIALOG + CORAL_2_BACKUP_SUFFIX, NN_CQ_DESIGN_DIALOG + CORAL_2_BACKUP_SUFFIX};
 
     /**
      * Checks if a node has a certain xtype.
@@ -132,9 +136,11 @@ public class DialogRewriteUtils {
             return type;
         }
 
-        if (NN_DIALOG.equals(node.getName()) && NT_DIALOG.equals(node.getPrimaryNodeType().getName())) {
+        String name = node.getName();
+
+        if (Arrays.asList(CLASSIC_DIALOG_NAMES).contains(name) && NT_DIALOG.equals(node.getPrimaryNodeType().getName())) {
             type = DialogType.CLASSIC;
-        } else if ((NN_CQ_DIALOG.equals(node.getName()) || NN_CQ_DIALOG_BACKUP.equals(node.getName())) && node.hasNode("content")) {
+        } else if (Arrays.asList(DIALOG_NAMES).contains(name) && node.hasNode("content")) {
             Node contentNode = node.getNode("content");
             type = DialogType.CORAL_2;
 
@@ -147,5 +153,22 @@ public class DialogRewriteUtils {
         }
 
         return type;
+    }
+
+    /**
+     * Checks whether a given node represents a design dialog.
+     *
+     * @param node The dialog node
+     * @return 'true' if the node represents a design dialog
+     * @throws RepositoryException
+     */
+    public static boolean isDesignDialog(Node node) throws RepositoryException {
+        if (node == null) {
+            return false;
+        }
+
+        String name = node.getName();
+
+        return name.equals(NameConstants.NN_DESIGN_DIALOG) || name.equals(NN_CQ_DESIGN_DIALOG) || name.equals(NN_CQ_DESIGN_DIALOG + CORAL_2_BACKUP_SUFFIX);
     }
 }

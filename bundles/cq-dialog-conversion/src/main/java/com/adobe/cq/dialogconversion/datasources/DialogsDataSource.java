@@ -42,6 +42,7 @@ import com.adobe.granite.ui.components.ds.ValueMapResource;
 import com.adobe.cq.dialogconversion.DialogRewriteUtils;
 import com.adobe.cq.dialogconversion.DialogType;
 import com.day.cq.commons.Externalizer;
+import com.day.cq.wcm.api.NameConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.felix.scr.annotations.Reference;
 import org.apache.felix.scr.annotations.sling.SlingServlet;
@@ -56,6 +57,12 @@ import org.apache.sling.api.wrappers.ValueMapDecorator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static com.adobe.cq.dialogconversion.DialogRewriteUtils.CORAL_2_BACKUP_SUFFIX;
+import static com.adobe.cq.dialogconversion.DialogRewriteUtils.NT_DIALOG;
+import static com.adobe.cq.dialogconversion.DialogRewriteUtils.NN_CQ_DIALOG;
+import static com.adobe.cq.dialogconversion.DialogRewriteUtils.NN_CQ_DESIGN_DIALOG;
+import static com.adobe.cq.dialogconversion.DialogRewriteUtils.DIALOG_CONTENT_RESOURCETYPE_PREFIX_CORAL3;
+
 /**
  * Returns a list of dialogs found on the given path
  */
@@ -66,12 +73,6 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
 
     private final static Logger log = LoggerFactory.getLogger(DialogsDataSource.class);
 
-    private static final String CORAL_2_BACKUP_SUFFIX = ".coral2";
-    private static final String NT_DIALOG = "cq:Dialog";
-    private static final String NN_CQ_DIALOG = "cq:dialog";
-    private static final String NN_CQ_DIALOG_BACKUP = "cq:dialog" + CORAL_2_BACKUP_SUFFIX;
-    private static final String NN_DIALOG = "dialog";
-    private static final String DIALOG_CONTENT_RESOURCETYPE_PREFIX_CORAL3 = "granite/ui/components/coral/foundation";
     private static final String CRX_LITE_PATH = "/crx/de/index";
 
     @Reference
@@ -130,15 +131,17 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
                 if (encodedPath.length() > 1 && encodedPath.endsWith("/")) {
                     encodedPath = encodedPath.substring(0, encodedPath.length() - 1);
                 }
-                String classicUIStatement = "SELECT * FROM [" + NT_DIALOG + "] AS s WHERE ISDESCENDANTNODE(s, '" + encodedPath + "') AND NAME() = '" + NN_DIALOG + "'";
+                String classicStatement = "SELECT * FROM [" + NT_DIALOG + "] AS s WHERE ISDESCENDANTNODE(s, '" + encodedPath + "') " +
+                        "AND NAME() IN ('" + NameConstants.NN_DIALOG + "', '" + NameConstants.NN_DESIGN_DIALOG + "')";
                 String coral2Statement = "SELECT parent.* FROM [nt:unstructured] AS parent INNER JOIN [nt:unstructured] " +
                         "AS child on ISCHILDNODE(child, parent) WHERE ISDESCENDANTNODE(parent, '" + encodedPath + "') " +
-                        "AND (NAME(parent) = '" + NN_CQ_DIALOG + "' OR NAME(parent) = '" + NN_CQ_DIALOG_BACKUP + "') " +
+                        "AND NAME(parent) IN ('" + NN_CQ_DIALOG + "', '" + NN_CQ_DIALOG + CORAL_2_BACKUP_SUFFIX + "', '" +
+                        NN_CQ_DESIGN_DIALOG + "', '" + NN_CQ_DESIGN_DIALOG + CORAL_2_BACKUP_SUFFIX + "') " +
                         "AND NAME(child) = 'content' AND child.[sling:resourceType] NOT LIKE '" + DIALOG_CONTENT_RESOURCETYPE_PREFIX_CORAL3 + "%'";
 
                 QueryManager queryManager = session.getWorkspace().getQueryManager();
                 List<Query> queries = new ArrayList<Query>();
-                queries.add(queryManager.createQuery(classicUIStatement, Query.JCR_SQL2));
+                queries.add(queryManager.createQuery(classicStatement, Query.JCR_SQL2));
                 queries.add(queryManager.createQuery(coral2Statement, Query.JCR_SQL2));
 
                 for (Query query : queries) {
@@ -147,7 +150,13 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
                         Node node = iterator.nextNode();
                         Node parent = node.getParent();
                         if (parent != null) {
-                            nodeMap.put(parent.getPath(), node);
+                            String name = node.getName();
+                            if (DialogRewriteUtils.isDesignDialog(node)) {
+                                // put design dialogs at a relative key
+                                nodeMap.put(parent.getPath() + "/" + NameConstants.NN_DESIGN_DIALOG, node);
+                            } else {
+                                nodeMap.put(parent.getPath(), node);
+                            }
                         }
                     }
                 }
@@ -181,8 +190,14 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
                 String type = dialogType.getString();
                 String href = externalizer.relativeLink(request, dialogPath) + ".html";
                 String crxHref = externalizer.relativeLink(request, CRX_LITE_PATH) + ".jsp#" + dialogPath;
-                boolean converted = parent.hasNode(NN_CQ_DIALOG) && (dialogType == DialogType.CLASSIC) ||
-                    (dialogType == DialogType.CORAL_2 && dialog.getName().endsWith(CORAL_2_BACKUP_SUFFIX));
+                boolean isDesignDialog = DialogRewriteUtils.isDesignDialog(dialog);
+
+                boolean converted = false;
+                if (dialogType == DialogType.CLASSIC) {
+                    converted = isDesignDialog ? parent.hasNode(NN_CQ_DESIGN_DIALOG) : parent.hasNode(NN_CQ_DIALOG);
+                } else if (dialogType == DialogType.CORAL_2) {
+                    converted = dialog.getName().endsWith(CORAL_2_BACKUP_SUFFIX);
+                }
 
                 Map<String, Object> map = new HashMap<String, Object>();
                 map.put("dialogPath", dialogPath);
@@ -192,10 +207,9 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
                 map.put("crxHref", crxHref);
 
                 if (converted) {
-                    Node touchDialogNode = parent.getNode(NN_CQ_DIALOG);
-                    String touchHref = externalizer.relativeLink(request, touchDialogNode.getPath()) + ".html";
-                    String touchCrxHref = externalizer.relativeLink(request, CRX_LITE_PATH) + ".jsp#" + touchDialogNode.getPath().replaceAll(":", "%3A");
-
+                    Node convertedNode = (isDesignDialog) ? parent.getNode(NN_CQ_DESIGN_DIALOG) : parent.getNode(NN_CQ_DIALOG);
+                    String touchHref = externalizer.relativeLink(request, convertedNode.getPath()) + ".html";
+                    String touchCrxHref = externalizer.relativeLink(request, CRX_LITE_PATH) + ".jsp#" + convertedNode.getPath().replaceAll(":", "%3A");
                     map.put("touchHref", touchHref);
                     map.put("touchCrxHref", touchCrxHref);
                 }

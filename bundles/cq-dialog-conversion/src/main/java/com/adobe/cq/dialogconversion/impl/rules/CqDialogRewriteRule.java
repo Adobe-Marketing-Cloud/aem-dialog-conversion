@@ -21,6 +21,7 @@ package com.adobe.cq.dialogconversion.impl.rules;
 import com.adobe.cq.dialogconversion.AbstractDialogRewriteRule;
 import com.adobe.cq.dialogconversion.DialogRewriteException;
 import com.day.cq.commons.jcr.JcrUtil;
+import com.day.cq.wcm.api.NameConstants;
 import org.apache.felix.scr.annotations.Component;
 import org.apache.felix.scr.annotations.Properties;
 import org.apache.felix.scr.annotations.Property;
@@ -30,6 +31,10 @@ import javax.jcr.Node;
 import javax.jcr.NodeIterator;
 import javax.jcr.RepositoryException;
 import java.util.Set;
+
+import static com.adobe.cq.dialogconversion.DialogRewriteUtils.NT_DIALOG;
+import static com.adobe.cq.dialogconversion.DialogRewriteUtils.NN_CQ_DIALOG;
+import static com.adobe.cq.dialogconversion.DialogRewriteUtils.NN_CQ_DESIGN_DIALOG;
 
 import static com.adobe.cq.dialogconversion.DialogRewriteUtils.hasPrimaryType;
 import static com.adobe.cq.dialogconversion.DialogRewriteUtils.hasXtype;
@@ -46,19 +51,26 @@ import static com.adobe.cq.dialogconversion.DialogRewriteUtils.hasXtype;
 })
 public class CqDialogRewriteRule extends AbstractDialogRewriteRule {
 
-    private static final String PRIMARY_TYPE = "cq:Dialog";
-
     public boolean matches(Node root)
             throws RepositoryException {
-        return hasPrimaryType(root, PRIMARY_TYPE);
+        return hasPrimaryType(root, NT_DIALOG);
     }
 
     public Node applyTo(Node root, Set<Node> finalNodes)
             throws DialogRewriteException, RepositoryException {
         // Granite UI dialog already exists at this location
         Node parent = root.getParent();
-        if (parent.hasNode("cq:dialog")) {
-            throw new DialogRewriteException("Could not rewrite dialog: cq:dialog node already exists");
+
+        boolean isDesignDialog = root.getName().contains(NameConstants.NN_DESIGN_DIALOG);
+
+        if (isDesignDialog) {
+            if (parent.hasNode(NN_CQ_DESIGN_DIALOG)) {
+                throw new DialogRewriteException("Could not rewrite dialog: " + NN_CQ_DESIGN_DIALOG + " node already exists");
+            }
+        } else {
+            if (parent.hasNode(NN_CQ_DIALOG)) {
+                throw new DialogRewriteException("Could not rewrite dialog: " + NN_CQ_DIALOG + " node already exists");
+            }
         }
 
         boolean isTabbed = isTabbed(root);
@@ -68,8 +80,8 @@ public class CqDialogRewriteRule extends AbstractDialogRewriteRule {
             throw new DialogRewriteException("Unable to find the dialog items");
         }
 
-        // add cq:dialog node
-        Node cqDialog = parent.addNode("cq:dialog", "nt:unstructured");
+        // add cq:dialog or cq:design_dialog node
+        Node cqDialog = (isDesignDialog) ? parent.addNode(NN_CQ_DESIGN_DIALOG, "nt:unstructured") : parent.addNode(NN_CQ_DIALOG, "nt:unstructured");
         finalNodes.add(cqDialog);
         cqDialog.setProperty("sling:resourceType", "cq/gui/components/authoring/dialog");
         if (root.hasProperty("helpPath")) {

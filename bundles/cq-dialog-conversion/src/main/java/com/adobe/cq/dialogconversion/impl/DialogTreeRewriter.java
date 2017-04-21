@@ -36,15 +36,15 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
+import static com.adobe.cq.dialogconversion.DialogRewriteUtils.CORAL_2_BACKUP_SUFFIX;
+import static com.adobe.cq.dialogconversion.DialogRewriteUtils.NN_CQ_DIALOG;
+import static com.adobe.cq.dialogconversion.DialogRewriteUtils.NN_CQ_DESIGN_DIALOG;
+
 public class DialogTreeRewriter {
 
     private Logger logger = LoggerFactory.getLogger(DialogTreeRewriter.class);
 
     private List<DialogRewriteRule> rules;
-
-    private static final String NN_CQ_DIALOG = "cq:dialog";
-    private static final String NN_DIALOG = "dialog";
-    private static final String BACKUP_SUFFIX = ".coral2";
 
     public DialogTreeRewriter(List<DialogRewriteRule> rules) {
         this.rules = rules;
@@ -57,15 +57,27 @@ public class DialogTreeRewriter {
 
         // verify that the node is a dialog and is convertible
         if (type == DialogType.UNKNOWN || type == DialogType.CORAL_3) {
-            logger.debug("{} is not a Classic or Coral 2 dialog", root.getPath());
-            throw new DialogRewriteException("Node is not a cq:Dialog or Coral 2 dialog");
+            logger.debug("{} is not a Classic (cq:Dialog) or Coral 2 dialog", root.getPath());
+            throw new DialogRewriteException("Node is not a Classic (cq:Dialog) or Coral 2 dialog");
         }
 
         if (type == DialogType.CLASSIC) {
-            // verify that a Coral 3 version of the dialog doesn't already exist
-            if (root.getParent().hasNode(NN_CQ_DIALOG)) {
-                Node node = root.getParent().getNode(NN_CQ_DIALOG);
-                type = DialogRewriteUtils.getDialogType(node);
+            boolean isDesignDialog = DialogRewriteUtils.isDesignDialog(root);
+            Node conversion = null;
+
+            if (isDesignDialog) {
+                if (root.getParent().hasNode(NN_CQ_DESIGN_DIALOG)) {
+                    conversion = root.getParent().getNode(NN_CQ_DESIGN_DIALOG);
+                }
+            } else {
+                if (root.getParent().hasNode(NN_CQ_DIALOG)) {
+                    conversion = root.getParent().getNode(NN_CQ_DIALOG);
+                }
+            }
+
+            if (conversion != null) {
+                // verify that a Coral 3 version of the dialog doesn't already exist
+                type = DialogRewriteUtils.getDialogType(conversion);
                 if (type == DialogType.CORAL_3) {
                     logger.debug("Dialog {} already has a Coral 3 counterpart", root.getPath());
                     throw new DialogRewriteException("Coral 3 dialog already exists");
@@ -91,7 +103,7 @@ public class DialogTreeRewriter {
         String name = "";
 
         if (type == DialogType.CORAL_2) {
-            name = NN_CQ_DIALOG + BACKUP_SUFFIX;
+            name = root.getName() + CORAL_2_BACKUP_SUFFIX;
             Node parent = root.getParent();
             if (parent != null) {
                 if (parent.hasNode(name)) {
@@ -100,7 +112,7 @@ public class DialogTreeRewriter {
                 }
             }
         } else {
-            name = JcrUtil.createValidChildName(root.getParent(), NN_DIALOG);
+            name = JcrUtil.createValidChildName(root.getParent(), root.getName());
         }
 
         // make a copy of the dialog. If the dialog is Classic, the copy will be rewritten.
