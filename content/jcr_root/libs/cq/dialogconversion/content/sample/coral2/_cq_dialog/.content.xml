@@ -335,7 +335,7 @@
                                         jcr:primaryType="nt:unstructured"
                                         sling:resourceType="granite/ui/components/foundation/button"
                                         text="Button text"
-                                        icon="checkCircle"
+                                        icon="coral-Icon--checkCircle"
                                         data-button-data-legacy="button-data-legacy"
                                         id="button-id"
                                         rel="button-rel"
@@ -386,7 +386,7 @@
                                         sling:resourceType="granite/ui/components/foundation/hyperlink"
                                         href="https://www.adobe.com/go/aem6_2_docs_component_en"
                                         text="Hyperlink text"
-                                        icon="link"
+                                        icon="coral-Icon--link"
                                         iconSize="L"/>
                                     <text
                                         jcr:primaryType="nt:unstructured"

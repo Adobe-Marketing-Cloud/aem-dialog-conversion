@@ -19,6 +19,10 @@
             hideText="${./hideText}"
             x-cq-linkchecker="${./x-cq-linkchecker}"
             icon="${./icon}"
-            iconSize="${./iconSize}"/>
+            iconSize="${./iconSize}">
+            <cq:rewriteProperties
+                jcr:primaryType="nt:unstructured"
+                icon="[(?:coral-Icon--)(.+), $1]"/>
+        </hyperlink>
     </replacement>
 </jcr:root>

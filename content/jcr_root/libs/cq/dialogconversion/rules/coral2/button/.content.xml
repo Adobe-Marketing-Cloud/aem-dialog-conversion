@@ -21,6 +21,10 @@
             active="${./active}"
             icon="${./icon}"
             iconSize="${./iconSize}"
-            variant="${./variant}"/>
+            variant="${./variant}">
+            <cq:rewriteProperties
+                jcr:primaryType="nt:unstructured"
+                icon="[(?:coral-Icon--)(.+), $1]"/>
+        </button>
     </replacement>
 </jcr:root>

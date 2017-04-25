@@ -23,6 +23,10 @@
             mimeTypes="${./mimeTypes}"
             icon="${./icon}"
             fileNameParameter="${./fileNameParameter}"
-            fileReferenceParameter="${./fileReferenceParameter}"/>
+            fileReferenceParameter="${./fileReferenceParameter}">
+            <cq:rewriteProperties
+                jcr:primaryType="nt:unstructured"
+                icon="[(?:coral-Icon--)(.+), $1]"/>
+        </fileupload>
     </replacement>
 </jcr:root>

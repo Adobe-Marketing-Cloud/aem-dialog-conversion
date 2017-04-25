@@ -24,6 +24,9 @@
             validation="${./validation}"
             multiple="${./multiple}"
             icon="${./icon}">
+            <cq:rewriteProperties
+                jcr:primaryType="nt:unstructured"
+                icon="[(?:coral-Icon--)(.+), $1]"/>
             <datasource
                 jcr:primaryType="nt:unstructured"
                 sling:resourceType="${\'./datasource/sling:resourceType\'}"/>

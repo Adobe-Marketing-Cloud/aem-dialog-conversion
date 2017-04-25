@@ -126,6 +126,27 @@ import java.util.regex.Pattern;
  *         granite:rendercondition child of the copy root.
  *     </li>
  * </ul>
+ *
+ * In addition, a special <code><cq:rewriteProperties></code> node can be added to a replacement node to define
+ * string rewrites for mapped properties in the result. The node is removed from the replacement.
+ * The properties of the <code><cq:rewriteProperties></code> node must
+ * be named the same as those which they are rewriting and accept a string array with two parameters:
+ *
+ * - pattern: regex to match against. e.g. "(?:coral-Icon--)(.+)"
+ * - replacement: provided to the matcher <code>replaceAll</code> function. e.g. "$1"
+ *
+ * Example:
+ *
+ * <pre>
+ * rule
+ *   ...
+ *   + replacement
+ *     + bar
+ *       - icon = ${./icon}
+ *       + cq:rewriteProperties
+ *          - icon = [(?:coral-Icon--)(.+), $1]
+ * </pre>
+ *
  */
 public class NodeBasedRewriteRule implements DialogRewriteRule {
 
@@ -139,6 +160,9 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
     private static final String PROPERTY_IS_FINAL = "cq:rewriteFinal";
     private static final String PROPERTY_COMMON_ATTRS = "cq:rewriteCommonAttrs";
     private static final String PROPERTY_RENDER_CONDITION = "cq:rewriteRenderCondition";
+
+    // special nodes
+    private static final String NN_CQ_REWRITE_PROPERTIES = "cq:rewriteProperties";
 
     // node names
     private static final String NN_RENDER_CONDITION = "rendercondition";
@@ -319,12 +343,19 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
             Node node = nodeIterator.next();
             // iterate over all properties
             PropertyIterator propertyIterator = node.getProperties();
+            Node rewritePropertiesNode = null;
+
+            if (node.hasNode(NN_CQ_REWRITE_PROPERTIES)) {
+                rewritePropertiesNode = node.getNode(NN_CQ_REWRITE_PROPERTIES);
+            }
+
             while (propertyIterator.hasNext()) {
                 Property property = propertyIterator.nextProperty();
                 // skip protected properties
                 if (property.getDefinition().isProtected()) {
                     continue;
                 }
+
                 // add mapping to collection
                 if (PROPERTY_MAP_CHILDREN.equals(property.getName())) {
                     mappings.put(property.getString(), node.getPath());
@@ -341,7 +372,18 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
                     continue;
                 }
                 // set value from original tree in case this is a mapped property
-                mapProperty(root, property);
+                Property mappedProperty = mapProperty(root, property);
+
+                if (mappedProperty != null && rewritePropertiesNode != null) {
+                    if (rewritePropertiesNode.hasProperty("./" + mappedProperty.getName())) {
+                        rewriteProperty(property, rewritePropertiesNode.getProperty("./" + mappedProperty.getName()));
+                    }
+                }
+            }
+
+            // remove <cq:rewriteProperties> node post-mapping
+            if (rewritePropertiesNode != null) {
+                rewritePropertiesNode.remove();
             }
         }
 
@@ -381,12 +423,13 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
      *
      * @param root the root node of the original tree
      * @param property the (potentially) mapped property in the replacement copy tree
+     * @return the mapped property if there was a successful mapping, null otherwise
      */
-    private void mapProperty(Node root, Property property)
+    private Property mapProperty(Node root, Property property)
             throws RepositoryException {
         if (property.getType() != PropertyType.STRING) {
             // a mapped property must be of type string
-            return;
+            return null;
         }
 
         // array containing the expressions: ${<path>}
@@ -415,11 +458,13 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
                     Node parent = property.getParent();
                     property.remove();
                     Property newProperty = JcrUtil.copy(originalProperty, parent, name);
+
                     // negate boolean properties if negation character has been set
                     String negate = matcher.group(1);
                     if ("!".equals(negate) && originalProperty.getType() == PropertyType.BOOLEAN) {
                         newProperty.setValue(!newProperty.getBoolean());
                     }
+
                     // the mapping was successful
                     deleteProperty = false;
                     break;
@@ -436,6 +481,32 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
         if (deleteProperty) {
             // mapped destination does not exist, we don't include the property in replacement tree
             property.remove();
+            return null;
+        }
+
+        return property;
+    }
+
+    /**
+     * Applies a string rewrite to a property.
+     *
+     * @param property the property to rewrite
+     * @param rewriteProperty the property that defines the string rewrite
+     */
+    private void rewriteProperty(Property property, Property rewriteProperty) throws RepositoryException {
+        if (property.getType() == PropertyType.STRING) {
+            if (rewriteProperty.isMultiple() && rewriteProperty.getValues().length == 2) {
+                Value[] rewrite = rewriteProperty.getValues();
+
+                if (rewrite[0].getType() == PropertyType.STRING && rewrite[1].getType() == PropertyType.STRING) {
+                    String pattern = rewrite[0].toString();
+                    String replacement = rewrite[1].toString();
+
+                    Pattern compiledPattern = Pattern.compile(pattern);
+                    Matcher matcher = compiledPattern.matcher(property.getValue().toString());
+                    property.setValue(matcher.replaceAll(replacement));
+                }
+            }
         }
     }
 
