@@ -86,6 +86,14 @@
                                 type="datetime"
                                 displayedFormat="YYYY-MM-DD"
                                 displayTimezoneMessage="{Boolean}true"/>
+                            <decoratedtextfield
+                                jcr:primaryType="nt:unstructured"
+                                sling:resourceType="granite/ui/components/foundation/form/decoratedtextfield"
+                                fieldLabel="Decorated Textfield label"
+                                fieldDescription="Decorated Textfield description"
+                                name="./decoratedtextfield-name"
+                                value="Decorated Textfield value"
+                                emptyText="Decorated Textfield empty text"/>
                             <fieldset
                                 jcr:primaryType="nt:unstructured"
                                 jcr:title="Fieldset legend"
