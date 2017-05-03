@@ -132,7 +132,7 @@ import java.util.regex.Pattern;
  * The properties of the <code><cq:rewriteProperties></code> node must
  * be named the same as those which they are rewriting and accept a string array with two parameters:
  *
- * - pattern: regex to match against. e.g. "(?:coral-Icon--)(.+)"
+ * - pattern: regexp to match against. e.g. "(?:coral-Icon--)(.+)"
  * - replacement: provided to the matcher <code>replaceAll</code> function. e.g. "$1"
  *
  * Example:
@@ -144,7 +144,7 @@ import java.util.regex.Pattern;
  *     + bar
  *       - icon = ${./icon}
  *       + cq:rewriteProperties
- *          - icon = [(?:coral-Icon--)(.+), $1]
+ *         - icon = [(?:coral-Icon--)(.+), $1]
  * </pre>
  *
  */
@@ -471,7 +471,17 @@ public class NodeBasedRewriteRule implements DialogRewriteRule {
                 } else {
                     String defaultValue = matcher.group(4);
                     if (defaultValue != null) {
-                        property.setValue(defaultValue);
+                        if (property.isMultiple()) {
+                            // the property is multiple in the replacement,
+                            // recreate it so we can set the property to the default
+                            String name = property.getName();
+                            Node parent = property.getParent();
+                            property.remove();
+                            parent.setProperty(name, defaultValue);
+                        } else {
+                            property.setValue(defaultValue);
+                        }
+
                         deleteProperty = false;
                         break;
                     }

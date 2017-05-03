@@ -150,13 +150,16 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
                         Node node = iterator.nextNode();
                         Node parent = node.getParent();
                         if (parent != null) {
-                            String name = node.getName();
-                            if (DialogRewriteUtils.isDesignDialog(node)) {
-                                // put design dialogs at a relative key
-                                nodeMap.put(parent.getPath() + "/" + NameConstants.NN_DESIGN_DIALOG, node);
-                            } else {
-                                nodeMap.put(parent.getPath(), node);
+                            // put design dialogs at a relative key
+                            String key = (DialogRewriteUtils.isDesignDialog(node)) ?
+                                    parent.getPath() + "/" + NameConstants.NN_DESIGN_DIALOG : parent.getPath();
+
+                            // backup Coral 2 dialogs shouldn't override none backup ones
+                            if (node.getName().endsWith(CORAL_2_BACKUP_SUFFIX) && nodeMap.get(key) != null) {
+                                continue;
                             }
+
+                            nodeMap.put(key, node);
                         }
                     }
                 }
@@ -181,16 +184,18 @@ public final class DialogsDataSource extends SlingSafeMethodsServlet {
 
                 DialogType dialogType = DialogRewriteUtils.getDialogType(dialog);
 
-                // ignore backup Coral 2 dialogs for which there's no replacement
-                if (dialogType == DialogType.CORAL_2 && dialog.getName().endsWith(CORAL_2_BACKUP_SUFFIX) && !parent.hasNode(NN_CQ_DIALOG)) {
-                    continue;
-                }
-
                 String dialogPath = dialog.getPath();
                 String type = dialogType.getString();
                 String href = externalizer.relativeLink(request, dialogPath) + ".html";
                 String crxHref = externalizer.relativeLink(request, CRX_LITE_PATH) + ".jsp#" + dialogPath;
                 boolean isDesignDialog = DialogRewriteUtils.isDesignDialog(dialog);
+
+                // only allow Coral 2 backup dialogs in the result if there's a replacement
+                if (dialogType == DialogType.CORAL_2 && dialog.getName().endsWith(CORAL_2_BACKUP_SUFFIX)) {
+                    if ((!isDesignDialog && !parent.hasNode(NN_CQ_DIALOG)) || (isDesignDialog && !parent.hasNode(NN_CQ_DESIGN_DIALOG))) {
+                        continue;
+                    }
+                }
 
                 boolean converted = false;
                 if (dialogType == DialogType.CLASSIC) {

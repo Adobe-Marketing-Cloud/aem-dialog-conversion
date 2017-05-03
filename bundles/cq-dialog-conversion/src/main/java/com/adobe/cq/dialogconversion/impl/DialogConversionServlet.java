@@ -164,10 +164,14 @@ public class DialogConversionServlet extends SlingAllMethodsServlet {
                 while (iterator.hasNext()) {
                     Node nextNode = iterator.nextNode();
                     if (isFolder(nextNode)) {
+                        // add first level folder rules
                         NodeIterator nodeIterator = nextNode.getNodes();
                         while (nodeIterator.hasNext()) {
-                            // add first level folder rules
-                            rules.add(new NodeBasedRewriteRule(nodeIterator.nextNode()));
+                            Node nestedNode = nodeIterator.nextNode();
+                            // don't include nested folders
+                            if (!isFolder(nestedNode)) {
+                                rules.add(new NodeBasedRewriteRule(nestedNode));
+                            }
                         }
                     } else {
                         // add rules directly at the rules search path
