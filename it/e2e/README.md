@@ -4,7 +4,7 @@ The aim of this module is to test the Dialog Conversion Tool UI.
 
 ### Dependencies on com.adobe.qe.ui-testing-commons and com.adobe.cq.wcm.it.e2e
 
-The dependencies are embedded as a subpackages
+The dependencies are embedded as subpackages
 
 ### Install on running AEM instance (http://localhost:4502)
 

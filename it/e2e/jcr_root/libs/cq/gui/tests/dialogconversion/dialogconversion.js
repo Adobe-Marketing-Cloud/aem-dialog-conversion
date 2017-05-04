@@ -1,7 +1,7 @@
 (function(window, hobs) {
   'use strict';
 
-  var CONSOLE_PATH = "/libs/cq/dialogconversion/content/console.html";
+  var CONSOLE_RELATIVE_URL = "/libs/cq/dialogconversion/content/console.html";
   var SAMPLE_PATH = "/libs/cq/dialogconversion/content/sample";
   var SAMPLE_DIALOG_COUNT = 3;
 
@@ -41,7 +41,7 @@
   };
 
   var beforeTest = new hobs.TestCase("Before Dialog Conversion Test")
-    .navigateTo(CONSOLE_PATH);
+    .navigateTo(CONSOLE_RELATIVE_URL);
 
   var suite = new hobs.TestSuite("Dialog Conversion", {
     execInNewWindow: true,
@@ -85,7 +85,7 @@
     // 1
     .assert.visible(selectors.dialogSearch.searchPathField)
     .fillInput(selectors.dialogSearch.searchPathField, SAMPLE_PATH)
-    .assert.exists(selectors.dialogSearch.showDialogsButton, true)
+    .assert.exist(selectors.dialogSearch.showDialogsButton, true)
     .click(selectors.dialogSearch.showDialogsButton, { expectNav: true })
 
     // 2
@@ -94,7 +94,7 @@
     })
 
     // 3
-    .assert.exists(selectors.dialogSearch.infoText + ":contains(%i18n_found% " + SAMPLE_DIALOG_COUNT + " %i18n_dialogs%)", true)
+    .assert.exist(selectors.dialogSearch.infoText + ":contains(%i18n_found% " + SAMPLE_DIALOG_COUNT + " %i18n_dialogs%)", true)
   );
 
   /**
@@ -108,13 +108,13 @@
    */
   suite.addTestCase(new hobs.TestCase("Dialog selection", { before: beforeTest })
     // 1
-    .navigateTo(CONSOLE_PATH + "?path=" + SAMPLE_PATH)
+    .navigateTo(CONSOLE_RELATIVE_URL + "?path=" + SAMPLE_PATH)
     .assert.isTrue(function() {
       return assertDialogCount(SAMPLE_DIALOG_COUNT);
     })
 
     // 2
-    .assert.exists(selectors.dialogSearch.dialogsTable.selectAll, true)
+    .assert.exist(selectors.dialogSearch.dialogsTable.selectAll, true)
     .click(selectors.dialogSearch.dialogsTable.selectAll)
 
     // 3
@@ -123,7 +123,7 @@
     })
 
     // 4
-    .assert.exists(selectors.dialogSearch.dialogsTable.row + "[selected]:eq(0) input[type=checkbox]", true)
+    .assert.exist(selectors.dialogSearch.dialogsTable.row + "[selected]:eq(0) input[type=checkbox]", true)
     .click(selectors.dialogSearch.dialogsTable.row + "[selected]:eq(0) input[type=checkbox]")
 
     // 5
@@ -144,17 +144,18 @@
    */
   suite.addTestCase(new hobs.TestCase("Convert dialogs and show converted dialogs", { before: beforeTest })
     // 1
-    .navigateTo(CONSOLE_PATH + "?path=" + SAMPLE_PATH)
+    .navigateTo(CONSOLE_RELATIVE_URL + "?path=" + SAMPLE_PATH)
     .assert.isTrue(function() {
       return assertDialogCount(SAMPLE_DIALOG_COUNT);
     })
 
     // 2
-    .assert.exists(selectors.dialogSearch.dialogsTable.selectAll, true)
+    .assert.exist(selectors.dialogSearch.dialogsTable.selectAll, true)
     .click(selectors.dialogSearch.dialogsTable.selectAll)
 
     // 3
-    .assert.exists(selectors.dialogSearch.convertDialogsButton, true)
+    .assert.exist(selectors.dialogSearch.convertDialogsButton, true)
+    // delayBefore to ensure Coral.Table is updated following selection
     .click(selectors.dialogSearch.convertDialogsButton, { delayBefore: 1000 })
 
     // 4
