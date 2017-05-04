@@ -1,5 +1,6 @@
 <sly data-sly-test.converted="${properties.converted}"/>
-<tr is="coral-table-row" class="foundation-collection-item"
+<tr is="coral-table-row"
+    class="${!converted ? 'foundation-collection-item' : ''}"
     data-foundation-collection-item-id="${properties.dialogPath @ uri}"
     data-sly-attribute.hidden="${converted ? converted : ''}"
     data-sly-attribute.data-dialogconversion-dialog-converted="${converted ? converted : ''}">

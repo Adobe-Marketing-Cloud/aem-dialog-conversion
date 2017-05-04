@@ -141,6 +141,7 @@
    * 4. Verify conversion UI
    * 5. Navigate back to search UI
    * 6. Test Show converted dialogs
+   * 7. Verify the convert button remains hidden following a select all when there are no convertible dialogs
    */
   suite.addTestCase(new hobs.TestCase("Convert dialogs and show converted dialogs", { before: beforeTest })
     // 1
@@ -176,6 +177,11 @@
     // delayBefore to ensure table content is loaded before toggling
     .click(selectors.dialogSearch.showConvertedDialogsCheckbox, { delayBefore: 1500 })
     .assert.visible(selectors.dialogSearch.dialogsTable.convertedRow, true)
+
+    // 7
+    .assert.exist(selectors.dialogSearch.dialogsTable.selectAll, true)
+    .click(selectors.dialogSearch.dialogsTable.selectAll)
+    .assert.visible(selectors.dialogSearch.convertDialogsButton, false)
   );
 
 }(window, window.hobs));
