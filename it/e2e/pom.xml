@@ -36,7 +36,7 @@
     <!-- P R O J E C T  D E S C R I P T I O N                                   -->
     <!-- ====================================================================== -->
     <groupId>com.adobe.cq</groupId>
-    <artifactId>com.adobe.cq.dialog-conversion.it.ui-js</artifactId>
+    <artifactId>com.adobe.cq.dialog-conversion.it.e2e</artifactId>
     <packaging>content-package</packaging>
     <name>Adobe AEM Dialog Conversion UI tests</name>
     <version>0.0.1-SNAPSHOT</version>
@@ -117,17 +117,6 @@
                 <configuration>
                     <includeEmptyDirs>true</includeEmptyDirs>
                 </configuration>
-            </plugin>
-
-            <!-- disable source plugin -->
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <phase>none</phase>
-                    </execution>
-                </executions>
             </plugin>
 
             <!-- ====================================================================== -->
