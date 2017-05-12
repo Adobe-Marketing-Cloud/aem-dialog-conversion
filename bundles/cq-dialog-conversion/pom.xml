@@ -42,9 +42,9 @@
     <!-- S C M  D E F I N I T I O N                                             -->
     <!-- ====================================================================== -->
     <scm>
-        <connection>scm:git:git@git.corp.adobe.com:obrist/dialog-conversion.git</connection>
-        <developerConnection>scm:git:git@git.corp.adobe.com:obrist/dialog-conversion.git</developerConnection>
-        <url>https://git.corp.adobe.com/obrist/dialog-conversion/tree/master/bundles/cq-dialog-conversion</url>
+        <connection>scm:git:git@git.corp.adobe.com:CQ/dialog-conversion.git</connection>
+        <developerConnection>scm:git:git@git.corp.adobe.com:CQ/dialog-conversion.git</developerConnection>
+        <url>https://git.corp.adobe.com/CQ/dialog-conversion/tree/master/bundles/cq-dialog-conversion</url>
         <tag>HEAD</tag>
     </scm>
 

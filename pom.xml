@@ -39,5 +39,6 @@
     <modules>
         <module>bundles/cq-dialog-conversion</module>
         <module>content</module>
+        <module>it/e2e</module>
     </modules>
 </project>
