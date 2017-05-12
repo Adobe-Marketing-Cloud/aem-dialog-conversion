@@ -35,7 +35,7 @@
     <artifactId>cq-dialog-conversion</artifactId>
     <packaging>bundle</packaging>
     <name>Adobe AEM Dialog Conversion</name>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.1.0</version>
     <description />
 
     <!-- ====================================================================== -->
@@ -45,7 +45,7 @@
         <connection>scm:git:git@git.corp.adobe.com:CQ/dialog-conversion.git</connection>
         <developerConnection>scm:git:git@git.corp.adobe.com:CQ/dialog-conversion.git</developerConnection>
         <url>https://git.corp.adobe.com/CQ/dialog-conversion/tree/master/bundles/cq-dialog-conversion</url>
-        <tag>HEAD</tag>
+        <tag>cq-dialog-conversion-1.1.0</tag>
     </scm>
 
     <!-- ====================================================================== -->
