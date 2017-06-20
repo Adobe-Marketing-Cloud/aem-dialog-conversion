@@ -1,34 +1,26 @@
-/*************************************************************************
+/*
+ *  (c) 2017 Adobe. All rights reserved.
+ *  This file is licensed to you under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License. You may obtain a copy
+ *  of the License at http://www.apache.org/licenses/LICENSE-2.0
  *
- * ADOBE CONFIDENTIAL
- * __________________
- *
- *  Copyright 2017 Adobe Systems Incorporated
- *  All Rights Reserved.
- *
- * NOTICE:  All information contained herein is, and remains
- * the property of Adobe Systems Incorporated and its suppliers,
- * if any.  The intellectual and technical concepts contained
- * herein are proprietary to Adobe Systems Incorporated and its
- * suppliers and are protected by trade secret or copyright law.
- * Dissemination of this information or reproduction of this material
- * is strictly forbidden unless prior written permission is obtained
- * from Adobe Systems Incorporated.
- **************************************************************************/
-
+ *  Unless required by applicable law or agreed to in writing, software distributed under
+ *  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+ *  OF ANY KIND, either express or implied. See the License for the specific language
+ *  governing permissions and limitations under the License.
+ */
 package com.adobe.cq.dialogconversion.datasources;
 
-import io.wcm.testing.mock.aem.junit.AemContext;
-import com.adobe.granite.ui.components.ds.DataSource;
 import com.adobe.granite.ui.components.ExpressionResolver;
+import com.adobe.granite.ui.components.ds.DataSource;
 import com.day.cq.commons.Externalizer;
-import com.day.cq.commons.impl.CommonAdapterFactory;
 
+import io.wcm.testing.mock.aem.junit.AemContext;
 import org.apache.commons.collections.IteratorUtils;
 import org.apache.jackrabbit.commons.cnd.ParseException;
-import org.apache.sling.api.adapter.AdapterFactory;
 import org.apache.sling.api.SlingHttpServletRequest;
 import org.apache.sling.api.SlingHttpServletResponse;
+import org.apache.sling.api.adapter.AdapterFactory;
 import org.apache.sling.api.request.RequestPathInfo;
 import org.apache.sling.api.resource.Resource;
 import org.apache.sling.api.resource.ResourceResolver;
@@ -37,13 +29,10 @@ import org.apache.sling.api.wrappers.ValueMapDecorator;
 import org.apache.sling.commons.testing.jcr.RepositoryUtil;
 import org.apache.sling.testing.mock.osgi.MockOsgi;
 import org.apache.sling.testing.mock.sling.ResourceResolverType;
-
-import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -52,14 +41,15 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 import javax.jcr.RepositoryException;
 import javax.jcr.Session;
-import javax.jcr.query.Query;
 import java.io.IOException;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DialogsDataSourceTest {
@@ -87,6 +77,9 @@ public class DialogsDataSourceTest {
     @Mock
     private ExpressionResolver expressionResolver;
 
+    @Mock
+    private Externalizer externalizer;
+
     @Before
     public void setUp() throws IOException, RepositoryException, ParseException {
         ResourceResolver resolver = context.resourceResolver();
@@ -97,11 +90,7 @@ public class DialogsDataSourceTest {
         context.load().json("/test-dialogs.json", DIALOGS_ROOT);
 
         // register mock services
-        context.registerService(Externalizer.class, Mockito.mock(Externalizer.class));
-
-        // register adapter factories
-        CommonAdapterFactory adapterFactory = (CommonAdapterFactory) context.registerService(AdapterFactory.class, new CommonAdapterFactory());
-        MockOsgi.injectServices(adapterFactory, context.bundleContext());
+        context.registerService(Externalizer.class, externalizer);
 
         // register data source
         dialogsDataSource = context.registerService(DialogsDataSource.class, new DialogsDataSource());
@@ -117,6 +106,9 @@ public class DialogsDataSourceTest {
         Mockito.stub(request.getResource()).toReturn(requestResource);
         Mockito.stub(request.getResourceResolver()).toReturn(resolver);
         Mockito.stub(request.getRequestPathInfo()).toReturn(requestPathInfo);
+
+        // prepare externalizer
+        Whitebox.setInternalState(dialogsDataSource, "externalizer", externalizer);
 
         // prepare expression resolver
         Mockito.stub(expressionResolver.resolve(DIALOGS_ROOT, Locale.US, String.class, request)).toReturn(DIALOGS_ROOT);

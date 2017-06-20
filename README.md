@@ -8,10 +8,10 @@ Install
 
 The tool runs on instances of AEM 6.3. To install it, do one of the following:
 
-* Download and install the latest released version of [cq-dialog-conversion-content](https://artifactory.corp.adobe.com/artifactory/maven-aem-release-local/com/adobe/cq/cq-dialog-conversion-content/1.1.0/cq-dialog-conversion-content-1.1.0.zip)
+* Download and install the latest released version of [cq-dialog-conversion-content](https://repo.adobe.com/nexus/content/groups/public/com/adobe/cq/cq-dialog-conversion-content/)
 * Clone this git repository, then build and install the content package located in `/content`
 
 Documentation
 -------------
 
-Go to the following wiki page for documentation and implementation details: https://wiki.corp.adobe.com/display/WEM/Technical+Documentation+-+Dialog+Conversion+Tool
+[AEM documentation page](https://docs.adobe.com/docs/en/aem/6-3/develop/dev-tools/dialog-conversion.html)

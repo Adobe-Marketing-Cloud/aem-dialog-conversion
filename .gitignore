@@ -17,8 +17,3 @@ jcr.log
 atlassian-ide-plugin.xml
 .vlt-sync.log
 .vlt-sync-config.properties
-generated
-
-# Ignore Quickstart launches in the source tree
-license.properties
-crx-quickstart

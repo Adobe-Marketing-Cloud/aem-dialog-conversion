@@ -1,14 +1,71 @@
+/*
+ *  (c) 2017 Adobe. All rights reserved.
+ *  This file is licensed to you under the Apache License, Version 2.0 (the "License");
+ *  you may not use this file except in compliance with the License. You may obtain a copy
+ *  of the License at http://www.apache.org/licenses/LICENSE-2.0
+ *
+ *  Unless required by applicable law or agreed to in writing, software distributed under
+ *  the License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES OR REPRESENTATIONS
+ *  OF ANY KIND, either express or implied. See the License for the specific language
+ *  governing permissions and limitations under the License.
+ */
 (function(window, hobs) {
   'use strict';
 
   var CONSOLE_RELATIVE_URL = "/libs/cq/dialogconversion/content/console.html";
   var SAMPLE_PATH = "/libs/cq/dialogconversion/content/sample";
   var SAMPLE_DIALOG_COUNT = 3;
+  var TOKEN_SERVLET = "/libs/granite/csrf/token.json";
+  var LOCALE_USER_DEFAULT = "en";
+  var LOCALE_SUITE = "fr";
 
   window.testsuites = window.testsuites || {};
   window.testsuites.cq = window.testsuites.cq || {};
 
-  var commons = window.testsuites.wcm.commons = window.testsuites.wcm.commons || {};
+  var i18n = {
+    "found": "Found",
+    "dialogs": "dialog(s)"
+  };
+
+  var setPreferences = new hobs.TestCase("Set User Preferences")
+    .execFct(function(opts, done) {
+      // set language to config locale value
+      var result = Granite.HTTP.eval(TOKEN_SERVLET);
+      var data = hobs.param("preferences")(opts);
+      data[":cq_csrf_token"] = result.token;
+      jQuery.post( hobs.config.context_path + hobs.utils.getUserInfo().home(opts)+"/preferences", data)
+        .always(function() {
+          done();
+        });
+    });
+
+  var beforeSuite = new hobs.TestCase("Before Suite")
+    .execFct(function(opts, done) {
+      var t = new hobs.TestCase("", opts)
+        .execTestCase(setPreferences, false, {
+          params: {
+            preferences: {
+              "granite.shell.showonboarding620": false, // disable onboarding
+              language: LOCALE_SUITE // set language
+            }
+          }
+        });
+      t.exec().then(function() {
+        done();
+      });
+    })
+    .execSyncFct(function(opts) {
+      hobs.utils.loadI18nParams(i18n, LOCALE_SUITE);
+    });
+
+  var afterSuite = new hobs.TestCase("After Suite")
+    .execTestCase(setPreferences, false, {
+      params: {
+        preferences: {
+          "granite.shell.showonboarding620@Delete": true, // enable onboarding
+          language: LOCALE_USER_DEFAULT } // reset language
+      }
+    });
 
   var selectors = {
     dialogSearch: {
@@ -34,25 +91,14 @@
     }
   };
 
-  var aem_steps = hobs.steps.aem.commons;
-  var i18n = {
-    "found": "Found",
-    "dialogs": "dialog(s)"
-  };
-
   var beforeTest = new hobs.TestCase("Before Dialog Conversion Test")
     .navigateTo(CONSOLE_RELATIVE_URL);
 
   var suite = new hobs.TestSuite("Dialog Conversion", {
     execInNewWindow: true,
-    execAfter: new hobs.TestCase('After suite')
-      .execTestCase(aem_steps.resetDefaultUserPreferences),
-    execBefore: new hobs.TestCase('Before suite')
-      .execTestCase(aem_steps.setDefaultUserPreferences)
-      .execSyncFct(function(opts) {
-        hobs.utils.loadI18nParams(i18n, commons.config.locale);
-      }),
-    locale: commons.config.locale,
+    execBefore: beforeSuite,
+    execAfter: afterSuite,
+    locale: LOCALE_SUITE,
     path: "/libs/cq/gui/tests/dialogconversion/dialogconversion.js",
     register: true
   });
