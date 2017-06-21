@@ -17,7 +17,7 @@
     <parent>
         <groupId>com.adobe.cq</groupId>
         <artifactId>cq-dialog-conversion-parent</artifactId>
-        <version>1.0.3-SNAPSHOT</version>
+        <version>1.0.1-SNAPSHOT</version>
         <relativePath>../../parent/pom.xml</relativePath>
     </parent>
 
@@ -25,7 +25,7 @@
     <!-- P R O J E C T  D E S C R I P T I O N                                   -->
     <!-- ====================================================================== -->
     <artifactId>cq-dialog-conversion</artifactId>
-    <version>2.0.1-SNAPSHOT</version>
+    <version>1.1.1-SNAPSHOT</version>
     <packaging>bundle</packaging>
 
     <name>Adobe AEM Dialog Conversion</name>
