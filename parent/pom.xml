@@ -18,14 +18,14 @@
     <groupId>com.adobe.cq</groupId>
     <artifactId>cq-dialog-conversion-parent</artifactId>
     <packaging>pom</packaging>
-    <version>1.0.1-SNAPSHOT</version>
+    <version>1.0.3</version>
     <name>Adobe AEM Dialog Conversion Parent</name>
 
     <scm>
         <connection>scm:git:https://github.com/Adobe-Marketing-Cloud/aem-dialog-conversion.git</connection>
         <developerConnection>scm:git:git@github.com:Adobe-Marketing-Cloud/aem-dialog-conversion.git</developerConnection>
         <url>https://github.com/Adobe-Marketing-Cloud/aem-dialog-conversion/tree/master/parent</url>
-        <tag>HEAD</tag>
+        <tag>cq-dialog-conversion-reactor-1.0.0</tag>
     </scm>
 
     <properties>
