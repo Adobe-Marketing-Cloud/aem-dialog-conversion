@@ -14,10 +14,16 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
+    <parent>
+        <groupId>com.adobe.cq</groupId>
+        <artifactId>cq-dialog-conversion-parent</artifactId>
+        <version>1.0.1-SNAPSHOT</version>
+        <relativePath>parent/pom.xml</relativePath>
+    </parent>
+
     <!-- ====================================================================== -->
     <!-- P R O J E C T  D E S C R I P T I O N                                   -->
     <!-- ====================================================================== -->
-    <groupId>com.adobe.cq</groupId>
     <artifactId>cq-dialog-conversion-reactor</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>Adobe AEM Dialog Conversion Tool Reactor</name>
