@@ -17,7 +17,7 @@
     <parent>
         <groupId>com.adobe.cq</groupId>
         <artifactId>cq-dialog-conversion-parent</artifactId>
-        <version>1.0.3</version>
+        <version>1.0.4-SNAPSHOT</version>
         <relativePath>parent/pom.xml</relativePath>
     </parent>
 
@@ -25,7 +25,7 @@
     <!-- P R O J E C T  D E S C R I P T I O N                                   -->
     <!-- ====================================================================== -->
     <artifactId>cq-dialog-conversion-reactor</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.1-SNAPSHOT</version>
     <name>Adobe AEM Dialog Conversion Tool Reactor</name>
     <packaging>pom</packaging>
 
@@ -36,7 +36,7 @@
         <connection>scm:git:git@github.com:Adobe-Marketing-Cloud/aem-dialog-conversion.git</connection>
         <developerConnection>scm:git:git@github.com:Adobe-Marketing-Cloud/aem-dialog-conversion.git</developerConnection>
         <url>https://github.com/Adobe-Marketing-Cloud/aem-dialog-conversion/tree/master</url>
-        <tag>cq-dialog-conversion-reactor-1.0.0</tag>
+        <tag>HEAD</tag>
     </scm>
 
     <!-- ====================================================================== -->
