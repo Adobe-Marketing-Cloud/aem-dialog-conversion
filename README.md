@@ -11,6 +11,14 @@ The tool runs on instances of AEM 6.3. To install it, do one of the following:
 * Download and install the latest released version of [cq-dialog-conversion-content](https://repo.adobe.com/nexus/content/groups/public/com/adobe/cq/cq-dialog-conversion-content/)
 * Clone this git repository, then build and install the content package located in `/content`
 
+How to contribute
+-----------------
+
+We value your feedback. You can contribute to improving the tool by:
+
+* Logging issues in the Github issue tracker
+* Forking the repository and sending pull requests
+
 Documentation
 -------------
 
