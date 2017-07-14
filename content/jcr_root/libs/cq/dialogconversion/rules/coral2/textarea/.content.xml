@@ -23,6 +23,8 @@
             autocomplete="${./autocomplete}"
             autofocus="${./autofocus}"
             validation="${./validation}"
-            maxlength="${./maxLength}"/>
+            maxlength="${./maxLength}"
+            rows="${./rows}"
+            cols="${./cols}"/>
     </replacement>
 </jcr:root>
